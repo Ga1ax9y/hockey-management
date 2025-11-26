@@ -1,0 +1,218 @@
+@font-face {
+    font-family: 'Inter';
+    font-style: normal;
+    font-weight: 400;
+    src: url('fonts/Inter-Regular.woff2') format('woff2');
+}
+
+@font-face {
+    font-family: 'Inter';
+    font-style: normal;
+    font-weight: 500;
+    src: url('fonts/Inter-Medium.woff2') format('woff2');
+}
+
+@font-face {
+    font-family: 'Inter';
+    font-style: normal;
+    font-weight: 600;
+    src: url('fonts/Inter-SemiBold.woff2') format('woff2');
+}
+
+@font-face {
+    font-family: 'Inter';
+    font-style: normal;
+    font-weight: 700;
+    src: url('fonts/Inter-Bold.woff2') format('woff2');
+}
+
+@font-face {
+    font-family: 'Roboto Slab';
+    font-style: normal;
+    font-weight: 600;
+    src: url('fonts/RobotoSlab-SemiBold.woff2') format('woff2');
+}
+
+@font-face {
+    font-family: 'Roboto Slab';
+    font-style: normal;
+    font-weight: 700;
+    src: url('fonts/RobotoSlab-Bold.woff2') format('woff2');
+}
+
+/*Нормализация блочной модели*/
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
+
+}
+
+/**
+Убираем внутренние отступы слева тегам списков
+у которых есть атрибут class
+*/
+:where(ul, ol):where([class]){
+    padding-left: 0;
+}
+
+/**
+Убираем внешние отступы body и 2 других
+у которых есть class
+*/
+body,
+:where(blockquote, figure):where([class]){
+    margin: 0;
+}
+
+/**
+Убираем внешние отступы вертикали у заголовков h1-h6 и других
+у которых есть class
+*/
+:where(
+    h1,
+    h2,
+    h3,
+    h4,
+    h5,
+    h6,
+    p,
+    ul,
+    ol,
+    dl
+):where([class]){
+    margin-block: 0;
+}
+
+:where(dd[class]){
+    margin-left: 0;
+}
+
+/**
+Убираем стандартный маркер у маркированного списка
+*/
+:where(ul[class]){
+    list-style: none;
+}
+
+/**
+Упрощаем работу с изображениями
+*/
+img{
+    display: block;
+    max-width: 100%; /* для предотвращения горизонтального скролла если большая картинка */
+}
+
+/**
+Наследуем свойства шрифт для тегов
+*/
+input,
+textarea,
+select,
+button {
+    font: inherit;
+}
+
+html{
+    /**
+    Пригодится в большинстве ситцаций
+    */
+    height: 100%;
+    /**
+    Плавный скролл для якорных ссылок
+    */
+    scroll-behavior: smooth;
+}
+
+body {
+    /*Для футера*/
+    min-height: 100%;
+    line-height: 1.5;
+}
+
+/**
+Удаление всех анимаций у людей
+у которых они выключены
+*/
+
+@media (prefers-reduced-motion: reduce) {
+    *{
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+        scroll-behavior: auto !important;
+    }
+}
+
+:root{
+  --color-dark: #000000;
+  --color-dark-alternate: #333333;
+  --color-dark-hover: #a9a9a9;
+
+  --color-light: #FFFFFF;
+  --color-light-alternate: #F8F8F8;
+
+  --color-gray: #EEEEEE;
+
+  --font-family-base: 'Inter', sans-serif;
+  --font-family-alternate: 'Roboto Slab', serif;
+
+  --container-width: 1200px;
+  --container-padding-x: 15px;
+
+  --transition-duration: 0.2s;
+}
+
+body{
+    font-family: var(--font-family-base);
+    font-size: 16px;
+    line-height: 1.6;
+    color: var(--color-dark);
+    background-color: var(--color-light);
+}
+
+.container{
+    max-width: calc(var(--container-width) + var(--container-padding-x) * 2);
+    margin-inline: auto;
+    padding-inline: var(--container-padding-x);
+}
+
+.container-wide{
+    max-width: 1920px;
+    margin-inline: auto;
+}
+
+h1, h2, h3, h4, h5, h6{
+    font-weight: 700;
+    color: var(--color-dark);
+    font-family: var(--font-family-alternate);
+    line-height: 1.2;
+}
+
+a,
+button,
+input,
+textarea,
+svg * {
+    transition-duration: var(--transition-duration);
+}
+
+svg * {
+    transition-property: fill, stroke;
+}
+
+svg *[fill] {fill: currentColor;}
+svg *[stroke] {stroke: currentColor;}
+
+.visually-hidden {
+    position: absolute !important;
+    width: 1px !important;
+    height: 1px !important;
+    margin: -1px !important;
+    border: 0 !important;
+    padding: 0 !important;
+    white-space: nowrap !important;
+    clip-path: inset(100%) !important;
+    clip: rect(0 0 0 0) !important;
+    overflow: hidden !important;
+}
