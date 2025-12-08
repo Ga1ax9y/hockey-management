@@ -30,8 +30,8 @@ export default function Home() {
   }, [token, navigate]);
 
   const handleLogout = () => {
-    localStorage.removeItem("token");
     navigate("/login");
+    location.reload()
   };
 
   if (!user) return <p>Загрузка...</p>;
@@ -39,10 +39,10 @@ export default function Home() {
   return (
     <div>
       <h1>Добро пожаловать, {user.full_name}!</h1>
+      {user.role_id === 2 && <p>Администратор</p>}
       <p>Email: {user.email}</p>
       <p>Роль: {user.role_id}</p>
       <p>Активен: {user.is_active ? "Да" : "Нет"}</p>
-      <p>Дата создания: {new Date(user.created_at).toLocaleDateString()}</p>
       <button onClick={handleLogout}>Выйти</button>
     </div>
   );

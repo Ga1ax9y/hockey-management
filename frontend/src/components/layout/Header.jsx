@@ -1,11 +1,20 @@
 import { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
+import { useAuthStore } from '../../hooks/useAuthStore';
 import './Header.css';
 
 export default function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-
+  const { role, logout } = useAuthStore();
+  const isAuthenticated = useAuthStore((state) => state.token !== null);
+  const navigate = useNavigate();
   const toggleMenu = () => setIsMenuOpen(!isMenuOpen);
+  const isAdmin = role === 1;
+
+  const handleLogout = () => {
+    logout();
+    navigate('/login', { replace: true });
+  };
 
   return (
     <header className="header">
@@ -26,7 +35,12 @@ export default function Header() {
       </button>
 
       <nav className="header__nav-desktop">
-        <Link to="/login">Войти</Link>
+        <Link to="/">Главная</Link>
+        {!isAuthenticated && <Link to="/login">Войти</Link>}
+        {isAdmin && <Link to="/admin/roles">Управление ролями</Link>}
+        <button onClick={handleLogout} className="header__logout-button">
+          Выйти
+        </button>
       </nav>
 
       <nav className={`header__nav-mobile ${isMenuOpen ? 'open' : ''}`}>

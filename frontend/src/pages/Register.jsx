@@ -8,7 +8,7 @@ export default function Register() {
     email: "",
     password: "",
     full_name: "",
-    role_id: 2,
+    role_id: 2, // TODO: поменять на другое
   });
   const [error, setError] = useState("");
   const navigate = useNavigate();

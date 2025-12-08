@@ -1,12 +1,14 @@
 import { useState } from "react";
 import { loginUser } from "../services/api";
 import { useNavigate, Link } from "react-router-dom";
+import { useAuthStore } from "../hooks/useAuthStore";
 import "./Login.css";
 
 export default function Login() {
   const [form, setForm] = useState({ email: "", password: "" });
   const [error, setError] = useState("");
   const navigate = useNavigate();
+  const { login } = useAuthStore();
 
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
@@ -16,7 +18,9 @@ export default function Login() {
     e.preventDefault();
     try {
       const res = await loginUser(form);
-      localStorage.setItem("token", res.data.token);
+
+      login(res.data.token);
+
       navigate("/");
     } catch (err) {
       setError(err.response?.data?.error || "Ошибка входа");
