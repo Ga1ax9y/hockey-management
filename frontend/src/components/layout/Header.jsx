@@ -10,6 +10,7 @@ export default function Header() {
   const navigate = useNavigate();
   const toggleMenu = () => setIsMenuOpen(!isMenuOpen);
   const isAdmin = role === 1;
+  const isManager = role === 7;
 
   const handleLogout = () => {
     logout();
@@ -38,6 +39,7 @@ export default function Header() {
         <Link to="/">Главная</Link>
         {!isAuthenticated && <Link to="/login">Войти</Link>}
         {isAdmin && <Link to="/admin/roles">Управление</Link>}
+        {(isManager || isAdmin) && <Link to="/manager/hierarchy">Иерархия</Link>}
         <button onClick={handleLogout} className="header__logout-button">
           Выйти
         </button>

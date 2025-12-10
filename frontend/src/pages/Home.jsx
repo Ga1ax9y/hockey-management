@@ -29,21 +29,15 @@ export default function Home() {
     fetchUser();
   }, [token, navigate]);
 
-  const handleLogout = () => {
-    navigate("/login");
-    location.reload()
-  };
 
   if (!user) return <p>Загрузка...</p>;
 
   return (
     <div>
       <h1>Добро пожаловать, {user.full_name}!</h1>
-      {user.role_id === 2 && <p>Администратор</p>}
       <p>Email: {user.email}</p>
       <p>Роль: {user.role_id}</p>
       <p>Активен: {user.is_active ? "Да" : "Нет"}</p>
-      <button onClick={handleLogout}>Выйти</button>
     </div>
   );
 }
