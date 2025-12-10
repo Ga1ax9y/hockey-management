@@ -73,7 +73,7 @@ router.put('/:id', async (req, res) => {
   try {
     const query = `
       UPDATE roles
-      SET role_name = $1, description = $2, updated_at = NOW()
+      SET role_name = $1, description = $2
       WHERE id = $3
       RETURNING id, role_name, description;
     `;

@@ -7,7 +7,10 @@ import NotFound from './pages/NotFound';
 import Register from './pages/Register';
 import Login from './pages/Login';
 import ProtectedRoute from './components/helpers/ProtectedRoute';
-
+import Roles from './components/admin/Roles';
+import Hierarchy from './components/manager/Hierarchy';
+import TeamDetails from './pages/TeamDetails';
+import TeamMembers from './pages/TeamMembers';
 const Layout = () => (
   <>
     <Header />
@@ -22,9 +25,38 @@ const router = createBrowserRouter([
     element: <Layout />,
     errorElement: <NotFound />,
     children: [
-      { path: '/', element: <ProtectedRoute><Home /></ProtectedRoute> },
+      { path: '/', element:
+      <ProtectedRoute>
+        <Home />
+      </ProtectedRoute> },
       { path: '/register', element: <Register /> },
       { path: '/login', element: <Login /> },
+      { path: '/admin/roles', element: (
+        <ProtectedRoute>
+          <Roles />
+        </ProtectedRoute>
+        ),
+      },
+      { path: '/manager/hierarchy', element: (
+        <ProtectedRoute>
+          <Hierarchy />
+        </ProtectedRoute>
+        ),
+      },
+      {
+      path: '/teams/:id', element: (
+        <ProtectedRoute>
+          <TeamDetails />
+        </ProtectedRoute>
+        ),
+      },
+      {
+      path: '/teams/:id/members', element: (
+        <ProtectedRoute>
+          <TeamMembers />
+        </ProtectedRoute>
+        ),
+      },
       { path: '*', element: <NotFound /> },
     ],
   },

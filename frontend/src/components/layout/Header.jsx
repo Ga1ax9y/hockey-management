@@ -37,7 +37,7 @@ export default function Header() {
       <nav className="header__nav-desktop">
         <Link to="/">Главная</Link>
         {!isAuthenticated && <Link to="/login">Войти</Link>}
-        {isAdmin && <Link to="/admin/roles">Управление ролями</Link>}
+        {isAdmin && <Link to="/admin/roles">Управление</Link>}
         <button onClick={handleLogout} className="header__logout-button">
           Выйти
         </button>
