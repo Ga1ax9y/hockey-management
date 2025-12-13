@@ -1,17 +1,14 @@
 import { useState } from "react";
-import { registerUser } from "../services/api";
+import { loginUser } from '../../services/api';
 import { useNavigate, Link } from "react-router-dom";
+import { useAuthStore } from "../../hooks/useAuthStore";
 import "./Login.css";
 
-export default function Register() {
-  const [form, setForm] = useState({
-    email: "",
-    password: "",
-    full_name: "",
-    role_id: 2, // TODO: поменять на другое
-  });
+export default function Login() {
+  const [form, setForm] = useState({ email: "", password: "" });
   const [error, setError] = useState("");
   const navigate = useNavigate();
+  const { login } = useAuthStore();
 
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
@@ -20,24 +17,20 @@ export default function Register() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      await registerUser(form);
-      navigate("/login");
+      const res = await loginUser(form);
+
+      login(res.data.token);
+
+      navigate("/");
     } catch (err) {
-      setError(err.response?.data?.error || "Ошибка регистрации");
+      setError(err.response?.data?.error || "Ошибка входа");
     }
   };
 
   return (
     <div className="auth-container">
-      <h1 className="auth-title">Регистрация</h1>
+      <h1 className="auth-title">Вход</h1>
       <form className="auth-form" onSubmit={handleSubmit}>
-        <input
-          className="auth-input"
-          name="full_name"
-          placeholder="ФИО"
-          value={form.full_name}
-          onChange={handleChange}
-        />
         <input
           className="auth-input"
           name="email"
@@ -54,12 +47,12 @@ export default function Register() {
           onChange={handleChange}
         />
         <button className="auth-button" type="submit">
-          Зарегистрироваться
+          Войти
         </button>
         {error && <p className="auth-error">{error}</p>}
       </form>
       <p className="auth-footer">
-        Уже есть аккаунт? <Link to="/login">Войти</Link>
+        У вас нет аккаунта? <Link to="/register">Зарегистрироваться</Link>
       </p>
     </div>
   );

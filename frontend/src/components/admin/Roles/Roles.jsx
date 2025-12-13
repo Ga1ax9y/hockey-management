@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
-import { getRoles, createRole, updateRole, deleteRole } from '../../services/api';
-import { useAuthStore } from '../../hooks/useAuthStore';
+import { getRoles, createRole, updateRole, deleteRole } from '../../../services/api';
+import { useAuthStore } from '../../../hooks/useAuthStore';
 import './Roles.css'
 export default function Roles() {
   const [roles, setRoles] = useState([]);

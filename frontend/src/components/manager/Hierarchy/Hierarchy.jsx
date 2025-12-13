@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { getTeams, createTeam } from '../../services/api';
+import { getTeams, createTeam } from '../../../services/api';
 import { useNavigate } from 'react-router-dom';
 import './Hierarchy.css';
 

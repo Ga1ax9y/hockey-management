@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { getUserById } from "../services/api";
+import { getUserById } from "../../services/api";
 
 export default function Home() {
   const [user, setUser] = useState(null);

@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { useAuthStore } from '../../hooks/useAuthStore';
+import { useAuthStore } from '../../../hooks/useAuthStore';
 import './Header.css';
 
 export default function Header() {
@@ -38,7 +38,7 @@ export default function Header() {
       <nav className="header__nav-desktop">
         <Link to="/">Главная</Link>
         {!isAuthenticated && <Link to="/login">Войти</Link>}
-        {isAdmin && <Link to="/admin/roles">Управление</Link>}
+        {isAdmin && <Link to="/admin">Управление</Link>}
         {(isManager || isAdmin) && <Link to="/manager/hierarchy">Иерархия</Link>}
         <button onClick={handleLogout} className="header__logout-button">
           Выйти

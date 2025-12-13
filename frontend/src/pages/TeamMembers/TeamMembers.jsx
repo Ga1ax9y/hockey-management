@@ -5,7 +5,7 @@ import {
   addTeamUser,
   removeTeamUser,
   getAllUsers,
-} from '../services/api';
+} from '../../services/api';
 import './TeamMembers.css';
 export default function TeamMembers() {
   const { id: teamId } = useParams();
