@@ -1,0 +1,225 @@
+.players {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 1.5rem;
+}
+
+.players h2 {
+  text-align: center;
+  margin-bottom: 1.5rem;
+}
+
+.players-add-btn {
+  display: block;
+  margin: 0 auto 1.5rem;
+  padding: 0.5rem 1.5rem;
+  background-color: #000;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 1rem;
+}
+
+.players-add-btn:hover {
+  background-color: #333;
+}
+
+.players-form {
+  background-color: #f9f9f9;
+  padding: 1.5rem;
+  border-radius: 8px;
+  margin-bottom: 2rem;
+  border: 1px solid #eee;
+}
+
+.players-form-row {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 1rem;
+  flex-wrap: wrap;
+}
+
+.players-form-group {
+  flex: 1;
+  min-width: 200px;
+}
+
+.players-form-group label {
+  display: block;
+  margin-bottom: 0.25rem;
+  font-weight: 600;
+}
+
+.players-form-group small {
+  color: var(--color-dark-alternate);
+  font-size: 0.875rem;
+}
+
+.players-form-group input {
+  width: 100%;
+  padding: 0.5rem;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: 1rem;
+}
+
+.players-form-group select {
+  width: 100%;
+  padding: 0.5rem;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: 1rem;
+  font-family: var(--font-family-base);
+  background-color: var(--color-light);
+  color: var(--color-dark);
+}
+
+.players-form-group select:focus {
+  outline: none;
+  border-color: var(--color-dark-alternate);
+  background-color: var(--color-light-alternate);
+}
+
+.players-form-actions {
+  display: flex;
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.players-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 1rem;
+  font-size: 0.95rem;
+}
+
+.players-table th,
+.players-table td {
+  padding: 0.75rem;
+  text-align: left;
+  border-bottom: 1px solid #eee;
+  vertical-align: top;
+}
+
+.players-table th {
+  background-color: #f5f5f5;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.players-table tbody tr:hover {
+  background-color: #fafafa;
+}
+
+.players-actions {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.btn-edit {
+  background-color: #1976d2;
+  color: white;
+  border: none;
+  padding: 0.375rem 0.75rem;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.875rem;
+}
+
+.btn-edit:hover {
+  background-color: #1565c0;
+}
+
+.btn-delete {
+  background-color: #d32f2f;
+  color: white;
+  border: none;
+  padding: 0.375rem 0.75rem;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.875rem;
+}
+
+.btn-delete:hover {
+  background-color: #b71c1c;
+}
+
+.btn-primary {
+  background-color: #000;
+  color: white;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 1rem;
+}
+
+.btn-primary:hover {
+  background-color: #333;
+}
+
+.btn-secondary {
+  background-color: #f0f0f0;
+  color: var(--color-dark);
+  border: 1px solid #ccc;
+  padding: 0.5rem 1rem;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 1rem;
+}
+
+.btn-secondary:hover {
+  background-color: #e0e0e0;
+}
+
+.players-empty,
+.players-loading,
+.players-error {
+  text-align: center;
+  padding: 2rem;
+}
+
+.players-error {
+  color: #d32f2f;
+}
+
+@media (max-width: 768px) {
+  .players-table,
+  .players-table thead,
+  .players-table tbody,
+  .players-table th,
+  .players-table td,
+  .players-table tr {
+    display: block;
+  }
+
+  .players-table thead tr {
+    position: absolute;
+    top: -9999px;
+    left: -9999px;
+  }
+
+  .players-table tr {
+    border-bottom: 2px solid var(--color-gray);
+    padding-bottom: 1rem;
+    margin-bottom: 1rem;
+  }
+
+  .players-table td {
+    clear: both;
+    text-align: right;
+    padding-left: 50%;
+    position: relative;
+  }
+
+  .players-table td::before {
+    content: attr(data-label);
+    position: absolute;
+    left: 0.75rem;
+    width: calc(50% - 1.5rem);
+    font-weight: 600;
+    text-align: left;
+  }
+}

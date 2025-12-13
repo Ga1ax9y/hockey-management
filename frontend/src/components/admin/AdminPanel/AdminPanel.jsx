@@ -12,7 +12,6 @@ export default function AdminPanel() {
       <h1 className="admin-panel__title">Панель управления</h1>
 
       <div className="admin-panel__grid">
-        {/* Только для администратора */}
         {isAdmin && (
           <Link to="/admin/roles" className="admin-panel__card">
             <h2>Роли пользователей</h2>
@@ -20,12 +19,17 @@ export default function AdminPanel() {
           </Link>
         )}
 
-        {/* Для администратора и менеджера */}
         {(isAdmin || isManager) && (
-          <Link to="/manager/hierarchy" className="admin-panel__card">
-            <h2>Иерархия команд</h2>
-            <p>Создание и управление хоккейными командами, привязка персонала</p>
-          </Link>
+          <>
+            <Link to="/manager/hierarchy" className="admin-panel__card">
+                <h2>Иерархия команд</h2>
+                <p>Создание и управление хоккейными командами, привязка персонала</p>
+            </Link>
+            <Link to="/manager/players" className="admin-panel__card">
+                <h2>Игроки</h2>
+                <p>Управление игроками, создание, редактирование и удаление</p>
+            </Link>
+          </>
         )}
 
         {/* Сюда позже другие разделы */}

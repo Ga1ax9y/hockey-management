@@ -40,9 +40,10 @@ export default function Header() {
         {!isAuthenticated && <Link to="/login">Войти</Link>}
         {isAdmin && <Link to="/admin">Управление</Link>}
         {(isManager || isAdmin) && <Link to="/manager/hierarchy">Иерархия</Link>}
-        <button onClick={handleLogout} className="header__logout-button">
-          Выйти
-        </button>
+        {isAuthenticated &&
+          <button onClick={handleLogout} className="header__logout-button">
+            Выйти
+          </button>}
       </nav>
 
       <nav className={`header__nav-mobile ${isMenuOpen ? 'open' : ''}`}>

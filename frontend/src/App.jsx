@@ -12,6 +12,7 @@ import Hierarchy from './components/manager/Hierarchy/Hierarchy';
 import TeamDetails from './pages/TeamDetails/TeamDetails';
 import TeamMembers from './pages/TeamMembers/TeamMembers';
 import AdminPanel from './components/admin/AdminPanel/AdminPanel';
+import Players from './components/manager/Players/Players';
 const Layout = () => (
   <>
     <Header />
@@ -30,6 +31,7 @@ const router = createBrowserRouter([
       <ProtectedRoute>
         <Home />
       </ProtectedRoute> },
+      { path: '/login', element: <Login /> },
       { path: '/register', element: <Register /> },
       {
         path: '/admin', element: (
@@ -48,6 +50,12 @@ const router = createBrowserRouter([
       { path: '/manager/hierarchy', element: (
         <ProtectedRoute>
           <Hierarchy />
+        </ProtectedRoute>
+        ),
+      },
+      { path: '/manager/players', element: (
+        <ProtectedRoute>
+          <Players />
         </ProtectedRoute>
         ),
       },
