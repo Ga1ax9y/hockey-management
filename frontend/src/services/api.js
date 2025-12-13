@@ -4,6 +4,14 @@ const API = axios.create({
   baseURL: "http://localhost:4000",
 });
 
+API.interceptors.request.use((config) => {
+  const token = localStorage.getItem("token");
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`;
+  }
+  return config;
+});
+
 export const registerUser = (data) => API.post("/auth/register", data);
 export const loginUser = (data) => API.post("/auth/login", data);
 export const getUsers = (token) => API.get("/api/users", {
@@ -13,7 +21,7 @@ export const getUserById = (id, token) =>
   API.get(`/api/users/${id}`, {
     headers: { Authorization: `Bearer ${token}` },
   });
-
+export const getCurrentUser = () => API.get("/api/users/me");
 
 export const getRoles = () => API.get("/api/roles");
 export const getRoleById = (id) => API.get(`/api/roles/${id}`);

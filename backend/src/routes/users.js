@@ -20,6 +20,30 @@ router.get('/', async (req, res) => {
   }
 });
 
+router.get('/me', async (req, res) => {
+  try {
+    const { id } = req.user;
+
+    const query = `
+      SELECT u.id, u.email, u.full_name, u.is_active, u.created_at, r.role_name
+      FROM users u
+      JOIN roles r ON u.role_id = r.id
+      WHERE u.id = $1;
+    `;
+
+    const result = await db.query(query, [id]);
+
+    if (result.rows.length === 0) {
+      return res.status(404).json({ error: "Пользователь не найден" });
+    }
+
+    res.json(result.rows[0]);
+  } catch (err) {
+    console.error("Ошибка при загрузке профиля:", err);
+    res.status(500).json({ error: "Ошибка при загрузке профиля" });
+  }
+});
+
 router.get('/:id', async (req, res) => {
   try {
     const { id } = req.params;

@@ -13,6 +13,7 @@ import TeamDetails from './pages/TeamDetails/TeamDetails';
 import TeamMembers from './pages/TeamMembers/TeamMembers';
 import AdminPanel from './components/admin/AdminPanel/AdminPanel';
 import Players from './components/manager/Players/Players';
+import Profile from './pages/Profile/Profile';
 const Layout = () => (
   <>
     <Header />
@@ -33,6 +34,12 @@ const router = createBrowserRouter([
       </ProtectedRoute> },
       { path: '/login', element: <Login /> },
       { path: '/register', element: <Register /> },
+      {path: '/profile', element: (
+          <ProtectedRoute>
+            <Profile />
+          </ProtectedRoute>
+        ),
+      },
       {
         path: '/admin', element: (
           <ProtectedRoute>

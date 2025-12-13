@@ -7,6 +7,7 @@ import trainingsRoutes from "./routes/trainings.js"
 import teamsRoutes from "./routes/teams.js"
 import rolesRoutes from "./routes/roles.js"
 import playersRoutes from "./routes/players.js"
+import authMiddleware from "./middleware/authMiddleware.js";
 
 const app = express();
 
@@ -15,7 +16,7 @@ app.use(express.json());
 
 app.use("/auth", authRoutes);
 
-app.use("/api/users", usersRoutes);
+app.use("/api/users", authMiddleware, usersRoutes);
 app.use("/api/matches", matchesRoutes);
 app.use("/api/trainings", trainingsRoutes);
 app.use("/api/teams", teamsRoutes);
