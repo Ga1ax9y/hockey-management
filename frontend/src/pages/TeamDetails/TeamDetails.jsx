@@ -130,7 +130,7 @@ export default function TeamDetails() {
             Удалить команду
           </button>
           <button onClick={() => navigate(`/teams/${id}/members`)} className="btn-primary">
-            Штаб
+            Состав
           </button>
           <button onClick={() => navigate('/manager/hierarchy')} className="btn-secondary">
             Назад к иерархии

@@ -42,7 +42,12 @@ export const removeTeamUser = (teamId, userId) =>
   API.delete(`/api/teams/${teamId}/users/${userId}`);
 export const getAllUsers = () => API.get("/api/users");
 
-export const getPlayers = () => API.get("/api/players");
+export const getPlayers = (teamId = null) => {
+  if (teamId) {
+    return API.get(`/api/players?teamId=${teamId}`);
+  }
+  return API.get("/api/players");
+};
 export const getPlayerById = (id) => API.get(`/api/players/${id}`);
 export const createPlayer = (data) => API.post("/api/players", data);
 export const updatePlayer = (id, data) => API.put(`/api/players/${id}`, data);

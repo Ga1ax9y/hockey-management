@@ -132,3 +132,68 @@
 .members-error {
   color: #d32f2f;
 }
+
+.players-section h3 {
+  color: #1976d2;
+}
+
+.staff-section h3 {
+  color: #388e3c;
+}
+
+.add-staff-section h3 {
+  color: #e65100;
+}
+
+.players-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 1.25rem;
+  margin-top: 1rem;
+}
+
+.player-card {
+  border: 1px solid var(--color-gray);
+  border-radius: 8px;
+  padding: 1.25rem;
+  background-color: var(--color-light);
+  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+}
+
+.player-name {
+  font-size: 1.125rem;
+  font-weight: 700;
+  margin-bottom: 0.75rem;
+  color: var(--color-dark);
+}
+
+.player-details > div {
+  margin-bottom: 0.5rem;
+  display: flex;
+  justify-content: space-between;
+}
+
+.player-details strong {
+  color: var(--color-dark-alternate);
+}
+
+.empty-message {
+  text-align: center;
+  color: var(--color-dark-alternate);
+  font-style: italic;
+  padding: 1rem;
+}
+
+.members-section {
+  margin-bottom: 2.5rem;
+  padding: 1.5rem;
+  border-radius: 8px;
+  background-color: #fafafa;
+}
+
+.members-section h3 {
+  margin-top: 0;
+  margin-bottom: 1.25rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 2px solid var(--color-gray);
+}

@@ -5,6 +5,8 @@ import {
   addTeamUser,
   removeTeamUser,
   getAllUsers,
+  getPlayers,
+  getRoles
 } from '../../services/api';
 import './TeamMembers.css';
 export default function TeamMembers() {
@@ -12,22 +14,32 @@ export default function TeamMembers() {
   const navigate = useNavigate();
   const [teamUsers, setTeamUsers] = useState([]);
   const [allUsers, setAllUsers] = useState([]);
+  const [players, setPlayers] = useState([]);
+  const [roles, setRoles] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [selectedUserId, setSelectedUserId] = useState('');
 
+  const getRoleName = (roleId) => {
+    const role = roles.find(r => r.id === roleId);
+    return role.description;
+  };
   const loadTeamData = async () => {
     try {
       setLoading(true);
-      const [teamUsersRes, allUsersRes] = await Promise.all([
+      const playersRes = await getPlayers(teamId);
+      const [teamUsersRes, allUsersRes, rolesRes] = await Promise.all([
         getTeamUsers(teamId),
         getAllUsers(),
+        getRoles(),
       ]);
 
+      setPlayers(playersRes.data);
       setTeamUsers(teamUsersRes.data);
       setAllUsers(allUsersRes.data.filter(user =>
         !teamUsersRes.data.some(tu => tu.id === user.id)
       ));
+      setRoles(rolesRes.data);
       setError('');
     } catch (err) {
       setError('Не удалось загрузить данные');
@@ -67,7 +79,7 @@ export default function TeamMembers() {
 
   return (
     <div className="team-members">
-      <h2>Управление составом команды</h2>
+      <h2>Состав и персонал команды</h2>
       <button
         className="members-back-btn"
         onClick={() => navigate(`/teams/${teamId}`)}
@@ -75,10 +87,10 @@ export default function TeamMembers() {
         ← Назад к команде
       </button>
 
-      <div className="members-section">
-        <h3>Текущие участники</h3>
+      <div className="members-section staff-section">
+        <h3>Персонал команды</h3>
         {teamUsers.length === 0 ? (
-          <p>Нет привязанных пользователей</p>
+          <p className="empty-message">Нет привязанного персонала</p>
         ) : (
           <ul className="members-list">
             {teamUsers.map(user => (
@@ -92,7 +104,7 @@ export default function TeamMembers() {
                   onClick={() => handleRemoveUser(user.id)}
                   className="btn-remove"
                 >
-                  Удалить
+                  Отвязать
                 </button>
               </li>
             ))}
@@ -100,10 +112,10 @@ export default function TeamMembers() {
         )}
       </div>
 
-      <div className="members-section">
-        <h3>Добавить пользователя в команду</h3>
+      <div className="members-section add-staff-section">
+        <h3>Добавить персонал</h3>
         {allUsers.length === 0 ? (
-          <p>Нет доступных пользователей для добавления</p>
+          <p className="empty-message">Нет доступных пользователей</p>
         ) : (
           <form onSubmit={(e) => { e.preventDefault(); handleAddUser(); }} className="add-member-form">
             <select
@@ -114,12 +126,36 @@ export default function TeamMembers() {
               <option value="">Выберите пользователя...</option>
               {allUsers.map(user => (
                 <option key={user.id} value={user.id}>
-                  {user.full_name} ({user.email}) — {user.role_name}
+                  {user.full_name} ({getRoleName(user.role_id)})
                 </option>
               ))}
             </select>
             <button type="submit" className="btn-add">Добавить</button>
           </form>
+        )}
+      </div>
+
+      <div className="members-section players-section">
+        <h3>Игроки команды</h3>
+        {players.length === 0 ? (
+          <p className="empty-message">Нет игроков в команде</p>
+        ) : (
+          <div className="players-grid">
+            {players.map(player => (
+              <div key={player.id} className="player-card">
+                <div className="player-name">
+                  {player.last_name} {player.first_name}
+                  {player.middle_name && ` ${player.middle_name}`}
+                </div>
+                <div className="player-details">
+                  <div>Позиция: <strong>{player.position || '—'}</strong></div>
+                  <div>Рост: <strong>{player.height || '—'} см</strong></div>
+                  <div>Вес: <strong>{player.weight || '—'} кг</strong></div>
+                  <div>Контракт до: <strong>{player.contract_expiry ? new Date(player.contract_expiry).toLocaleDateString('ru-RU') : '—'}</strong></div>
+                </div>
+              </div>
+            ))}
+          </div>
         )}
       </div>
     </div>

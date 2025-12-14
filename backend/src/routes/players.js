@@ -6,14 +6,31 @@ const router = Router();
 
 router.get('/', async (req, res) => {
   try {
-    const query = `
-      SELECT
-        id, last_name, first_name, middle_name, birth_date,
-        position, height, weight, contract_expiry, current_team_id
-      FROM players
-      ORDER BY last_name, first_name;
-    `;
-    const result = await db.query(query);
+    const { teamId } = req.query;
+    let query, params;
+
+    if (teamId) {
+      query = `
+        SELECT
+          id, last_name, first_name, middle_name, birth_date,
+          position, height, weight, contract_expiry, current_team_id
+        FROM players
+        WHERE current_team_id = $1
+        ORDER BY last_name, first_name;
+      `;
+      params = [teamId];
+    } else {
+      query = `
+        SELECT
+          id, last_name, first_name, middle_name, birth_date,
+          position, height, weight, contract_expiry, current_team_id
+        FROM players
+        ORDER BY last_name, first_name;
+      `;
+      params = [];
+    }
+
+    const result = await db.query(query, params);
     res.json(result.rows);
   } catch (err) {
     console.error("Ошибка при загрузке игроков:", err);
