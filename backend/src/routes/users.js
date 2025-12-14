@@ -25,7 +25,7 @@ router.get('/me', async (req, res) => {
     const { id } = req.user;
 
     const query = `
-      SELECT u.id, u.email, u.full_name, u.is_active, u.created_at, r.role_name
+      SELECT u.id, u.email, u.full_name, u.is_active, u.created_at, r.role_name, r.description, u.role_id
       FROM users u
       JOIN roles r ON u.role_id = r.id
       WHERE u.id = $1;
@@ -41,6 +41,25 @@ router.get('/me', async (req, res) => {
   } catch (err) {
     console.error("Ошибка при загрузке профиля:", err);
     res.status(500).json({ error: "Ошибка при загрузке профиля" });
+  }
+});
+
+router.get('/me/teams', async (req, res) => {
+  try {
+    const { id } = req.user;
+
+    const query = `
+      SELECT t.id, t.team_name, t.league, t.level, t.season
+      FROM user_teams ut
+      JOIN teams t ON ut.team_id = t.id
+      WHERE ut.user_id = $1;
+    `;
+
+    const result = await db.query(query, [id]);
+    res.json(result.rows);
+  } catch (err) {
+    console.error("Ошибка при загрузке команд пользователя:", err);
+    res.status(500).json({ error: "Ошибка при загрузке команд" });
   }
 });
 

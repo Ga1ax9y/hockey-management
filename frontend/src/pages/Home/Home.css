@@ -1,0 +1,113 @@
+.home {
+  max-width: var(--container-width);
+  margin: 0 auto;
+  padding: 2rem var(--container-padding-x);
+}
+
+.home__welcome {
+  text-align: center;
+  margin-bottom: 2.5rem;
+  padding-bottom: 1.5rem;
+  border-bottom: 2px solid var(--color-gray);
+}
+
+.home__welcome h1 {
+  font-size: 2.25rem;
+  margin-bottom: 1rem;
+  color: var(--color-dark);
+}
+
+.home__meta {
+  display: flex;
+  justify-content: center;
+  gap: 2rem;
+  flex-wrap: wrap;
+  color: var(--color-dark-alternate);
+  font-size: 1.1rem;
+}
+
+.home__stats {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+  max-width: 768px;
+  margin: 2.5rem auto 0;
+  padding: 0 var(--container-padding-x);
+}
+
+.stat-card {
+  background: none;
+  border: none;
+  padding: 0;
+  margin: 0;
+}
+
+.stat-card h3 {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--color-dark);
+  margin-bottom: 1rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid var(--color-gray);
+}
+
+.teams-list,
+.quick-links {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.teams-list li,
+.quick-links li {
+  margin-bottom: 0.625rem;
+}
+
+.team-link,
+.quick-links a {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  text-decoration: none;
+  color: var(--color-dark);
+  font-weight: 500;
+  padding: 0.25rem 0;
+  border-radius: 3px;
+  transition: color var(--transition-duration);
+}
+
+.team-link:hover,
+.quick-links a:hover {
+  color: var(--color-dark-hover);
+}
+
+.team-league {
+  color: var(--color-dark-alternate);
+  font-weight: normal;
+  font-size: 0.95em;
+}
+
+.home__no-teams {
+  color: var(--color-dark-alternate);
+  font-style: italic;
+  margin: 0;
+}
+
+.home__footer {
+  text-align: center;
+  color: var(--color-dark-alternate);
+  font-size: 0.95rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid var(--color-gray);
+}
+
+.home-loading,
+.home-error {
+  text-align: center;
+  padding: 2rem;
+  font-size: 1.1rem;
+}
+
+.home-error {
+  color: #d32f2f;
+}
