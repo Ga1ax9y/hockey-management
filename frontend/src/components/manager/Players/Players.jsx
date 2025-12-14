@@ -130,10 +130,10 @@ export default function Players() {
         className="players-add-btn"
         onClick={() => {
           resetForm();
-          setIsCreating(true);
+          setIsCreating(!isCreating);
         }}
       >
-        {isCreating ? 'Добавление игрока' : 'Добавить игрока'}
+        {isCreating ? 'Отменить' : 'Добавить игрока'}
       </button>
 
       {isCreating && (

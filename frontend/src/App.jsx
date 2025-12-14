@@ -15,6 +15,7 @@ import AdminPanel from './components/admin/AdminPanel/AdminPanel';
 import Players from './components/manager/Players/Players';
 import Profile from './pages/Profile/Profile';
 import PlayerProfile from './pages/PlayerProfile/PlayerProfile';
+import Trainings from './components/coach/Trainings/Trainings';
 const Layout = () => (
   <>
     <Header />
@@ -64,6 +65,12 @@ const router = createBrowserRouter([
         <ProtectedRoute>
           <Players />
         </ProtectedRoute>
+        ),
+      },
+      { path: '/coach/trainings', element: (
+          <ProtectedRoute>
+            <Trainings />
+          </ProtectedRoute>
         ),
       },
       { path: '/players/:id', element: (

@@ -76,18 +76,17 @@ export default function Home() {
             <h3>Быстрый доступ</h3>
             <ul className="quick-links">
               {user.role_id === 1 && (
-                <li><Link to="/admin/roles">Управление ролями</Link></li>
+                <li><Link to="/admin">Панель управления</Link></li>
               )}
               {user.role_id === 2 && (
-                <li><Link to="/coach/schedule">Тренировки</Link></li>
+                <li><Link to="/coach/trainings">Тренировки</Link></li>
               )}
-              {user.role_id === 1 && (
+              {user.role_id === 3 && (
                 <li><Link to="/admin/roles">Управление ролями</Link></li>
               )}
               {user.role_id === 7 && (
                 <li><Link to="/manager/hierarchy">Иерархия команд</Link></li>
               )}
-              <li><Link to="/manager/players">Управление игроками</Link></li>
             </ul>
           </div>
       </div>

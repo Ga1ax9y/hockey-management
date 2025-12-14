@@ -212,7 +212,7 @@ router.get('/:teamId/users', async (req, res) => {
     const { teamId } = req.params;
 
     const query = `
-      SELECT u.id, u.email, u.full_name, r.role_name
+      SELECT u.id, u.email, u.full_name, r.role_name, u.role_id
       FROM user_teams ut
       JOIN users u ON ut.user_id = u.id
       JOIN roles r ON u.role_id = r.id

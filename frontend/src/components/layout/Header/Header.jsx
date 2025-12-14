@@ -11,6 +11,7 @@ export default function Header() {
   const toggleMenu = () => setIsMenuOpen(!isMenuOpen);
   const isAdmin = role === 1;
   const isManager = role === 7;
+  const isCoach = role === 2;
 
   const handleLogout = () => {
     logout();
@@ -40,6 +41,7 @@ export default function Header() {
         {!isAuthenticated && <Link to="/login">Войти</Link>}
         {isAdmin && <Link to="/admin">Управление</Link>}
         {(isManager || isAdmin) && <Link to="/manager/hierarchy">Иерархия</Link>}
+        {(isCoach || isAdmin) && <Link to="/coach/trainings">Тренировки</Link>}
         {isAuthenticated && (
           <>
             <Link to="/profile">Профиль</Link>
