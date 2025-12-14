@@ -1,0 +1,139 @@
+.player-profile {
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 1.5rem;
+}
+
+.player-profile-back {
+  margin-bottom: 1.5rem;
+  padding: 0.25rem 0.5rem;
+  background: #f0f0f0;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.player-header {
+  text-align: center;
+  margin-bottom: 2rem;
+  padding-bottom: 1.5rem;
+  border-bottom: 2px solid var(--color-gray);
+}
+
+.player-header h1 {
+  font-size: 2rem;
+  margin-bottom: 0.5rem;
+}
+
+.player-position {
+  font-size: 1.25rem;
+  color: var(--color-dark-alternate);
+  margin-bottom: 1rem;
+}
+
+.player-basic-info {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 1.5rem;
+  font-size: 1.1rem;
+}
+
+.player-section {
+  margin-bottom: 2.5rem;
+}
+
+.player-section h2 {
+  margin-bottom: 1rem;
+  color: var(--color-dark);
+}
+
+.stats-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.stats-table th,
+.stats-table td {
+  padding: 0.75rem;
+  text-align: center;
+  border-bottom: 1px solid #eee;
+}
+
+.stats-table th {
+  background-color: #f5f5f5;
+  font-weight: 600;
+}
+
+.trainings-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.training-card {
+  padding: 1rem;
+  border: 1px solid #eee;
+  border-radius: 8px;
+  background-color: #fafafa;
+}
+
+.training-header {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 0.5rem;
+  font-weight: 600;
+}
+
+.training-type {
+  background-color: #e3f2fd;
+  padding: 0.125rem 0.5rem;
+  border-radius: 4px;
+  color: #1976d2;
+}
+
+.career-list,
+.medical-list {
+  list-style: none;
+  padding: 0;
+}
+
+.career-item,
+.medical-item {
+  padding: 1rem;
+  border: 1px solid #eee;
+  border-radius: 8px;
+  margin-bottom: 0.75rem;
+  background-color: #fafafa;
+}
+
+.career-date,
+.medical-date {
+  font-weight: 600;
+  margin-right: 0.5rem;
+}
+
+.career-type,
+.medical-status {
+  background-color: var(--color-light-alternate);
+  padding: 0.125rem 0.5rem;
+  border-radius: 4px;
+  font-size: 0.9rem;
+}
+
+.medical-header {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 0.5rem;
+}
+
+.player-profile-loading,
+.player-profile-error {
+  text-align: center;
+  padding: 2rem;
+  font-size: 1.1rem;
+}
+
+.player-profile-error {
+  color: #d32f2f;
+}

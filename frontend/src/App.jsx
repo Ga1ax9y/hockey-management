@@ -14,6 +14,7 @@ import TeamMembers from './pages/TeamMembers/TeamMembers';
 import AdminPanel from './components/admin/AdminPanel/AdminPanel';
 import Players from './components/manager/Players/Players';
 import Profile from './pages/Profile/Profile';
+import PlayerProfile from './pages/PlayerProfile/PlayerProfile';
 const Layout = () => (
   <>
     <Header />
@@ -34,14 +35,13 @@ const router = createBrowserRouter([
       </ProtectedRoute> },
       { path: '/login', element: <Login /> },
       { path: '/register', element: <Register /> },
-      {path: '/profile', element: (
+      { path: '/profile', element: (
           <ProtectedRoute>
             <Profile />
           </ProtectedRoute>
         ),
       },
-      {
-        path: '/admin', element: (
+      { path: '/admin', element: (
           <ProtectedRoute>
             <AdminPanel />
           </ProtectedRoute>
@@ -64,6 +64,12 @@ const router = createBrowserRouter([
         <ProtectedRoute>
           <Players />
         </ProtectedRoute>
+        ),
+      },
+      { path: '/players/:id', element: (
+          <ProtectedRoute>
+            <PlayerProfile />
+          </ProtectedRoute>
         ),
       },
       {

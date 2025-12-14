@@ -52,3 +52,7 @@ export const getPlayerById = (id) => API.get(`/api/players/${id}`);
 export const createPlayer = (data) => API.post("/api/players", data);
 export const updatePlayer = (id, data) => API.put(`/api/players/${id}`, data);
 export const deletePlayer = (id) => API.delete(`/api/players/${id}`);
+export const getPlayerMatchStats = (playerId) => API.get(`/api/players/${playerId}/match-stats`);
+export const getPlayerTrainingStats = (playerId) => API.get(`/api/players/${playerId}/training-stats`);
+export const getPlayerCareerHistory = (playerId) => API.get(`/api/players/${playerId}/career`);
+export const getPlayerMedicalHistory = (playerId) => API.get(`/api/players/${playerId}/medical`);

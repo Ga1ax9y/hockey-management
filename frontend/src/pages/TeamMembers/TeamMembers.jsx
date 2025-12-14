@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, Link } from 'react-router-dom';
 import {
   getTeamUsers,
   addTeamUser,
@@ -144,8 +144,10 @@ export default function TeamMembers() {
             {players.map(player => (
               <div key={player.id} className="player-card">
                 <div className="player-name">
-                  {player.last_name} {player.first_name}
-                  {player.middle_name && ` ${player.middle_name}`}
+                  <Link to={`/players/${player.id}`}>
+                    {player.last_name} {player.first_name}
+                    {player.middle_name && ` ${player.middle_name}`}
+                  </Link>
                 </div>
                 <div className="player-details">
                   <div>Позиция: <strong>{player.position || '—'}</strong></div>
