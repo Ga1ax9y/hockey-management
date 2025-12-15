@@ -9,6 +9,8 @@ import {
   getRoles
 } from '../../services/api';
 import './TeamMembers.css';
+import { useAuthStore } from '../../hooks/useAuthStore';
+
 export default function TeamMembers() {
   const { id: teamId } = useParams();
   const navigate = useNavigate();
@@ -19,6 +21,9 @@ export default function TeamMembers() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [selectedUserId, setSelectedUserId] = useState('');
+  const { role } = useAuthStore();
+  const isAdmin = role === 1;
+  const isManager = role === 7;
 
   const getRoleName = (roleId) => {
     const role = roles.find(r => r.id === roleId);
@@ -97,44 +102,46 @@ export default function TeamMembers() {
               <li key={user.id} className="member-item">
                 <div className="member-info">
                   <strong>{user.full_name}</strong>
-                  <span className="member-role">{user.role_name}</span>
+                  <span className="member-role">{getRoleName(user.role_id)}</span>
                   <span className="member-email">{user.email}</span>
                 </div>
-                <button
-                  onClick={() => handleRemoveUser(user.id)}
-                  className="btn-remove"
-                >
-                  Отвязать
-                </button>
+                {(isAdmin || isManager) && (
+                  <button
+                    onClick={() => handleRemoveUser(user.id)}
+                    className="btn-remove"
+                  >
+                    Отвязать
+                  </button>
+                )}
               </li>
             ))}
           </ul>
         )}
       </div>
-
-      <div className="members-section add-staff-section">
-        <h3>Добавить персонал</h3>
-        {allUsers.length === 0 ? (
-          <p className="empty-message">Нет доступных пользователей</p>
-        ) : (
-          <form onSubmit={(e) => { e.preventDefault(); handleAddUser(); }} className="add-member-form">
-            <select
-              value={selectedUserId}
-              onChange={(e) => setSelectedUserId(e.target.value)}
-              required
-            >
-              <option value="">Выберите пользователя...</option>
-              {allUsers.map(user => (
-                <option key={user.id} value={user.id}>
-                  {user.full_name} ({getRoleName(user.role_id)})
-                </option>
-              ))}
-            </select>
-            <button type="submit" className="btn-add">Добавить</button>
-          </form>
-        )}
-      </div>
-
+      {isAdmin || isManager && (
+        <div className="members-section add-staff-section">
+          <h3>Добавить персонал</h3>
+          {allUsers.length === 0 ? (
+            <p className="empty-message">Нет доступных пользователей</p>
+          ) : (
+            <form onSubmit={(e) => { e.preventDefault(); handleAddUser(); }} className="add-member-form">
+              <select
+                value={selectedUserId}
+                onChange={(e) => setSelectedUserId(e.target.value)}
+                required
+              >
+                <option value="">Выберите пользователя...</option>
+                {allUsers.map(user => (
+                  <option key={user.id} value={user.id}>
+                    {user.full_name} ({getRoleName(user.role_id)})
+                  </option>
+                ))}
+              </select>
+              <button type="submit" className="btn-add">Добавить</button>
+            </form>
+          )}
+        </div>
+      )}
       <div className="members-section players-section">
         <h3>Игроки команды</h3>
         {players.length === 0 ? (

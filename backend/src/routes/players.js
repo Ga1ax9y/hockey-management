@@ -101,6 +101,28 @@ router.get('/:id/medical', async (req, res) => {
   }
 });
 
+router.post('/:id/medical', async (req, res) => {
+  const { id } = req.params;
+  const { injury_date, recovery_date, diagnosis, status } = req.body;
+
+  if (!injury_date || !diagnosis || !status) {
+    return res.status(400).json({ error: "Обязательные поля: дата травмы, диагноз, статус" });
+  }
+
+  try {
+    const query = `
+      INSERT INTO medical_history (player_id, injury_date, recovery_date, diagnosis, status)
+      VALUES ($1, $2, $3, $4, $5)
+      RETURNING id;
+    `;
+    await db.query(query, [id, injury_date, recovery_date || null, diagnosis, status]);
+    res.status(201).json({ message: "Медицинская запись создана" });
+  } catch (err) {
+    console.error("Ошибка создания медзаписи:", err);
+    res.status(500).json({ error: "Ошибка при сохранении" });
+  }
+});
+
 router.get('/:id/match-stats', async (req, res) => {
   try {
     const { id } = req.params;

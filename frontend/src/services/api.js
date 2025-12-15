@@ -63,3 +63,6 @@ export const getTrainingById = (id) => API.get(`/api/trainings/${id}`);
 export const createTraining = (data) => API.post("/api/trainings", data);
 export const updateTraining = (id, data) => API.put(`/api/trainings/${id}`, data);
 export const deleteTraining = (id) => API.delete(`/api/trainings/${id}`);
+
+export const addMedicalRecord = (playerId, data) =>
+  API.post(`/api/players/${playerId}/medical`, data);

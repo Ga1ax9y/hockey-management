@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { getTeamById, updateTeam, deleteTeam } from '../../services/api';
 import './TeamDetails.css';
+import { useAuthStore } from '../../hooks/useAuthStore';
 
 export default function TeamDetails() {
   const { id } = useParams();
@@ -16,6 +17,9 @@ export default function TeamDetails() {
     level: 1,
     season: '',
   });
+  const { role } = useAuthStore();
+  const isAdmin = role === 1;
+  const isManager = role === 7;
 
   const loadTeam = async () => {
     try {
@@ -123,17 +127,21 @@ export default function TeamDetails() {
 
       {!isEditing && (
         <div className="team-actions">
-          <button onClick={() => setIsEditing(true)} className="btn-primary">
-            Редактировать
-          </button>
-          <button onClick={handleDelete} className="btn-danger">
-            Удалить команду
-          </button>
+          {(isAdmin || isManager) && (
+            <>
+            <button onClick={() => setIsEditing(true)} className="btn-primary">
+              Редактировать
+            </button>
+            <button onClick={handleDelete} className="btn-danger">
+              Удалить команду
+            </button>
+            </>
+          )}
           <button onClick={() => navigate(`/teams/${id}/members`)} className="btn-primary">
             Состав
           </button>
-          <button onClick={() => navigate('/manager/hierarchy')} className="btn-secondary">
-            Назад к иерархии
+          <button onClick={() => navigate(-1)} className="btn-secondary">
+            Назад
           </button>
         </div>
       )}

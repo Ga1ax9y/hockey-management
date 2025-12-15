@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { getTeams, createTeam } from '../../../services/api';
 import { useNavigate } from 'react-router-dom';
 import './Hierarchy.css';
-
+import { useAuthStore } from '../../../hooks/useAuthStore';
 export default function Hierarchy() {
   const navigate = useNavigate();
   const [teams, setTeams] = useState([]);
@@ -15,6 +15,9 @@ export default function Hierarchy() {
     level: 1,
     season: new Date().getFullYear() + '/' + (new Date().getFullYear() + 1).toString().slice(-2),
   });
+  const { role } = useAuthStore();
+  const isAdmin = role === 1;
+  const isManager = role === 7;
 
   const loadTeams = async () => {
     try {
@@ -61,13 +64,14 @@ export default function Hierarchy() {
   return (
     <div className="hierarchy">
       <h2>Иерархия команд</h2>
-
-      <button
-        className="hierarchy-add-btn"
-        onClick={() => setIsCreating(!isCreating)}
-      >
-        {isCreating ? 'Отменить' : 'Добавить команду'}
-      </button>
+      {(isAdmin || isManager) && (
+        <button
+          className="hierarchy-add-btn"
+          onClick={() => setIsCreating(!isCreating)}
+        >
+          {isCreating ? 'Отменить' : 'Добавить команду'}
+        </button>
+      )}
 
       {isCreating && (
         <form className="hierarchy-create-form" onSubmit={handleCreate}>

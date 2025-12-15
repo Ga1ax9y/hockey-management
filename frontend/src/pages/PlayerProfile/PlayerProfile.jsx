@@ -8,6 +8,7 @@ import {
   getPlayerMedicalHistory,
 } from '../../services/api';
 import './PlayerProfile.css';
+import { useAuthStore } from '../../hooks/useAuthStore';
 
 export default function PlayerProfile() {
   const { id } = useParams();
@@ -19,6 +20,8 @@ export default function PlayerProfile() {
   const [medicalHistory, setMedicalHistory] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const { role } = useAuthStore();
+  const isMedicalStaff = role === 8;
 
   const loadPlayerData = async () => {
     try {
@@ -170,6 +173,14 @@ export default function PlayerProfile() {
               </li>
             ))}
           </ul>
+        )}
+        {isMedicalStaff && (
+          <button
+            className="btn-medical-add"
+            onClick={() => navigate(`/medical/add/${id}`)}
+          >
+            Добавить медицинское заключение
+          </button>
         )}
       </div>
     </div>

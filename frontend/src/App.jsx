@@ -16,6 +16,7 @@ import Players from './components/manager/Players/Players';
 import Profile from './pages/Profile/Profile';
 import PlayerProfile from './pages/PlayerProfile/PlayerProfile';
 import Trainings from './components/coach/Trainings/Trainings';
+import AddMedicalRecord from './components/medical/AddMedicalRecord/AddMedicalRecord';
 const Layout = () => (
   <>
     <Header />
@@ -77,6 +78,12 @@ const router = createBrowserRouter([
           <ProtectedRoute>
             <PlayerProfile />
           </ProtectedRoute>
+        ),
+      },
+      { path: '/medical/add/:playerId', element: (
+        <ProtectedRoute>
+          <AddMedicalRecord />
+        </ProtectedRoute>
         ),
       },
       {
