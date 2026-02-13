@@ -1,0 +1,218 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model Role {
+  id          Int @id @default(autoincrement())
+  name        String  @unique @db.VarChar(50)
+  description String? @db.Text
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  users       User[]
+}
+
+model User {
+  id           Int @id @default(autoincrement())
+  email        String @unique @db.VarChar(255)
+  passwordHash String @db.VarChar(255)
+  fullName     String @db.VarChar(255)
+  isActive     Boolean @default(true)
+  role         Role @relation(fields: [roleId], references: [id], onDelete: Restrict)
+  roleId       Int
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+  userTeams    UserTeam[]
+  logs AuditLog[]
+  trainings Training[]
+}
+
+model Team {
+  id        Int @id @default(autoincrement())
+  name      String @db.VarChar(255)
+  league    String @db.VarChar(100)
+  level     Int
+  season    String @db.VarChar(9)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  userTeams UserTeam[]
+  players   Player[]
+  historyExits   PlayerCareerHistory[] @relation("FromTeam")
+  historyEntries PlayerCareerHistory[] @relation("ToTeam")
+  matches Match[]
+  trainings Training[]
+}
+
+model UserTeam {
+  user   User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  team   Team @relation(fields: [teamId], references: [id], onDelete: Cascade)
+  userId Int
+  teamId Int
+  @@id([userId, teamId])
+}
+
+model Player{
+  id          Int @id @default(autoincrement())
+  lastName       String @db.VarChar(100)
+  firstName      String @db.VarChar(100)
+  middleName     String? @db.VarChar(100)
+  birthDate      DateTime @db.Date
+  position       String @db.VarChar(50)
+  height         Int
+  weight         Int
+  contractExpiry DateTime @db.Date
+  currentTeam    Team? @relation(fields: [currentTeamId], references: [id], onDelete: SetNull)
+  currentTeamId  Int?
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+  careerHistory PlayerCareerHistory[]
+  physicalData PhysicalData[]
+  medicalHistory MedicalHistory[]
+  readinessIndex PlayerReadinessIndex[]
+  matchStats MatchStats[]
+  trainingStats TrainingStats[]
+}
+
+model PlayerCareerHistory {
+  id  Int @id @default(autoincrement())
+  player Player @relation(fields: [playerId], references: [id], onDelete: Cascade)
+  playerId Int
+  transferDate DateTime @db.Date
+  transferType String @db.VarChar(50)
+  fromTeam Team? @relation("FromTeam", fields: [fromTeamId], references: [id], onDelete: SetNull)
+  toTeam Team? @relation("ToTeam", fields: [toTeamId], references: [id], onDelete: SetNull)
+  fromTeamId Int?
+  toTeamId Int?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+}
+
+model PhysicalData {
+  id Int @id @default(autoincrement())
+  player Player @relation(fields: [playerId], references: [id], onDelete: Cascade)
+  playerId  Int
+  recordedDate DateTime @db.Date
+  metricType String @db.VarChar(100)
+  metricValue Decimal
+  unit String @db.VarChar(20)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+}
+
+model MedicalHistory {
+  id Int @id @default(autoincrement())
+  player Player @relation(fields: [playerId], references: [id], onDelete: Cascade)
+  playerId Int
+  injuryDate DateTime @db.Date
+  recoveryDate DateTime @db.Date
+  diagnosis String @db.Text
+  status String @db.VarChar(50)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+}
+
+model PlayerReadinessIndex {
+  id Int @id @default(autoincrement())
+  player Player @relation(fields: [playerId], references: [id], onDelete: Cascade)
+  playerId Int
+  readinessValue Decimal @db.Decimal(5,2)
+  confidenceLevel String @db.VarChar(50)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+}
+
+model AuditLog {
+  id Int @id @default(autoincrement())
+  user User? @relation(fields: [userId], references: [id], onDelete: SetNull)
+  userId Int?
+  action String @db.VarChar(100)
+  entityType String @db.VarChar(50)
+  entityId Int
+  oldValues Json @db.JsonB
+  newValues Json @db.JsonB
+  timestamp DateTime @db.Timestamp() @default(now())
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  @@index([userId])
+  @@index([entityType, entityId])
+  @@index([timestamp(sort: Desc)])
+}
+
+model Match {
+  id Int @id @default(autoincrement())
+  matchDate DateTime @db.Date
+  matchTime DateTime @db.Time()
+  location String @db.VarChar(255)
+  myTeam Team @relation(fields: [myTeamId], references: [id], onDelete: Cascade)
+  myTeamId Int
+  opponentName String @db.VarChar(255)
+  isHomeGame Boolean @default(true)
+  myScore Int @default(0)
+  opponentScore Int @default(0)
+  matchType     String?  @db.VarChar(50)
+  season        String?  @db.VarChar(9)
+  status        String   @default("scheduled") @db.VarChar(50)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  playerStats MatchStats[]
+}
+
+model Training {
+  id Int @id @default(autoincrement())
+  trainingDate DateTime @db.Date
+  startTime DateTime? @db.Time()
+  endTime DateTime? @db.Time()
+  location String @db.VarChar(255)
+  trainingType String @db.VarChar(100)
+  team Team @relation(fields: [teamId], references: [id], onDelete: Cascade)
+  teamId Int
+  coach User @relation(fields: [coachId], references: [id], onDelete: Cascade)
+  coachId Int
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  playerStats TrainingStats[]
+}
+
+model MatchStats {
+  id Int @id @default(autoincrement())
+  match Match @relation(fields: [matchId], references: [id], onDelete: Cascade)
+  matchId Int
+  player Player @relation(fields: [playerId], references: [id], onDelete: Cascade)
+  playerId Int
+  goals Int @default(0)
+  assists Int @default(0)
+  shots Int @default(0)
+  hits Int @default(0)
+  penaltyMinutes Int @default(0)
+  plusMinus Int @default(0)
+  faceoffWins Int @default(0)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  @@unique([matchId, playerId])
+}
+
+model TrainingStats {
+  id Int @id @default(autoincrement())
+  training Training @relation(fields: [trainingId], references: [id], onDelete: Cascade)
+  trainingId Int
+  player Player @relation(fields: [playerId], references: [id], onDelete: Cascade)
+  playerId Int
+  coachRating Int?
+  description String @db.Text
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  @@unique([trainingId, playerId])
+}
