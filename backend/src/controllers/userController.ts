@@ -22,3 +22,22 @@ export const getAllUsers = async (req: Request, res: Response) => {
         res.status(500).json({ error: error.message });
     }
 };
+
+export const getUserById = async (req: Request, res: Response) => {
+    try {
+        const {id} = req.params;
+        const user = await prisma.user.findUnique({
+            where: {
+                id: Number(id)
+            },
+            select: {
+                fullName: true,
+            }
+        })
+        res.json(user);
+
+    } catch (error: any) {
+        res.status(500).json({ error: error.message });
+    }
+
+}
