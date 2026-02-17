@@ -2,6 +2,7 @@ import type { Request, Response } from "express";
 import { prisma } from "../lib/prisma";
 import bcrypt from "bcrypt"
 import jwt from "jsonwebtoken"
+import type { AuthRequest } from "../middlewares/authMiddleware";
 
 const JWT_SECRET = process.env.JWT_SECRET as string;
 
@@ -86,5 +87,37 @@ export const login = async (req: Request, res: Response) => {
     catch (error: any){
         console.error("Ошибка авторизации:", error);
         res.status(500).json({ error: "Ошибка сервера при входе" });
+    }
+}
+
+export const getMe = async (req: AuthRequest, res: Response) => {
+    try{
+        const userId = req.user?.id
+
+        if (!userId){
+        return res.status(401).json({error: "Пользователь не авторизован"})
+        }
+        const user = await prisma.user.findUnique({
+            where: {id: userId},
+            select: {
+                id: true,
+                email: true,
+                fullName: true,
+                createdAt: true,
+                role: {
+                    select: {
+                        name: true
+                    }
+                }
+            }
+        })
+
+        if (!user){
+            return res.status(404).json({error: "Пользователь не найден"})
+        }
+        res.json(user)
+    }
+    catch(error: any){
+        res.status(500).json({ error: "Ошибка сервера" });
     }
 }
