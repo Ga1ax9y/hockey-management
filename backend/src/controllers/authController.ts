@@ -106,15 +106,27 @@ export const getMe = async (req: AuthRequest, res: Response) => {
                 createdAt: true,
                 role: {
                     select: {
-                        name: true
+                        name: true,
+                        code: true
+                    }
+                },
+                userTeams: {
+                    select: {
+                        team: {
+                            select: {
+                                name: true,
+                            }
+                        }
                     }
                 }
+
             }
         })
 
         if (!user){
             return res.status(404).json({error: "Пользователь не найден"})
         }
+        console.log(user)
         res.json(user)
     }
     catch(error: any){
