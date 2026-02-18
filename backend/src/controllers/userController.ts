@@ -19,7 +19,10 @@ export const getAllUsers = async (req: Request, res: Response) => {
         res.json(users);
     }
     catch (error: any) {
-        res.status(500).json({ error: error.message });
+        res.status(500).json({
+            error: error.message,
+            description: "Ошибка при получении пользователей"
+        });
     }
 };
 
@@ -31,13 +34,24 @@ export const getUserById = async (req: Request, res: Response) => {
                 id: Number(id)
             },
             select: {
+                id: true,
+                email: true,
                 fullName: true,
+                role: {
+                    select: {
+                        name: true
+                    }
+                }
+
             }
         })
         res.json(user);
 
     } catch (error: any) {
-        res.status(500).json({ error: error.message });
+        res.status(500).json({
+            error: error.message,
+            description: "Ошибка при получении пользователей по id"
+        });
     }
 
 }
