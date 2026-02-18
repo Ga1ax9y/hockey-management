@@ -1,16 +1,18 @@
 import jwt from "jsonwebtoken";
 import type { Request, Response, NextFunction } from "express";
-
-interface UserPayload {
-    id: number;
-    email: string;
-    roleId: number;
-}
+import { prisma } from "../lib/prisma";
 
 export interface AuthRequest extends Request {
-    user?: UserPayload;
+    user?: {
+        id: number;
+        email: string;
+        role: {
+            code: string;
+            name: string;
+        };
+    };
 }
-export default function authMiddleware (req: AuthRequest, res: Response, next: NextFunction) {
+export default async function authMiddleware (req: AuthRequest, res: Response, next: NextFunction) {
     const header = req.headers.authorization;
 
     if (!header) {
@@ -29,8 +31,19 @@ export default function authMiddleware (req: AuthRequest, res: Response, next: N
     }
 
     try {
-        const decoded = jwt.verify(token, SECRET_KEY) as UserPayload;
-        req.user = decoded;
+        const decoded = jwt.verify(token, SECRET_KEY) as {id: number};
+        const user = await prisma.user.findUnique({
+            where: {
+                id: decoded.id
+            },
+            include: {
+                role: true
+            }
+        })
+        if (!user || !user.isActive) {
+            return res.status(401).json({ error: "Пользователь не найден или заблокирован" });
+        }
+        req.user = user;
         next()
     } catch (error) {
         return res.status(401).json({ error: "Неверный или просроченный токен" });
