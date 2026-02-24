@@ -1,5 +1,7 @@
-import type { Request, Response } from "express";
+import type { NextFunction, Request, Response } from "express";
 import { prisma } from "../lib/prisma";
+import { AppError, commonErrorDict } from "../types/AppError";
+import { error } from "node:console";
 
 export const getAllPlayers = async (req: Request, res: Response) => {
     try{
@@ -35,7 +37,7 @@ export const getAllPlayers = async (req: Request, res: Response) => {
     }
 }
 
-export const getPlayerById = async (req: Request, res: Response) => {
+export const getPlayerById = async (req: Request, res: Response, next: NextFunction) => {
     try {
         const { id } = req.params
 
@@ -64,14 +66,19 @@ export const getPlayerById = async (req: Request, res: Response) => {
 
             }
         })
+        if (!player){
+            return next(
+                new AppError(
+                    commonErrorDict.resourceNotFound.name,
+                    commonErrorDict.resourceNotFound.httpCode,
+                    "Игрок не найден"
+                )
+            );
+        }
         res.json(player)
     }
     catch (error: any) {
-        res.status(500).json({
-            error: error.message,
-            description: "Ошибка при получении игрока по id"
-         });
-
+        next(error)
     }
 }
 
@@ -109,7 +116,7 @@ export const createPlayer = async (req: Request, res: Response) => {
     }
 }
 
-export const updatePlayer = async (req: Request, res: Response) => {
+export const updatePlayer = async (req: Request, res: Response, next: NextFunction) => {
     try {
         const { id } = req.params
         const { firstName, lastName, middleName, birthDate, position, height, weight, contractExpiry, currentTeamId } = req.body
@@ -132,14 +139,11 @@ export const updatePlayer = async (req: Request, res: Response) => {
         res.json(updatedPlayer)
     }
     catch (error: any) {
-        res.status(500).json({
-            error: error.message,
-            description: "Ошибка при обновлении данных игрока"
-        })
+        next(error)
     }
 }
 
-export const deletePlayer = async (req: Request, res: Response) => {
+export const deletePlayer = async (req: Request, res: Response, next:  NextFunction) => {
     try {
         const { id } = req.params
         await prisma.player.delete({
@@ -157,9 +161,13 @@ export const deletePlayer = async (req: Request, res: Response) => {
                 description: "Нельзя удалить игрока, так как он  имеет связи с другими таблицами" });
         }
         else if (error.code === 'P2025') {
-            return res.status(404).json({
-                error: error.message,
-                description: `Игрок не найдена` });
+            return next(
+                new AppError(
+                    commonErrorDict.resourceNotFound.name,
+                    commonErrorDict.resourceNotFound.httpCode,
+                    "Игрок для удаления не найден"
+                )
+            );
         }
         res.status(500).json({
             error: error.message,

@@ -52,6 +52,7 @@ export const getUserById = async (req: Request, res: Response) => {
             error: error.message,
             description: "Ошибка при получении пользователей по id"
         });
+
     }
 
 }
