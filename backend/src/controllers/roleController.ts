@@ -1,7 +1,8 @@
-import type { Request, Response } from "express";
+import type { NextFunction, Request, Response } from "express";
 import { prisma } from "../lib/prisma";
+import { AppError, commonErrorDict } from "../types/AppError";
 
-export const getAllRoles = async (req: Request, res: Response) => {
+export const getAllRoles = async (req: Request, res: Response, next: NextFunction) => {
     try{
         const roles = await prisma.role.findMany({
             select: {
@@ -17,14 +18,16 @@ export const getAllRoles = async (req: Request, res: Response) => {
         res.json(roles)
     }
     catch(error: any){
-        res.status(500).json({
-            error: error.message,
-            description: "Ошибка при получении ролей"
-         });
+        next(new AppError(
+            commonErrorDict.serverError.name,
+            commonErrorDict.serverError.httpCode,
+            error.message,
+            "Ошибка при получении ролей"
+        ))
     }
 }
 
-export const getRoleById = async (req: Request, res: Response) => {
+export const getRoleById = async (req: Request, res: Response, next: NextFunction) => {
     try {
         const { id } = req.params
 
@@ -45,22 +48,27 @@ export const getRoleById = async (req: Request, res: Response) => {
         res.json(role)
     }
     catch (error: any) {
-        res.status(500).json({
-            error: error.message,
-            description: "Ошибка при получении роли по id"
-         });
+        next(new AppError(
+            commonErrorDict.serverError.name,
+            commonErrorDict.serverError.httpCode,
+            error.message,
+            "Ошибка при получении роли по id"
+        ))
 
     }
 }
 
-export const createRole = async (req: Request, res: Response) => {
+export const createRole = async (req: Request, res: Response, next: NextFunction) => {
     try {
         const { name, code, description} = req.body
 
         if (!name || !code){
-            return res.status(400).json({
-                error: "Поля name и code обязательные"
-            })
+            return next(new AppError(
+                commonErrorDict.badRequest.name,
+                commonErrorDict.badRequest.httpCode,
+                "Поля name, code обязательны",
+                "Ошибка при создании роли"
+            ))
         }
         const newRole = await prisma.role.create({
             data: {
@@ -72,14 +80,16 @@ export const createRole = async (req: Request, res: Response) => {
         res.status(201).json(newRole)
 
     } catch (error: any) {
-        res.status(500).json({
-            error: error.message,
-            description: "Ошибка при создании новой роли"
-         });
+        next(new AppError(
+            commonErrorDict.serverError.name,
+            commonErrorDict.serverError.httpCode,
+            error.message,
+            "Ошибка при создании роли"
+        ))
     }
 }
 
-export const updateRole = async (req: Request, res: Response) => {
+export const updateRole = async (req: Request, res: Response, next: NextFunction) => {
     try {
         const { id } = req.params
         const { name, code, description } = req.body
@@ -96,14 +106,16 @@ export const updateRole = async (req: Request, res: Response) => {
         res.json(updatedRole)
     }
     catch (error: any) {
-        res.status(500).json({
-            error: error.message,
-            description: "Ошибка при обновлении роли"
-        })
+        next(new AppError(
+            commonErrorDict.serverError.name,
+            commonErrorDict.serverError.httpCode,
+            error.message,
+            "Ошибка при обновлении роли"
+        ))
     }
 }
 
-export const deleteRole = async (req: Request, res: Response) => {
+export const deleteRole = async (req: Request, res: Response, next: NextFunction) => {
     try {
         const { id } = req.params
         await prisma.role.delete({
@@ -115,19 +127,21 @@ export const deleteRole = async (req: Request, res: Response) => {
             message: `Роль с id ${id} успешно удалена`
         })
     } catch (error: any) {
-        if (error.code === 'P2003') {
-            return res.status(400).json({
-                error: error.message,
-                description: "Нельзя удалить роль, так как она назначена пользователям" });
-        }
-        else if (error.code === 'P2025') {
-            return res.status(404).json({
-                error: error.message,
-                description: `Роль не найдена` });
-        }
-        res.status(500).json({
-            error: error.message,
-            description: "Ошибка при удалении роли"
-        })
+        // if (error.code === 'P2003') {
+        //     return res.status(400).json({
+        //         error: error.message,
+        //         description: "Нельзя удалить роль, так как она назначена пользователям" });
+        // }
+        // else if (error.code === 'P2025') {
+        //     return res.status(404).json({
+        //         error: error.message,
+        //         description: `Роль не найдена` });
+        // }
+        next(new AppError(
+            commonErrorDict.serverError.name,
+            commonErrorDict.serverError.httpCode,
+            error.message,
+            "Ошибка при удалении роли"
+        ))
     }
 }

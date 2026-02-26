@@ -139,23 +139,23 @@ export const deleteTeam = async (req: Request, res: Response, next:  NextFunctio
             message: `Команда с id ${id} успешно удален`
         })
     } catch (error: any) {
-        if (error.code === 'P2003') {
-            next(new AppError(
-                commonErrorDict.serverError.name,
-                commonErrorDict.serverError.httpCode,
-                error.message,
-                "Нельзя удалить команду, так как она имеет связи с другими таблицами"
-            ))
-        }
-        else if (error.code === 'P2025') {
-            return next(
-                new AppError(
-                    commonErrorDict.resourceNotFound.name,
-                    commonErrorDict.resourceNotFound.httpCode,
-                    "Команда для удаления не найдена"
-                )
-            );
-        }
+        // if (error.code === 'P2003') {
+        //     next(new AppError(
+        //         commonErrorDict.serverError.name,
+        //         commonErrorDict.serverError.httpCode,
+        //         error.message,
+        //         "Нельзя удалить команду, так как она имеет связи с другими таблицами"
+        //     ))
+        // }
+        // else if (error.code === 'P2025') {
+        //     return next(
+        //         new AppError(
+        //             commonErrorDict.resourceNotFound.name,
+        //             commonErrorDict.resourceNotFound.httpCode,
+        //             "Команда для удаления не найдена"
+        //         )
+        //     );
+        // }
         next(new AppError(
             commonErrorDict.serverError.name,
             commonErrorDict.serverError.httpCode,

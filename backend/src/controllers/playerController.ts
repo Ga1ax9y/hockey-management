@@ -1,9 +1,8 @@
 import type { NextFunction, Request, Response } from "express";
 import { prisma } from "../lib/prisma";
 import { AppError, commonErrorDict } from "../types/AppError";
-import { error } from "node:console";
 
-export const getAllPlayers = async (req: Request, res: Response) => {
+export const getAllPlayers = async (req: Request, res: Response, next: NextFunction) => {
     try{
         const players = await prisma.player.findMany({
             select: {
@@ -30,10 +29,12 @@ export const getAllPlayers = async (req: Request, res: Response) => {
         res.json(players)
     }
     catch(error: any){
-        res.status(500).json({
-            error: error.message,
-            description: "Ошибка при получении игроков"
-         });
+        next(new AppError(
+            commonErrorDict.serverError.name,
+            commonErrorDict.serverError.httpCode,
+            error.message,
+            "Ошибка при получении игроков"
+        ))
     }
 }
 
@@ -71,25 +72,34 @@ export const getPlayerById = async (req: Request, res: Response, next: NextFunct
                 new AppError(
                     commonErrorDict.resourceNotFound.name,
                     commonErrorDict.resourceNotFound.httpCode,
-                    "Игрок не найден"
+                    "Игрок не найден",
+                    "Ошибка при получении игрока по id"
                 )
             );
         }
         res.json(player)
     }
     catch (error: any) {
-        next(error)
+        next(new AppError(
+            commonErrorDict.serverError.name,
+            commonErrorDict.serverError.httpCode,
+            error.message,
+            "Ошибка при получении игрока по id"
+        ))
     }
 }
 
-export const createPlayer = async (req: Request, res: Response) => {
+export const createPlayer = async (req: Request, res: Response, next: NextFunction) => {
     try {
         const { firstName, lastName, middleName, birthDate, position, height, weight, contractExpiry, currentTeamId } = req.body
 
         if (!lastName || !firstName || !birthDate) {
-            return res.status(400).json({
-                error: "Поля lastName, firstName, birthDate обязательны"
-            });
+            return next(new AppError(
+                commonErrorDict.badRequest.name,
+                commonErrorDict.badRequest.httpCode,
+                "Поля lastName, firstName, birthDate обязательны",
+                "Ошибка при создании нового игрока"
+            ))
         }
 
         //TODO: перевод даты
@@ -109,10 +119,12 @@ export const createPlayer = async (req: Request, res: Response) => {
         res.status(201).json(newPlayer)
 
     } catch (error: any) {
-        res.status(500).json({
-            error: error.message,
-            description: "Ошибка при создании нового игрока"
-         });
+        next(new AppError(
+            commonErrorDict.serverError.name,
+            commonErrorDict.serverError.httpCode,
+            error.message,
+            "Ошибка при создании нового игрока"
+        ))
     }
 }
 
@@ -139,7 +151,12 @@ export const updatePlayer = async (req: Request, res: Response, next: NextFuncti
         res.json(updatedPlayer)
     }
     catch (error: any) {
-        next(error)
+        next(new AppError(
+            commonErrorDict.serverError.name,
+            commonErrorDict.serverError.httpCode,
+            error.message,
+            "Ошибка при обновлении игрока"
+        ))
     }
 }
 
@@ -155,23 +172,29 @@ export const deletePlayer = async (req: Request, res: Response, next:  NextFunct
             message: `Игрок с id ${id} успешно удален`
         })
     } catch (error: any) {
-        if (error.code === 'P2003') {
-            return res.status(400).json({
-                error: error.message,
-                description: "Нельзя удалить игрока, так как он  имеет связи с другими таблицами" });
-        }
-        else if (error.code === 'P2025') {
-            return next(
-                new AppError(
-                    commonErrorDict.resourceNotFound.name,
-                    commonErrorDict.resourceNotFound.httpCode,
-                    "Игрок для удаления не найден"
-                )
-            );
-        }
-        res.status(500).json({
-            error: error.message,
-            description: "Ошибка при удалении игрока"
-        })
+        // if (error.code === 'P2003') {
+        //    return next(new AppError(
+        //         commonErrorDict.badRequest.name,
+        //         commonErrorDict.badRequest.httpCode,
+        //         "Нельзя удалить игрока, так как он  имеет связи с другими таблицами",
+        //         "Ошибка при удалении игрока"
+        //     ))
+        // }
+        // else if (error.code === 'P2025') {
+        //     return next(
+        //         new AppError(
+        //             commonErrorDict.resourceNotFound.name,
+        //             commonErrorDict.resourceNotFound.httpCode,
+        //             "Игрок для удаления не найден",
+        //             "Ошибка при удалении игрока"
+        //         )
+        //     );
+        // }
+        next(new AppError(
+            commonErrorDict.serverError.name,
+            commonErrorDict.serverError.httpCode,
+            error.message,
+            "Ошибка при удалении игрока"
+        ))
     }
 }

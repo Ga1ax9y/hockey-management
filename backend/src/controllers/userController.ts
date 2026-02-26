@@ -1,7 +1,8 @@
-import type { Request, Response } from "express";
+import type { NextFunction, Request, Response } from "express";
 import { prisma } from "../lib/prisma"
+import { AppError, commonErrorDict } from "../types/AppError";
 
-export const getAllUsers = async (req: Request, res: Response) => {
+export const getAllUsers = async (req: Request, res: Response, next: NextFunction) => {
     try {
         const users = await prisma.user.findMany({
             select: {
@@ -19,14 +20,16 @@ export const getAllUsers = async (req: Request, res: Response) => {
         res.json(users);
     }
     catch (error: any) {
-        res.status(500).json({
-            error: error.message,
-            description: "Ошибка при получении пользователей"
-        });
+        next(new AppError(
+            commonErrorDict.serverError.name,
+            commonErrorDict.serverError.httpCode,
+            error.message,
+            "Ошибка при получении пользователей"
+        ))
     }
 };
 
-export const getUserById = async (req: Request, res: Response) => {
+export const getUserById = async (req: Request, res: Response, next: NextFunction) => {
     try {
         const {id} = req.params;
         const user = await prisma.user.findUnique({
@@ -48,10 +51,12 @@ export const getUserById = async (req: Request, res: Response) => {
         res.json(user);
 
     } catch (error: any) {
-        res.status(500).json({
-            error: error.message,
-            description: "Ошибка при получении пользователей по id"
-        });
+        next(new AppError(
+            commonErrorDict.serverError.name,
+            commonErrorDict.serverError.httpCode,
+            error.message,
+            "Ошибка при получении пользователя по id"
+        ))
 
     }
 

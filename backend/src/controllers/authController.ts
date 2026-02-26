@@ -1,12 +1,13 @@
-import type { Request, Response } from "express";
+import type { NextFunction, Request, Response } from "express";
 import { prisma } from "../lib/prisma";
 import bcrypt from "bcrypt"
 import jwt from "jsonwebtoken"
 import type { AuthRequest } from "../middlewares/authMiddleware";
+import { AppError, commonErrorDict } from "../types/AppError";
 
 const JWT_SECRET = process.env.JWT_SECRET as string;
 
-export const register  = async (req: Request, res: Response) => {
+export const register  = async (req: Request, res: Response, next: NextFunction) => {
     try {
         const {email, password, fullName, roleId} = req.body
         const existingUser = await prisma.user.findUnique({
@@ -16,7 +17,12 @@ export const register  = async (req: Request, res: Response) => {
         })
 
         if (existingUser){
-            return res.status(400).json({ error: "email уже занят"})
+            return next(new AppError(
+                commonErrorDict.badRequest.name,
+                commonErrorDict.badRequest.httpCode,
+                "email уже занят",
+                "Ошибка при создании пользователя"
+        ))
         }
 
         const hashedPassword = await bcrypt.hash(password, 10)
@@ -39,12 +45,16 @@ export const register  = async (req: Request, res: Response) => {
 
         res.status(201).json(newUser)
     } catch (error: any) {
-        console.error("Ошибка при регистрации:", error);
-        res.status(500).json({ error: "Не удалось создать пользователя" });
+        next(new AppError(
+            commonErrorDict.serverError.name,
+            commonErrorDict.serverError.httpCode,
+            error.message,
+            "Ошибка при создании пользователя"
+        ))
     }
 }
 
-export const login = async (req: Request, res: Response) => {
+export const login = async (req: Request, res: Response, next: NextFunction) => {
     try {
         const {email, password} = req.body;
         const user = await prisma.user.findUnique({
@@ -53,13 +63,23 @@ export const login = async (req: Request, res: Response) => {
         });
 
         if (!user) {
-            return res.status(401).json({ error: "Неверный почтовый адрес или пароль"})
+            return next(new AppError(
+                commonErrorDict.unauthorized.name,
+                commonErrorDict.unauthorized.httpCode,
+                "Неверный почтовый адрес или пароль",
+                "Ошибка сервера при входе"
+        ))
         }
 
         const isPasswordValid = bcrypt.compare(password, user.passwordHash)
 
         if (!isPasswordValid) {
-            return res.status(401).json({ error: "Неверный почтовый адрес или пароль"})
+            return next(new AppError(
+                commonErrorDict.unauthorized.name,
+                commonErrorDict.unauthorized.httpCode,
+                "Неверный почтовый адрес или пароль",
+                "Ошибка сервера при входе"
+        ))
         }
 
         const token = jwt.sign(
@@ -85,17 +105,26 @@ export const login = async (req: Request, res: Response) => {
         })
     }
     catch (error: any){
-        console.error("Ошибка авторизации:", error);
-        res.status(500).json({ error: "Ошибка сервера при входе" });
+        next(new AppError(
+            commonErrorDict.serverError.name,
+            commonErrorDict.serverError.httpCode,
+            error.message,
+            "Ошибка сервера при входе"
+        ))
     }
 }
 
-export const getMe = async (req: AuthRequest, res: Response) => {
+export const getMe = async (req: AuthRequest, res: Response, next: NextFunction) => {
     try{
         const userId = req.user?.id
 
         if (!userId){
-        return res.status(401).json({error: "Пользователь не авторизован"})
+            return next(new AppError(
+                commonErrorDict.unauthorized.name,
+                commonErrorDict.unauthorized.httpCode,
+                "Пользователь не авторизован",
+                "Ошибка при получении данных пользователя"
+        ))
         }
         const user = await prisma.user.findUnique({
             where: {id: userId},
@@ -124,12 +153,22 @@ export const getMe = async (req: AuthRequest, res: Response) => {
         })
 
         if (!user){
-            return res.status(404).json({error: "Пользователь не найден"})
+            return next(new AppError(
+                commonErrorDict.resourceNotFound.name,
+                commonErrorDict.resourceNotFound.httpCode,
+                "Пользователь не найден",
+                "Ошибка при получении данных пользователя"
+        ))
         }
         console.log(user)
         res.json(user)
     }
     catch(error: any){
-        res.status(500).json({ error: "Ошибка сервера" });
+            next(new AppError(
+                commonErrorDict.serverError.name,
+                commonErrorDict.serverError.httpCode,
+                error.message,
+                "Ошибка при получении данных пользователя"
+        ))
     }
 }
