@@ -1,0 +1,163 @@
+import type { NextFunction, Request, Response } from "express";
+import { prisma } from "../lib/prisma";
+import { AppError, commonErrorDict } from "../types/AppError";
+
+export const getAllTrainings = async (req: Request, res: Response, next: NextFunction) => {
+    try{
+        const trainings = await prisma.training.findMany({
+            select: {
+                id: true,
+                trainingDate: true,
+                startTime: true,
+                endTime: true,
+                location: true,
+                trainingType: true,
+                team: true,
+                coach: true,
+                createdAt: true,
+                updatedAt: true
+
+            }
+        })
+        res.json(trainings)
+    }
+    catch(error: any){
+        next(new AppError(
+            commonErrorDict.serverError.name,
+            commonErrorDict.serverError.httpCode,
+            error.message,
+            "Ошибка при получении всех тренировок"
+        ))
+    }
+}
+
+export const getTrainingById = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+        const { id } = req.params
+
+        const training = await prisma.training.findUnique({
+            where: {
+                id: Number(id)
+            },
+            select: {
+                id: true,
+                trainingDate: true,
+                startTime: true,
+                endTime: true,
+                location: true,
+                trainingType: true,
+                team: true,
+                coach: true,
+                createdAt: true,
+                updatedAt: true
+
+            }
+        })
+        if (!training){
+            return next(
+                new AppError(
+                    commonErrorDict.resourceNotFound.name,
+                    commonErrorDict.resourceNotFound.httpCode,
+                    "Тренировка не найдена",
+                    "Ошибка при получении тренировки по id"
+                )
+            );
+        }
+        res.json(training)
+    }
+    catch (error: any) {
+        next(new AppError(
+            commonErrorDict.serverError.name,
+            commonErrorDict.serverError.httpCode,
+            error.message,
+            "Ошибка при получении тренировки по id"
+        ))
+    }
+}
+
+export const createTraining = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+        const { trainingDate, startTime, endTime, location, trainingType, teamId, coachId } = req.body
+
+        if (!trainingDate  || !location || !trainingType || !teamId || !coachId) {
+            next(new AppError(
+                commonErrorDict.serverError.name,
+                commonErrorDict.serverError.httpCode,
+                'Поля trainingDate, location, trainingType, teamId, coachId обязательны для заполнения',
+                "Ошибка при создании тренировки"
+            ))
+        }
+
+        const newTraining = await prisma.training.create({
+            data: {
+                trainingDate,
+                startTime,
+                endTime,
+                location,
+                trainingType,
+                teamId,
+                coachId
+            }
+        })
+        res.status(201).json(newTraining)
+
+    } catch (error: any) {
+        next(new AppError(
+            commonErrorDict.serverError.name,
+            commonErrorDict.serverError.httpCode,
+            error.message,
+            "Ошибка при создании тренировки"
+        ))
+    }
+}
+
+export const updateTraining = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+        const { id } = req.params
+        const { trainingDate, startTime, endTime, location, trainingType, teamId, coachId } = req.body
+        const updatedTraining = await prisma.training.update({
+            where: {
+                id: Number(id)
+            },
+            data: {
+                trainingDate,
+                startTime,
+                endTime,
+                location,
+                trainingType,
+                teamId,
+                coachId
+            }
+        })
+        res.json(updatedTraining)
+    }
+    catch (error: any) {
+        next(new AppError(
+            commonErrorDict.serverError.name,
+            commonErrorDict.serverError.httpCode,
+            error.message,
+            "Ошибка при обновлении тренировки"
+        ))
+    }
+}
+
+export const deleteTraining = async (req: Request, res: Response, next:  NextFunction) => {
+    try {
+        const { id } = req.params
+        await prisma.training.delete({
+            where: {
+                id: Number(id)
+            }
+        })
+        res.json({
+            message: `Тренировка с id ${id} успешно удален`
+        })
+    } catch (error: any) {
+        next(new AppError(
+            commonErrorDict.serverError.name,
+            commonErrorDict.serverError.httpCode,
+            error.message,
+            "Ошибка при удалении тренировки"
+        ))
+    }
+}

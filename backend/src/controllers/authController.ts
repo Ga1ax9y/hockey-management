@@ -143,6 +143,7 @@ export const getMe = async (req: AuthRequest, res: Response, next: NextFunction)
                     select: {
                         team: {
                             select: {
+                                id: true,
                                 name: true,
                             }
                         }
