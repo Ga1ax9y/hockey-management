@@ -2,20 +2,147 @@ import type { NextFunction, Request, Response } from "express";
 import { prisma } from "../lib/prisma";
 import { AppError, commonErrorDict } from "../types/AppError";
 
+const buildTeamWhereClause = (query: any) => {
+    const where: any = {}
+
+    const {
+        search,
+        league,
+        season,
+        level,
+        hasPlayers,
+        createdAfter,
+        createdBefore
+    } = query
+
+    if (search) {
+        where.name = { contains: search as string, mode: 'insensitive'}
+    }
+
+    if (league) {
+        where.name = { contains: search as string, mode: 'insensitive'}
+    }
+    if (level !== undefined) {
+        where.level = Number(level);
+    }
+
+    if (season) {
+        where.season = season as string
+    }
+
+    if (createdAfter || createdBefore) {
+        where.createdAt = {}
+        if (createdAfter) where.createdAt.gte = new Date(createdAfter as string)
+        if (createdBefore) where.createdAt.lte = new Date(createdBefore as string)
+    }
+
+    return where
+
+}
 export const getAllTeams = async (req: Request, res: Response, next: NextFunction) => {
     try{
-        const teams = await prisma.team.findMany({
-            select: {
-                id: true,
-                name: true,
-                league: true,
-                level: true,
-                season: true,
-                createdAt: true,
-                updatedAt: true
+        const {
+            page = "1",
+            limit = "20",
+            sortBy = "createdAt",
+            order = "desc",
+            includePlayers = "false",
+            includeStats = "false",
+            ...filters
+        } = req.query
+
+        const pageNum = Math.max(1, Number(page))
+        const limitNum = Math.min(100, Math.max(1, Number(limit)))
+        const skip = (pageNum - 1) * limitNum
+
+        const where = buildTeamWhereClause(filters)
+
+        if (filters.hasPlayers === "true") {
+            where.players = { some: {}}
+        }
+        else if (filters.hasPlayers === "false") {
+            where.players = { none: {}}
+        }
+
+        const include: any = {}
+
+        if (includePlayers === "true"){
+            include.players = {
+                select: {
+                    id: true,
+                    lastName: true,
+                    firstName: true,
+                    position: true,
+                    birthDate: true
+                },
+                orderBy: {
+                    lastName: 'asc'
+                }
+            }
+        }
+        if (includeStats === "true"){
+            include._count = {
+                select: {
+                    players: true,
+                    matches: true,
+                    trainings: true
+                }
+            }
+        }
+        const [teams, total] = await Promise.all([
+            prisma.team.findMany({
+                where,
+                include,
+                skip,
+                take: limitNum,
+                orderBy: {
+                    [sortBy as string]: order
+                }
+            }),
+            prisma.team.count({where})
+        ])
+        const transformedTeams = teams.map(team => ({
+            id: team.id,
+            name: team.name,
+            league: team.league,
+            season: team.season,
+            level: team.level,
+            createdAt: team.createdAt,
+            updatedAt: team.updatedAt,
+            ...(includePlayers === "true") && {
+                players: team.players,
+                playerCount: team.players?.length
+            },
+            // ...(includeStats === "true") && {
+            //     totalPlayers: team._count.players,
+            //     totalMatches: team._count.matches,
+            //     totalTrainings: team._count.trainings
+
+            // }
+        }))
+        res.json({
+            data: transformedTeams,
+            meta: {
+                total,
+                page: pageNum,
+                limit: limitNum,
+                totalPages: Math.ceil(total / limitNum),
+                hasNextPage: pageNum * limitNum < total,
+                hasPrevPage: pageNum > 1
             }
         })
-        res.json(teams)
+        // const teams = await prisma.team.findMany({
+        //     select: {
+        //         id: true,
+        //         name: true,
+        //         league: true,
+        //         level: true,
+        //         season: true,
+        //         createdAt: true,
+        //         updatedAt: true
+        //     }
+        // })
+        // res.json(teams)
     }
     catch(error: any){
         next(new AppError(

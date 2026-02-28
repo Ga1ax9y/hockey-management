@@ -15,6 +15,7 @@ export const getAllPlayers = async (req: Request, res: Response, next: NextFunct
                 height: true,
                 weight: true,
                 contractExpiry: true,
+                currentTeamId: true,
                 currentTeam: {
                     select: {
                         name: true
@@ -56,6 +57,7 @@ export const getPlayerById = async (req: Request, res: Response, next: NextFunct
                 height: true,
                 weight: true,
                 contractExpiry: true,
+                currentTeamId: true,
                 currentTeam: {
                     select: {
                         name: true
