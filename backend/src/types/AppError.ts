@@ -4,6 +4,10 @@ export const commonErrorDict = {
         name: "Resource not found",
         httpCode: 404 as HttpCode
     },
+    unauthorized: {
+        name: "Unauthorized",
+        httpCode: 401 as HttpCode
+    },
     badRequest: {
         name: "Bad request",
         httpCode: 400 as HttpCode
