@@ -171,9 +171,8 @@ model Match {
 
 model Training {
   id Int @id @default(autoincrement())
-  trainingDate DateTime @db.Date
-  startTime DateTime? @db.Time()
-  endTime DateTime? @db.Time()
+  startTime DateTime
+  endTime DateTime
   location String @db.VarChar(255)
   trainingType String @db.VarChar(100)
   team Team @relation(fields: [teamId], references: [id], onDelete: Cascade)

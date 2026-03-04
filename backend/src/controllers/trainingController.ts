@@ -7,7 +7,6 @@ export const getAllTrainings = async (req: Request, res: Response, next: NextFun
         const trainings = await prisma.training.findMany({
             select: {
                 id: true,
-                trainingDate: true,
                 startTime: true,
                 endTime: true,
                 location: true,
@@ -19,7 +18,9 @@ export const getAllTrainings = async (req: Request, res: Response, next: NextFun
 
             }
         })
-        res.json(trainings)
+        res.json({
+            data: trainings
+        })
     }
     catch(error: any){
         next(new AppError(
@@ -41,7 +42,6 @@ export const getTrainingById = async (req: Request, res: Response, next: NextFun
             },
             select: {
                 id: true,
-                trainingDate: true,
                 startTime: true,
                 endTime: true,
                 location: true,
@@ -77,9 +77,9 @@ export const getTrainingById = async (req: Request, res: Response, next: NextFun
 
 export const createTraining = async (req: Request, res: Response, next: NextFunction) => {
     try {
-        const { trainingDate, startTime, endTime, location, trainingType, teamId, coachId } = req.body
-
-        if (!trainingDate  || !location || !trainingType || !teamId || !coachId) {
+        const {startTime, endTime, location, trainingType, teamId, coachId } = req.body
+         console.log('Received body:', req.body);
+        if (!startTime || !endTime  || !location || !trainingType || !teamId || !coachId) {
             next(new AppError(
                 commonErrorDict.serverError.name,
                 commonErrorDict.serverError.httpCode,
@@ -90,9 +90,8 @@ export const createTraining = async (req: Request, res: Response, next: NextFunc
 
         const newTraining = await prisma.training.create({
             data: {
-                trainingDate,
-                startTime,
-                endTime,
+                startTime: new Date(startTime),
+                endTime: new Date(endTime),
                 location,
                 trainingType,
                 teamId,
@@ -114,15 +113,14 @@ export const createTraining = async (req: Request, res: Response, next: NextFunc
 export const updateTraining = async (req: Request, res: Response, next: NextFunction) => {
     try {
         const { id } = req.params
-        const { trainingDate, startTime, endTime, location, trainingType, teamId, coachId } = req.body
+        const {  startTime, endTime, location, trainingType, teamId, coachId } = req.body
         const updatedTraining = await prisma.training.update({
             where: {
                 id: Number(id)
             },
             data: {
-                trainingDate,
-                startTime,
-                endTime,
+                startTime: new Date(startTime),
+                endTime: new Date(endTime),
                 location,
                 trainingType,
                 teamId,

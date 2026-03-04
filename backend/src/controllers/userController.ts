@@ -42,7 +42,8 @@ export const getUserById = async (req: Request, res: Response, next: NextFunctio
                 fullName: true,
                 role: {
                     select: {
-                        name: true
+                        name: true,
+                        code: true
                     }
                 }
 

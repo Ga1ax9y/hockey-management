@@ -145,6 +145,7 @@ export const getMe = async (req: AuthRequest, res: Response, next: NextFunction)
                             select: {
                                 id: true,
                                 name: true,
+                                league: true
                             }
                         }
                     }
