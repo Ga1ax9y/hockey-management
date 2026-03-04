@@ -50,7 +50,7 @@ export const getAllTeams = async (req: Request, res: Response, next: NextFunctio
             includeStats = "false",
             ...filters
         } = req.query
-
+        console.log(filters)
         const pageNum = Math.max(1, Number(page))
         const limitNum = Math.min(100, Math.max(1, Number(limit)))
         const skip = (pageNum - 1) * limitNum
@@ -157,20 +157,73 @@ export const getAllTeams = async (req: Request, res: Response, next: NextFunctio
 export const getTeamById = async (req: Request, res: Response, next: NextFunction) => {
     try {
         const { id } = req.params
+        const {
+            includePlayers = "false",
+            includeUsers = 'false',
+            playerLimit = "50"
+         } = req.query
+
+        const include: any = {}
+
+        if (includePlayers === "true"){
+            include.players = {
+                select: {
+                    id: true,
+                    lastName: true,
+                    firstName: true,
+                    position: true,
+                    birthDate: true,
+                    height: true,
+                    weight: true,
+                    contractExpiry: true
+                },
+                orderBy: [
+                    { position: 'asc'},
+                    { lastName: 'asc'}
+                ],
+                take: Number(playerLimit)
+            }
+        }
+        if (includeUsers === "true") {
+        include.userTeams = {
+            include: {
+                user: {
+                    select: {
+                        id: true,
+                        fullName: true,
+                        email: true,
+                        isActive: true,
+                        role: {
+                            select: {
+                                name: true,
+                                code: true
+                            }
+                        }
+                    }
+                }
+            },
+            where: {
+            user: {
+                isActive: true
+            }
+            }
+        };
+        }
 
         const team = await prisma.team.findUnique({
             where: {
-                id: Number(id)
+                id: Number(id),
             },
-            select: {
-                id: true,
-                name: true,
-                league: true,
-                level: true,
-                season: true,
-                createdAt: true,
-                updatedAt: true
-            }
+            include,
+            // select: {
+            //     id: true,
+            //     name: true,
+            //     league: true,
+            //     level: true,
+            //     season: true,
+            //     createdAt: true,
+            //     updatedAt: true
+            // }
         })
         if (!team){
             return next(
@@ -182,6 +235,7 @@ export const getTeamById = async (req: Request, res: Response, next: NextFunctio
                 )
             );
         }
+
         res.json(team)
     }
     catch (error: any) {
@@ -291,3 +345,149 @@ export const deleteTeam = async (req: Request, res: Response, next:  NextFunctio
         ))
     }
 }
+
+export const addUserToTeam = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+        const { id: teamId } = req.params
+        const { userId } = req.body
+
+        if (!userId) {
+            return next(new AppError(
+                commonErrorDict.badRequest.name,
+                commonErrorDict.badRequest.httpCode,
+                "Поле userId обязательно",
+                "Ошибка при добавлении пользователя в команду"
+            ));
+        }
+            const team = await prisma.team.findUnique({
+                where: {
+                    id: Number(teamId)
+                }
+            })
+
+        if (!team) {
+            return next(new AppError(
+                commonErrorDict.resourceNotFound.name,
+                commonErrorDict.resourceNotFound.httpCode,
+                "Команда не найдена",
+                "Ошибка при добавлении пользователя в команду"
+            ));
+         }
+        const user = await prisma.user.findUnique({
+            where: {
+                id: Number(userId)
+            }
+        })
+
+        if (!user) {
+            return next(new AppError(
+                commonErrorDict.resourceNotFound.name,
+                commonErrorDict.resourceNotFound.httpCode,
+                "Пользователь не найден",
+                "Ошибка при добавлении пользователя в команду"
+            ));
+        }
+        const existingLink = await prisma.userTeam.findUnique({
+            where: {
+                userId_teamId: {
+                userId: Number(userId),
+                teamId: Number(teamId)
+                }
+            }
+        });
+
+        if (existingLink) {
+            return next(new AppError(
+                commonErrorDict.serverError.name,
+                commonErrorDict.serverError.httpCode,
+                "Пользователь уже привязан к этой команде",
+                "Ошибка при добавлении пользователя в команду"
+            ));
+        }
+        const userTeam = await prisma.userTeam.create({
+            data: {
+                userId: Number(userId),
+                teamId: Number(teamId)
+            },
+            include: {
+                user: {
+                    select: {
+                        id: true,
+                        fullName: true,
+                        email: true,
+                        role: {
+                            select:{
+                                name: true,
+                                code: true
+                            }
+                        }
+                    }
+                }
+            }
+        });
+
+        res.status(201).json({
+            success: true,
+            message: "Пользователь успешно добавлен в команду",
+            data: userTeam
+        });
+    }
+    catch (error: any) {
+        next(new AppError(
+        commonErrorDict.serverError.name,
+        commonErrorDict.serverError.httpCode,
+        error.message,
+        "Ошибка при удалении пользователя из команды"
+        ));
+    }
+}
+
+export const removeUserFromTeam = async ( req: Request, res: Response, next: NextFunction) => {
+    try {
+        const { id: teamId, userId } = req.params;
+
+        const userTeam = await prisma.userTeam.findUnique({
+            where: {
+                userId_teamId: {
+                    userId: Number(userId),
+                    teamId: Number(teamId)
+                }
+            }
+        });
+
+        if (!userTeam) {
+            return next(new AppError(
+                commonErrorDict.resourceNotFound.name,
+                commonErrorDict.resourceNotFound.httpCode,
+                "Пользователь не привязан к этой команде",
+                "Ошибка при удалении пользователя из команды"
+            ));
+        }
+
+        await prisma.userTeam.delete({
+            where: {
+                userId_teamId: {
+                    userId: Number(userId),
+                    teamId: Number(teamId)
+                }
+            }
+        });
+
+        res.json({
+            success: true,
+            message: "Пользователь успешно удалён из команды",
+            deleted: {
+                userId: Number(userId),
+                teamId: Number(teamId)
+            }
+        });
+
+    } catch (error: any) {
+        next(new AppError(
+            commonErrorDict.serverError.name,
+            commonErrorDict.serverError.httpCode,
+            error.message,
+            "Ошибка при удалении пользователя из команды"
+        ));
+    }
+};
