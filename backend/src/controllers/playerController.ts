@@ -1,33 +1,139 @@
 import type { NextFunction, Request, Response } from "express";
 import { prisma } from "../lib/prisma";
 import { AppError, commonErrorDict } from "../types/AppError";
+import type { Prisma } from "../generated/prisma/client";
+import { getPagination } from "../services/pagination";
+import type { PlayerInclude, PlayerWhereInput } from "../generated/prisma/models";
+import { paginatedResponse } from "../services/paginatedResponse";
 
+const buildPlayerWhereClause = (query: any) => {
+    const where: Prisma.PlayerWhereInput = {}
+
+    const {
+        search,
+        position,
+        minHeight,
+        maxHeight,
+        minWeight,
+        maxWeight,
+        contractExpiryLte,
+        currentTeamId,
+        hasTransfers
+    } = query
+
+    if (search){
+        where.lastName = { contains: search as string, mode: "insensitive"}
+    }
+
+    if (position){
+        where.position = position as string
+    }
+
+    if (currentTeamId){
+        where.currentTeamId = Number(currentTeamId)
+    }
+
+    if (minHeight || maxHeight){
+        where.height = {}
+        if (minHeight) where.height.gte = Number(minHeight)
+        if (maxHeight) where.height.lte = Number(maxHeight)
+    }
+
+    if (minWeight || maxWeight){
+        where.weight = {}
+        if (minWeight) where.weight.gte = Number(minWeight)
+        if (maxWeight) where.weight.lte = Number(maxWeight)
+    }
+
+    if (contractExpiryLte){
+        where.contractExpiry = { lte: new Date(contractExpiryLte as string)}
+    }
+
+    return where
+
+}
 export const getAllPlayers = async (req: Request, res: Response, next: NextFunction) => {
-    try{
-        const players = await prisma.player.findMany({
-            select: {
-                id: true,
-                lastName: true,
-                firstName: true,
-                middleName: true,
-                birthDate: true,
-                position: true,
-                height: true,
-                weight: true,
-                contractExpiry: true,
-                currentTeamId: true,
-                currentTeam: {
-                    select: {
-                        name: true
-                    }
-                },
-                createdAt: true,
-                updatedAt: true
+    try {
+        const {
+            sortBy = "lastName",
+            order = "desc",
+            includeCurrentTeam,
+            includeStats,
+            ...filters
+        } = req.query
+        const { page, limit, skip } = getPagination(req.query)
 
+        const where: PlayerWhereInput = buildPlayerWhereClause(filters)
 
+        if (filters.hasTransfers === "true"){
+            where.careerHistory = { some: {}}
+        }
+        else if (filters.hasTransfers === "false"){
+            where.careerHistory = { none: {}}
+        }
+
+        const include: PlayerInclude = {}
+
+        if (includeCurrentTeam === "true"){
+            include.currentTeam = {
+                select: {
+                    id: true,
+                    name: true,
+                    league: true
+                }
             }
-        })
-        res.json(players)
+        }
+        if (includeStats === "true"){
+            include._count = {
+                select: {
+                    careerHistory: true,
+                    medicalHistory: true,
+                    physicalData: true,
+                    matchStats: true,
+                    trainingStats: true
+                }
+            }
+        }
+
+        const [players, total] = await Promise.all([
+            prisma.player.findMany({
+                where,
+                include,
+                skip,
+                take: limit,
+                orderBy: {
+                    [sortBy as string]: order
+                }
+            }),
+            prisma.player.count({where})
+        ])
+        const transformedPlayers = players.map(player => ({
+            id: player.id,
+            lastName: player.lastName,
+            firstName: player.firstName,
+            middleName: player.middleName,
+            birthDate: player.birthDate,
+            position: player.position,
+            height: player.height,
+            weight: player.weight,
+            contractExpiry: player.contractExpiry,
+            currentTeamId: player.currentTeamId,
+            createdAt: player.createdAt,
+            updatedAt: player.updatedAt,
+            ...(includeCurrentTeam === "true") && {
+                currentTeam: player.currentTeam
+            },
+            ...(includeStats === "true" && player._count) && {
+                totalMatches: player._count.matchStats,
+                totalTrainings: player._count.trainingStats,
+                totalTransfers: player._count.careerHistory,
+                totalInjuries: player._count.medicalHistory,
+                totalPhysical: player._count.physicalData
+            }
+        }))
+
+        res.json(paginatedResponse(transformedPlayers, total, page, limit))
+
     }
     catch(error: any){
         next(new AppError(
@@ -42,33 +148,147 @@ export const getAllPlayers = async (req: Request, res: Response, next: NextFunct
 export const getPlayerById = async (req: Request, res: Response, next: NextFunction) => {
     try {
         const { id } = req.params
+        const {
+            includeMedical = "false",
+            includeTransfers = "false",
+            includePhysical = "false",
+            includeMatchStats = "false",
+            includeTrainingStats = "false",
+            includeReadinessIndex = "false",
+            limit = "10"
+        } = req.query
+        const limitNum = Math.min(25, Math.max(1, Number(limit)))
+        const include: Prisma.PlayerInclude = {}
+
+        if (includeTransfers === "true"){
+            include.careerHistory = {
+                select: {
+                    id: true,
+                    transferDate: true,
+                    transferType: true,
+                    fromTeam: {
+                        select: {
+                            id: true,
+                            name: true,
+                            season: true,
+                            league: true,
+                            level: true
+                        }
+                    },
+                    toTeam:{
+                        select: {
+                            id: true,
+                            name: true,
+                            season: true,
+                            league: true,
+                            level: true
+                        }
+                    },
+                    createdAt: true,
+                    updatedAt: true
+                },
+                orderBy: { transferDate: 'desc'},
+                take: limitNum
+            }
+        }
+
+        if (includeMedical === "true"){
+            include.medicalHistory = {
+                select: {
+                    injuryDate: true,
+                    recoveryDate: true,
+                    diagnosis: true,
+                    status: true,
+                    createdAt: true,
+                    updatedAt: true
+                },
+                orderBy: {injuryDate: 'desc'},
+                take: Number(limitNum)
+            }
+        }
+
+        if (includePhysical === "true"){
+            include.physicalData = {
+                select: {
+                    recordedDate: true,
+                    metricType: true,
+                    metricValue: true,
+                    unit: true,
+                    createdAt: true,
+                    updatedAt: true
+                },
+                orderBy: {recordedDate: 'desc'},
+                take: limitNum
+            }
+        }
+
+        if (includeMatchStats === "true"){
+            include.matchStats = {
+                select: {
+                    match: {
+                        select: {
+                            opponentName: true,
+                            matchDate: true
+                        }
+                    },
+                    goals: true,
+                    assists: true,
+                    shots: true,
+                    hits: true,
+                    plusMinus: true,
+                    penaltyMinutes: true,
+                    faceoffWins: true,
+                    createdAt: true,
+                    updatedAt: true
+                },
+                orderBy: { match: {matchDate: "desc"} },
+                take: limitNum
+            }
+        }
+
+        if (includeTrainingStats === "true"){
+            include.trainingStats = {
+                select: {
+                    training: {
+                        select: {
+                            startTime: true,
+                            trainingType: true,
+                            coach: {
+                                select: {
+                                    fullName: true
+                                }
+                            }
+                        }
+                    },
+                    coachRating: true,
+                    description: true,
+                    createdAt: true,
+                    updatedAt: true
+                },
+                orderBy: {training: {startTime: 'desc'}},
+                take: limitNum
+            }
+        }
+
+        if (includeReadinessIndex === "true"){
+            include.readinessIndex =  {
+                select: {
+                    readinessValue: true,
+                    confidenceLevel: true,
+                    createdAt: true,
+                    updatedAt: true
+                },
+                orderBy: { createdAt: 'desc'}
+            }
+        }
 
         const player = await prisma.player.findUnique({
             where: {
                 id: Number(id)
             },
-            select: {
-                id: true,
-                lastName: true,
-                firstName: true,
-                middleName: true,
-                birthDate: true,
-                position: true,
-                height: true,
-                weight: true,
-                contractExpiry: true,
-                currentTeamId: true,
-                currentTeam: {
-                    select: {
-                        name: true
-                    }
-                },
-                createdAt: true,
-                updatedAt: true
-
-
-            }
+            include
         })
+
         if (!player){
             return next(
                 new AppError(
@@ -79,7 +299,29 @@ export const getPlayerById = async (req: Request, res: Response, next: NextFunct
                 )
             );
         }
-        res.json(player)
+        const response = {
+            id: player.id,
+            lastName: player.lastName,
+            firstName: player.firstName,
+            middleName: player.middleName,
+            birthDate: player.birthDate,
+            position: player.position,
+            height: player.height,
+            weight: player.weight,
+            contractExpiry: player.contractExpiry,
+            currentTeamId: player.currentTeamId,
+            createdAt: player.createdAt,
+            updatedAt: player.updatedAt,
+
+            ...(includeTransfers === "true" && { transfers: player.careerHistory }),
+            ...(includeMedical === "true" && { medicalHistory: player.medicalHistory }),
+            ...(includePhysical === "true" && { physicalData: player.physicalData }),
+            ...(includeMatchStats === "true" && { matchStats: player.matchStats }),
+            ...(includeTrainingStats === "true" && { trainingStats: player.trainingStats }),
+            ...(includeReadinessIndex === "true" && { readinessIndex: player.readinessIndex?.[0] }),
+        }
+
+        res.json(response)
     }
     catch (error: any) {
         next(new AppError(
