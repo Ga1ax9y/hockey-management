@@ -1,9 +1,12 @@
 import type { NextFunction, Request, Response } from "express";
 import { prisma } from "../lib/prisma";
 import { AppError, commonErrorDict } from "../types/AppError";
+import { Prisma } from "../generated/prisma/client";
+import { getPagination } from "../services/pagination";
+import { paginatedResponse } from "../services/paginatedResponse";
 
 const buildTeamWhereClause = (query: any) => {
-    const where: any = {}
+    const where: Prisma.TeamWhereInput = {}
 
     const {
         search,
@@ -20,7 +23,7 @@ const buildTeamWhereClause = (query: any) => {
     }
 
     if (league) {
-        where.name = { contains: search as string, mode: 'insensitive'}
+        where.league = { contains: league as string, mode: 'insensitive'}
     }
     if (level !== undefined) {
         where.level = Number(level);
@@ -42,18 +45,13 @@ const buildTeamWhereClause = (query: any) => {
 export const getAllTeams = async (req: Request, res: Response, next: NextFunction) => {
     try{
         const {
-            page = "1",
-            limit = "20",
             sortBy = "createdAt",
             order = "desc",
             includePlayers = "false",
             includeStats = "false",
             ...filters
         } = req.query
-        console.log(filters)
-        const pageNum = Math.max(1, Number(page))
-        const limitNum = Math.min(100, Math.max(1, Number(limit)))
-        const skip = (pageNum - 1) * limitNum
+        const { page, limit, skip } = getPagination(req.query)
 
         const where = buildTeamWhereClause(filters)
 
@@ -64,7 +62,7 @@ export const getAllTeams = async (req: Request, res: Response, next: NextFunctio
             where.players = { none: {}}
         }
 
-        const include: any = {}
+        const include: Prisma.TeamInclude = {}
 
         if (includePlayers === "true"){
             include.players = {
@@ -94,7 +92,7 @@ export const getAllTeams = async (req: Request, res: Response, next: NextFunctio
                 where,
                 include,
                 skip,
-                take: limitNum,
+                take: limit,
                 orderBy: {
                     [sortBy as string]: order
                 }
@@ -113,36 +111,15 @@ export const getAllTeams = async (req: Request, res: Response, next: NextFunctio
                 players: team.players,
                 playerCount: team.players?.length
             },
-            // ...(includeStats === "true") && {
-            //     totalPlayers: team._count.players,
-            //     totalMatches: team._count.matches,
-            //     totalTrainings: team._count.trainings
-
-            // }
+            ...(includeStats === "true" && team._count && {
+                totalPlayers: team._count.players,
+                totalMatches: team._count.matches,
+                totalTrainings: team._count.trainings
+            })
         }))
-        res.json({
-            data: transformedTeams,
-            meta: {
-                total,
-                page: pageNum,
-                limit: limitNum,
-                totalPages: Math.ceil(total / limitNum),
-                hasNextPage: pageNum * limitNum < total,
-                hasPrevPage: pageNum > 1
-            }
-        })
-        // const teams = await prisma.team.findMany({
-        //     select: {
-        //         id: true,
-        //         name: true,
-        //         league: true,
-        //         level: true,
-        //         season: true,
-        //         createdAt: true,
-        //         updatedAt: true
-        //     }
-        // })
-        // res.json(teams)
+        res.json(
+            paginatedResponse(transformedTeams, total, page, limit)
+        )
     }
     catch(error: any){
         next(new AppError(
@@ -163,7 +140,7 @@ export const getTeamById = async (req: Request, res: Response, next: NextFunctio
             playerLimit = "50"
          } = req.query
 
-        const include: any = {}
+        const include: Prisma.TeamInclude = {}
 
         if (includePlayers === "true"){
             include.players = {
@@ -215,15 +192,6 @@ export const getTeamById = async (req: Request, res: Response, next: NextFunctio
                 id: Number(id),
             },
             include,
-            // select: {
-            //     id: true,
-            //     name: true,
-            //     league: true,
-            //     level: true,
-            //     season: true,
-            //     createdAt: true,
-            //     updatedAt: true
-            // }
         })
         if (!team){
             return next(
@@ -236,7 +204,19 @@ export const getTeamById = async (req: Request, res: Response, next: NextFunctio
             );
         }
 
-        res.json(team)
+        const response =  {
+            id: team.id,
+            name:  team.name,
+            league: team.league,
+            season: team.season,
+            createdAt: team.createdAt,
+            updatedAt: team.updatedAt,
+
+            ...(includePlayers === "true" && { players: team.players }),
+            ...(includeUsers === "true" && { users: team.userTeams }),
+        }
+
+        res.json(response)
     }
     catch (error: any) {
         next(new AppError(
