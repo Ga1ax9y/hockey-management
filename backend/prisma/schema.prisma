@@ -152,8 +152,7 @@ model AuditLog {
 
 model Match {
   id Int @id @default(autoincrement())
-  matchDate DateTime @db.Date
-  matchTime DateTime @db.Time()
+  matchDate DateTime
   location String @db.VarChar(255)
   myTeam Team @relation(fields: [myTeamId], references: [id], onDelete: Cascade)
   myTeamId Int
