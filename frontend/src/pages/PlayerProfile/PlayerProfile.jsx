@@ -1,14 +1,8 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import {
-  getPlayerById,
-  getPlayerMatchStats,
-  getPlayerTrainingStats,
-  getPlayerCareerHistory,
-  getPlayerMedicalHistory,
-} from '../../services/api';
+import {getPlayerById,} from '../../services/api';
 import './PlayerProfile.css';
-import { useAuthStore } from '../../hooks/useAuthStore';
+import { useRole } from '../../hooks/useRole';
 
 export default function PlayerProfile() {
   const { id } = useParams();
@@ -20,31 +14,23 @@ export default function PlayerProfile() {
   const [medicalHistory, setMedicalHistory] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
-  const { role } = useAuthStore();
-  const isMedicalStaff = role === 8;
+  const { isDoctor } = useRole()
 
   const loadPlayerData = async () => {
     try {
       setLoading(true);
-      const [
-        profileRes,
-        matchRes,
-        trainingRes,
-        careerRes,
-        medicalRes
-      ] = await Promise.all([
-        getPlayerById(id),
-        getPlayerMatchStats(id),
-        getPlayerTrainingStats(id),
-        getPlayerCareerHistory(id),
-        getPlayerMedicalHistory(id),
-      ]);
+      const player = await getPlayerById(id, {includeTransfers: true,
+                                              includeMedical: true,
+                                              includePhysical:true,
+                                              includeMatchStats: true,
+                                              includeTrainingStats: true,
+                                              includeReadinessIndex: true} )
 
-      setPlayer(profileRes.data);
-      setMatchStats(matchRes.data);
-      setTrainingStats(trainingRes.data);
-      setCareerHistory(careerRes.data);
-      setMedicalHistory(medicalRes.data);
+      setPlayer(player.data);
+      setMatchStats(player.data.matchStats);
+      setTrainingStats(player.data.trainingStats);
+      setCareerHistory(player.data.transfers);
+      setMedicalHistory(player.data.medicalHistory);
       setError('');
     } catch (err) {
       setError('Не удалось загрузить профиль игрока');
@@ -72,19 +58,19 @@ export default function PlayerProfile() {
       </button>
 
       <div className="player-header">
-        <h1>{player.last_name} {player.first_name}</h1>
+        <h1>{player.lastName} {player.firstName}</h1>
         <p className="player-position">{player.position || 'Позиция не указана'}</p>
         <div className="player-basic-info">
           <span>Рост: {player.height || '—'} см</span>
           <span>Вес: {player.weight || '—'} кг</span>
-          <span>Дата рождения: {player.birth_date ? new Date(player.birth_date).toLocaleDateString('ru-RU') : '—'}</span>
-          <span>Контракт до: {player.contract_expiry ? new Date(player.contract_expiry).toLocaleDateString('ru-RU') : '—'}</span>
+          <span>Дата рождения: {player.birthDate ? new Date(player.birthDate).toLocaleDateString('ru-RU') : '—'}</span>
+          <span>Контракт до: {player.contractExpiry ? new Date(player.contractExpiry).toLocaleDateString('ru-RU') : '—'}</span>
         </div>
       </div>
 
       <div className="player-section">
         <h2>Матчевая статистика (последние 10)</h2>
-        {matchStats.length === 0 ? (
+        {matchStats?.length === 0 ? (
           <p>Нет данных о матчах</p>
         ) : (
           <table className="stats-table">
@@ -103,10 +89,10 @@ export default function PlayerProfile() {
               {matchStats.map((match, i) => (
                 <tr key={i}>
                   <td>{new Date(match.match_date).toLocaleDateString('ru-RU')}</td>
-                  <td>{match.home_team} – {match.away_team}</td>
+                  <td>{match.myTeam.name} – {match.opponentName}</td>
                   <td>{match.goals}</td>
                   <td>{match.assists}</td>
-                  <td>{match.plus_minus}</td>
+                  <td>{match.plusMinus}</td>
                   <td>{match.shots}</td>
                   <td>{match.hits}</td>
                 </tr>
@@ -118,18 +104,18 @@ export default function PlayerProfile() {
 
       <div className="player-section">
         <h2>Тренировки (последние 5)</h2>
-        {trainingStats.length === 0 ? (
+        {trainingStats?.length === 0 ? (
           <p>Нет данных о тренировках</p>
         ) : (
           <div className="trainings-list">
             {trainingStats.map((train, i) => (
               <div key={i} className="training-card">
                 <div className="training-header">
-                  <span className="training-date">{new Date(train.training_date).toLocaleDateString('ru-RU')}</span>
-                  <span className="training-type">{train.training_type}</span>
+                  <span className="training-date">{new Date(train.trainingDate).toLocaleDateString('ru-RU')}</span>
+                  <span className="training-type">{train.trainingType}</span>
                 </div>
-                <p><strong>Тренер:</strong> {train.coach_name || '—'}</p>
-                <p><strong>Оценка:</strong> {train.coach_rating || '—'}</p>
+                <p><strong>Тренер:</strong> {train.coachName || '—'}</p>
+                <p><strong>Оценка:</strong> {train.coachRating || '—'}</p>
                 {train.description && <p>{train.description}</p>}
               </div>
             ))}
@@ -139,15 +125,15 @@ export default function PlayerProfile() {
 
       <div className="player-section">
         <h2>История карьеры</h2>
-        {careerHistory.length === 0 ? (
+        {careerHistory?.length === 0 ? (
           <p>Нет данных о карьере</p>
         ) : (
           <ul className="career-list">
             {careerHistory.map((item) => (
               <li key={item.id} className="career-item">
-                <span className="career-date">{new Date(item.transfer_date).toLocaleDateString('ru-RU')}</span>
-                <span className="career-type">{item.transfer_type}</span>
-                <span>из {item.from_team || '—'} → в {item.to_team || '—'}</span>
+                <span className="career-date">{new Date(item.transferDate).toLocaleDateString('ru-RU')}</span>
+                <span className="career-type">{item.transferType}</span>
+                <span>из {item.fromTeam || '—'} → в {item.toTeam || '—'}</span>
               </li>
             ))}
           </ul>
@@ -156,28 +142,28 @@ export default function PlayerProfile() {
 
       <div className="player-section">
         <h2>Медицинская история</h2>
-        {medicalHistory.length === 0 ? (
+        {medicalHistory?.length === 0 ? (
           <p>Нет медицинских записей</p>
         ) : (
           <ul className="medical-list">
             {medicalHistory.map((rec) => (
               <li key={rec.id} className="medical-item">
                 <div className="medical-header">
-                  <span className="medical-date">{new Date(rec.injury_date).toLocaleDateString('ru-RU')}</span>
+                  <span className="medical-date">{new Date(rec.injuryDate).toLocaleDateString('ru-RU')}</span>
                   <span className="medical-status">{rec.status}</span>
                 </div>
                 <p><strong>Диагноз:</strong> {rec.diagnosis}</p>
-                {rec.recovery_date && (
-                  <p><strong>Восстановление:</strong> {new Date(rec.recovery_date).toLocaleDateString('ru-RU')}</p>
+                {rec.recoveryDate && (
+                  <p><strong>Восстановление:</strong> {new Date(rec.recoveryDate).toLocaleDateString('ru-RU')}</p>
                 )}
               </li>
             ))}
           </ul>
         )}
-        {isMedicalStaff && (
+        {isDoctor && (
           <button
             className="btn-medical-add"
-            onClick={() => navigate(`/medical/add/${id}`)}
+            onClick={() => navigate(`/players/${id}/addMedical`)}
           >
             Добавить медицинское заключение
           </button>

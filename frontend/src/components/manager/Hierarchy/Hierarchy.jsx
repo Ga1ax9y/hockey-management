@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { getTeams, createTeam } from '../../../services/api';
 import { useNavigate } from 'react-router-dom';
 import './Hierarchy.css';
-import { useAuthStore } from '../../../hooks/useAuthStore';
+import { useRole } from '../../../hooks/useRole';
 export default function Hierarchy() {
   const navigate = useNavigate();
   const [teams, setTeams] = useState([]);
@@ -10,22 +10,22 @@ export default function Hierarchy() {
   const [error, setError] = useState('');
   const [isCreating, setIsCreating] = useState(false);
   const [newTeam, setNewTeam] = useState({
-    team_name: '',
+    name: '',
     league: '',
     level: 1,
     season: new Date().getFullYear() + '/' + (new Date().getFullYear() + 1).toString().slice(-2),
   });
-  const { role } = useAuthStore();
-  const isAdmin = role === 1;
-  const isManager = role === 7;
+  const {isAdmin, isManager} = useRole()
+
 
   const loadTeams = async () => {
     try {
       setLoading(true);
       const res = await getTeams();
-      const sorted = res.data.sort((a, b) => {
+      const teamsArray = res.data.data
+      const sorted = teamsArray.sort((a, b) => {
         if (a.level !== b.level) return a.level - b.level;
-        return a.team_name.localeCompare(b.team_name);
+        return a.name.localeCompare(b.name);
       });
       setTeams(sorted);
       setError('');
@@ -46,7 +46,7 @@ export default function Hierarchy() {
     try {
       await createTeam(newTeam);
       setNewTeam({
-        team_name: '',
+        name: '',
         league: '',
         level: 1,
         season: new Date().getFullYear() + '/' + (new Date().getFullYear() + 1).toString().slice(-2),
@@ -79,8 +79,8 @@ export default function Hierarchy() {
             <label>Название команды *</label>
             <input
               type="text"
-              value={newTeam.team_name}
-              onChange={(e) => setNewTeam({ ...newTeam, team_name: e.target.value })}
+              value={newTeam.name}
+              onChange={(e) => setNewTeam({ ...newTeam, name: e.target.value })}
               required
             />
           </div>
@@ -135,7 +135,7 @@ export default function Hierarchy() {
                     className="hierarchy-team-card clickable"
                     onClick={() => navigate(`/teams/${team.id}`)}
                     >
-                    <div className="team-name">{team.team_name}</div>
+                    <div className="team-name">{team.name}</div>
                     <div className="team-meta">
                         {team.league && <span className="team-league">{team.league}</span>}
                         <span className="team-season">{team.season}</span>

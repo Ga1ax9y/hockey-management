@@ -1,51 +1,62 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import {
   getTrainings,
   createTraining,
   updateTraining,
   deleteTraining,
   getTeams,
-  getCurrentUserTeams,
-  getCurrentUser,
-  getTeamUsers,
+  getTeamById,
 } from '../../../services/api';
 import './Trainings.css';
-import { formatISOToDateInput } from '../../../utils/date';
+import { useRole } from '../../../hooks/useRole';
+import { useAuthStore } from '../../../hooks/useAuthStore';
+import { formatDateTimeToRU, toInputDateTime, inputDateTimeToISO } from '../../../utils/date';
+
+const TRAINING_TYPES = [
+  { value: '', label: 'Выберите тип' },
+  { value: 'ice', label: 'Лед' },
+  { value: 'gym', label: 'Тренажерный зал' },
+  { value: 'theory', label: 'Теория' },
+  { value: 'recovery', label: 'Восстановление' },
+  { value: 'game', label: 'Игровая' },
+];
 
 export default function Trainings() {
   const [trainings, setTrainings] = useState([]);
   const [teams, setTeams] = useState([]);
-  const [userTeams, setUserTeams] = useState([]);
   const [coaches, setCoaches] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [isCreating, setIsCreating] = useState(false);
   const [editingId, setEditingId] = useState(null);
+
   const [formData, setFormData] = useState({
-    training_date: '',
-    start_time: '',
-    end_time: '',
+    startTime: '',
+    endTime: '',
     location: '',
-    training_type: '',
-    team_id: '',
-    coach_id: '',
+    trainingType: '',
+    teamId: '',
+    coachId: '',
   });
-  const [user, setUser] = useState(null);
+
+  const { isCoach, isAdmin, isManager } = useRole();
+  const user = useAuthStore(state => state.user);
+  const canManage = isCoach || isAdmin || isManager;
 
   useEffect(() => {
     const loadData = async () => {
       try {
         setLoading(true);
-        const [trainingsRes, teamsRes, userTeamsRes, userRes] = await Promise.all([
+        const [trainingsRes, teamsRes] = await Promise.all([
           getTrainings(),
           getTeams(),
-          getCurrentUserTeams(),
-          getCurrentUser(),
         ]);
-        setTrainings(trainingsRes.data);
-        setTeams(teamsRes.data);
-        setUserTeams(userTeamsRes.data || []);
-        setUser(userRes.data);
+
+        const trainingsData = trainingsRes.data?.data || trainingsRes.data || [];
+        const teamsData = teamsRes.data?.data || teamsRes.data || [];
+
+        setTrainings(trainingsData);
+        setTeams(teamsData);
         setError('');
       } catch (err) {
         console.error(err);
@@ -57,47 +68,54 @@ export default function Trainings() {
     loadData();
   }, []);
 
-  useEffect(() => {
-    if (!user || !formData.team_id) {
+  const loadCoaches = useCallback(async (teamId) => {
+    if (!teamId) {
       setCoaches([]);
       return;
     }
 
-    const loadCoaches = async () => {
-      try {
-        const res = await getTeamUsers(formData.team_id);
-        const teamCoaches = res.data.filter(u => u.role_id === 2);
-        setCoaches(teamCoaches);
+    try {
+      const res = await getTeamById(teamId, { includeUsers: true });
+      const teamData = res.data?.data || res.data || {};
 
-        if (!editingId && user.role_id === 2) {
-          const isUserCoach = teamCoaches.some(c => c.id === user.id);
-          if (isUserCoach) {
-            setFormData(prev => {
-              if (prev.team_id === formData.team_id) {
-                return { ...prev, coach_id: user.id.toString() };
-              }
-              return prev;
-            });
-          }
-        }
-      } catch (err) {
-        console.error('Ошибка загрузки тренеров', err);
-        setCoaches([]);
-      }
-    };
+      const teamUsers = teamData.userTeams?.map(ut => ut.user).filter(Boolean) || [];
 
-    loadCoaches();
-  }, [formData.team_id, user, editingId]);
+      const teamCoaches = teamUsers.filter(u => u.role?.code === 'COACH');
+
+      setCoaches(teamCoaches);
+    } catch (err) {
+      console.error('Ошибка загрузки тренеров:', err);
+      setCoaches([]);
+    }
+  }, []);
+
+  useEffect(() => {
+    if (editingId) return;
+
+    const teamId = formData.teamId;
+    if (!teamId) {
+      setCoaches([]);
+      return;
+    }
+
+    loadCoaches(teamId);
+
+    if (isCoach) {
+      setFormData(prev => ({
+        ...prev,
+        coachId: user?.id?.toString() || ''
+      }));
+    }
+  }, [formData.teamId, loadCoaches, isCoach, user, editingId]);
 
   const resetForm = () => {
     setFormData({
-      training_date: '',
-      start_time: '',
-      end_time: '',
+      startTime: '',
+      endTime: '',
       location: '',
-      training_type: '',
-      team_id: '',
-      coach_id: '',
+      trainingType: '',
+      teamId: '',
+      coachId: '',
     });
     setEditingId(null);
     setIsCreating(false);
@@ -106,10 +124,14 @@ export default function Trainings() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
     const submitData = {
-      ...formData,
-      team_id: Number(formData.team_id),
-      coach_id: formData.coach_id ? Number(formData.coach_id) : null,
+      startTime:  inputDateTimeToISO(formData.startTime),
+      endTime:  inputDateTimeToISO(formData.endTime),
+      location: formData.location,
+      trainingType: formData.trainingType,
+      teamId: Number(formData.teamId),
+      coachId: formData.coachId ? Number(formData.coachId) : null,
     };
 
     try {
@@ -118,47 +140,59 @@ export default function Trainings() {
       } else {
         await createTraining(submitData);
       }
+
       resetForm();
+
       const res = await getTrainings();
-      setTrainings(res.data);
+      setTrainings(res.data?.data || res.data || []);
+
     } catch (err) {
-      setError(err.response?.data?.error || 'Ошибка при сохранении');
+      setError(err.response?.data?.message || err.response?.data?.error || 'Ошибка при сохранении');
     }
   };
 
-  const handleEdit = (t) => {
-    setFormData({
-      training_date: t.training_date,
-      start_time: t.start_time,
-      end_time: t.end_time || '',
-      location: t.location,
-      training_type: t.training_type,
-      team_id: t.team_id?.toString() || '',
-      coach_id: t.coach_id?.toString() || '',
-    });
+  const handleEdit = async (t) => {
     setEditingId(t.id);
+
+    setFormData({
+      startTime: toInputDateTime(t.startTime),
+      endTime: toInputDateTime(t.endTime),
+      location: t.location || '',
+      trainingType: t.trainingType || '',
+      teamId: t.teamId?.toString() || '',
+      coachId: t.coachId?.toString() || '',
+    });
+
     setIsCreating(true);
 
-    if (t.team_id) {
-      getTeamUsers(t.team_id).then(res => {
-        const teamCoaches = res.data.filter(u => u.role_id === 2);
-        setCoaches(teamCoaches);
-      }).catch(console.error);
+    if (t.teamId) {
+      await loadCoaches(t.teamId.toString());
     }
   };
 
   const handleDelete = async (id) => {
     if (!confirm('Удалить тренировку?')) return;
+
     try {
       await deleteTraining(id);
       const res = await getTrainings();
-      setTrainings(res.data);
+      setTrainings(res.data?.data || res.data || []);
     } catch (err) {
-      setError(err.response?.data?.error || 'Ошибка при удалении');
+      setError(err.response?.data?.message || err.response?.data?.error || 'Ошибка при удалении');
     }
   };
 
-  const availableTeams = user?.role_id === 1 ? teams : userTeams;
+  const availableTeams = canManage
+    ? teams
+    : (user?.userTeams?.map(ut => ut.team) || []);
+
+  const formatTrainingDisplay = (t) => {
+    const teamName = t.team?.name || teams.find(tm => tm.id === t.teamId)?.name || '—';
+    const coachName = t.coach?.fullName || coaches.find(c => c.id === t.coachId)?.fullName || '—';
+    const typeLabel = TRAINING_TYPES.find(tt => tt.value === t.trainingType)?.label || t.trainingType;
+
+    return { teamName, coachName, typeLabel };
+  };
 
   if (loading) return <div className="trainings-loading">Загрузка...</div>;
   if (error) return <div className="trainings-error">{error}</div>;
@@ -167,104 +201,127 @@ export default function Trainings() {
     <div className="trainings">
       <h1>Управление тренировками</h1>
 
-      <button
-        className="trainings-add-btn"
-        onClick={() => {
-          resetForm();
-          setIsCreating(!isCreating);
-        }}
-      >
-        {isCreating ? 'Отменить' : 'Добавить тренировку'}
-      </button>
+      {canManage && (
+        <button
+          className="trainings-add-btn"
+          onClick={() => {
+            if (isCreating) {
+              resetForm();
+            } else {
+              setIsCreating(true);
+            }
+          }}
+        >
+          {isCreating ? 'Отменить' : 'Добавить тренировку'}
+        </button>
+      )}
 
-      {isCreating && (
+      {isCreating && canManage && (
         <form className="training-form" onSubmit={handleSubmit}>
           <div className="training-form-row">
             <input
-              type="date"
-              value={formData.training_date}
-              onChange={(e) => setFormData({ ...formData, training_date: e.target.value })}
+              type="datetime-local"
+              value={formData.startTime}
+              onChange={(e) => setFormData({ ...formData, startTime: e.target.value })}
               required
             />
             <input
-              type="time"
-              value={formData.start_time}
-              onChange={(e) => setFormData({ ...formData, start_time: e.target.value })}
-              required
-            />
-            <input
-              type="time"
-              value={formData.end_time}
-              onChange={(e) => setFormData({ ...formData, end_time: e.target.value })}
+              type="datetime-local"
+              value={formData.endTime}
+              onChange={(e) => setFormData({ ...formData, endTime: e.target.value })}
+              placeholder="Время окончания"
             />
           </div>
 
           <div className="training-form-row">
             <input
               type="text"
-              placeholder="Место"
+              placeholder="Место проведения"
               value={formData.location}
               onChange={(e) => setFormData({ ...formData, location: e.target.value })}
               required
             />
-            <input
-              type="text"
-              placeholder="Тип тренировки"
-              value={formData.training_type}
-              onChange={(e) => setFormData({ ...formData, training_type: e.target.value })}
+            <select
+              value={formData.trainingType}
+              onChange={(e) => setFormData({ ...formData, trainingType: e.target.value })}
               required
-            />
+            >
+              {TRAINING_TYPES.map(type => (
+                <option key={type.value} value={type.value}>
+                  {type.label}
+                </option>
+              ))}
+            </select>
           </div>
 
           <div className="training-form-row">
             <select
-              value={formData.team_id}
-              onChange={(e) => setFormData({ ...formData, team_id: e.target.value })}
+              value={formData.teamId}
+              onChange={(e) => setFormData({ ...formData, teamId: e.target.value, coachId: '' })}
               required
             >
               <option value="">Выберите команду</option>
               {availableTeams.map(team => (
                 <option key={team.id} value={team.id}>
-                  {team.team_name}
+                  {team.name}
                 </option>
               ))}
             </select>
 
             <select
-              value={formData.coach_id}
-              onChange={(e) => setFormData({ ...formData, coach_id: e.target.value })}
-              disabled={!formData.team_id}
+              value={formData.coachId}
+              onChange={(e) => setFormData({ ...formData, coachId: e.target.value })}
+              disabled={!formData.teamId || coaches.length === 0}
             >
-              <option value="">Не выбран</option>
+              <option value="">
+                {coaches.length === 0 ? 'Нет доступных тренеров' : 'Выберите тренера'}
+              </option>
               {coaches.map(coach => (
                 <option key={coach.id} value={coach.id}>
-                  {coach.full_name}
+                  {coach.fullName}
                 </option>
               ))}
             </select>
           </div>
 
           <button type="submit" className="btn-submit">
-            {editingId ? 'Сохранить' : 'Добавить'}
+            {editingId ? 'Сохранить изменения' : 'Создать тренировку'}
           </button>
         </form>
       )}
 
       <div className="trainings-list">
         {trainings.length === 0 ? (
-          <p>Нет тренировок</p>
+          <p className="empty-message">Нет запланированных тренировок</p>
         ) : (
-          trainings.map(t => (
-            <div key={t.id} className="training-item">
-              <div>
-                <strong>{formatISOToDateInput(t.training_date)}</strong> — {t.team_name || '—'} — {t.coach_name || '—'}
+          trainings.map(t => {
+            const { teamName, coachName, typeLabel } = formatTrainingDisplay(t);
+
+            return (
+              <div key={t.id} className="training-item">
+                <div className="training-info">
+                  <div className="training-main">
+                    <strong>{teamName} </strong>
+                    <span className="training-type">{typeLabel}</span>
+                  </div>
+                  <div className="training-details">
+                    {formatDateTimeToRU(t.startTime)} — {formatDateTimeToRU(t.endTime)} | Локация: {t.location} | Тренер: {coachName}
+                  </div>
+                </div>
+
+                {canManage && (
+                  <div className="training-actions">
+                    <button onClick={() => handleEdit(t)} className="btn-edit">
+                      Редактировать
+                    </button>
+                    <button onClick={() => handleDelete(t.id)} className="btn-delete">
+                      Удалить
+                    </button>
+                  </div>
+                )}
               </div>
-              <div>
-                <button onClick={() => handleEdit(t)} className="btn-edit">Редактировать</button>
-                <button onClick={() => handleDelete(t.id)} className="btn-delete">Удалить</button>
-              </div>
-            </div>
-          ))
+            );
+          })
         )}
       </div>
     </div>

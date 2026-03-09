@@ -61,20 +61,22 @@
   transform: translateY(-9px) rotate(-45deg);
 }
 
-.header__nav-desktop {
+.header__nav-desktop ul
+{
+  list-style-type: none;
   display: flex;
+  flex-direction: row;
   gap: 24px;
   align-items: center;
 }
-
-.header__nav-desktop a {
+.header__nav-desktop li a{
   color: var(--color-dark);
   text-decoration: none;
   font-weight: 500;
   font-size: 1rem;
 }
 
-.header__nav-desktop a:hover {
+.header__nav-desktop li a:hover {
   color: var(--color-dark-hover);
 }
 

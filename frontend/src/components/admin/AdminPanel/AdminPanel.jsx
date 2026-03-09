@@ -1,11 +1,9 @@
-import { useAuthStore } from '../../../hooks/useAuthStore';
 import { Link } from 'react-router-dom';
 import './AdminPanel.css';
+import { useRole } from '../../../hooks/useRole';
 
 export default function AdminPanel() {
-  const role = useAuthStore(state => state.role);
-  const isAdmin = role === 1;
-  const isManager = role === 7;
+  const {isAdmin, isManager} = useRole()
 
   return (
     <div className="admin-panel">

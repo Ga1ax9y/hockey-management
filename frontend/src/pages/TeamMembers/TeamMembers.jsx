@@ -1,15 +1,13 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import {
-  getTeamUsers,
   addTeamUser,
   removeTeamUser,
   getAllUsers,
-  getPlayers,
-  getRoles
+  getTeamById
 } from '../../services/api';
 import './TeamMembers.css';
-import { useAuthStore } from '../../hooks/useAuthStore';
+import { useRole } from '../../hooks/useRole';
 
 export default function TeamMembers() {
   const { id: teamId } = useParams();
@@ -17,36 +15,26 @@ export default function TeamMembers() {
   const [teamUsers, setTeamUsers] = useState([]);
   const [allUsers, setAllUsers] = useState([]);
   const [players, setPlayers] = useState([]);
-  const [roles, setRoles] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [selectedUserId, setSelectedUserId] = useState('');
-  const { role } = useAuthStore();
-  const isAdmin = role === 1;
-  const isManager = role === 7;
+  const {isAdmin, isManager} = useRole()
 
-  const getRoleName = (roleId) => {
-    const role = roles.find(r => r.id === roleId);
-    return role.description;
-  };
+
   const loadTeamData = async () => {
     try {
       setLoading(true);
-      const playersRes = await getPlayers(teamId);
-      const [teamUsersRes, allUsersRes, rolesRes] = await Promise.all([
-        getTeamUsers(teamId),
-        getAllUsers(),
-        getRoles(),
-      ]);
-
-      setPlayers(playersRes.data);
-      setTeamUsers(teamUsersRes.data);
-      setAllUsers(allUsersRes.data.filter(user =>
-        !teamUsersRes.data.some(tu => tu.id === user.id)
-      ));
-      setRoles(rolesRes.data);
+      const playersRes = await getTeamById(teamId, {includePlayers: true, includeUsers: true});
+      const allUsersRes = await getAllUsers()
+      const teamUsersRes = playersRes.data.users.map(ut => ut?.user)
+      setPlayers(playersRes.data.players);
+      setTeamUsers(teamUsersRes);
+      setAllUsers(allUsersRes.data.filter(
+                    user =>!teamUsersRes.some(ut => ut.id === user.id)));
       setError('');
     } catch (err) {
+      setTeamUsers([]);
+      setPlayers([]);
       setError('Не удалось загрузить данные');
       console.error(err);
     } finally {
@@ -101,8 +89,8 @@ export default function TeamMembers() {
             {teamUsers.map(user => (
               <li key={user.id} className="member-item">
                 <div className="member-info">
-                  <strong>{user.full_name}</strong>
-                  <span className="member-role">{getRoleName(user.role_id)}</span>
+                  <strong>{user.fullName}</strong>
+                  <span className="member-role">{user.role.name}</span>
                   <span className="member-email">{user.email}</span>
                 </div>
                 {(isAdmin || isManager) && (
@@ -118,7 +106,7 @@ export default function TeamMembers() {
           </ul>
         )}
       </div>
-      {isAdmin || isManager && (
+      {(isAdmin || isManager) && (
         <div className="members-section add-staff-section">
           <h3>Добавить персонал</h3>
           {allUsers.length === 0 ? (
@@ -133,7 +121,7 @@ export default function TeamMembers() {
                 <option value="">Выберите пользователя...</option>
                 {allUsers.map(user => (
                   <option key={user.id} value={user.id}>
-                    {user.full_name} ({getRoleName(user.role_id)})
+                    {user.fullName} ({user.role.name})
                   </option>
                 ))}
               </select>
@@ -152,15 +140,15 @@ export default function TeamMembers() {
               <div key={player.id} className="player-card">
                 <div className="player-name">
                   <Link to={`/players/${player.id}`}>
-                    {player.last_name} {player.first_name}
-                    {player.middle_name && ` ${player.middle_name}`}
+                    {player.lastName} {player.firstName}
+                    {player.middleName && ` ${player.middleName}`}
                   </Link>
                 </div>
                 <div className="player-details">
                   <div>Позиция: <strong>{player.position || '—'}</strong></div>
                   <div>Рост: <strong>{player.height || '—'} см</strong></div>
                   <div>Вес: <strong>{player.weight || '—'} кг</strong></div>
-                  <div>Контракт до: <strong>{player.contract_expiry ? new Date(player.contract_expiry).toLocaleDateString('ru-RU') : '—'}</strong></div>
+                  <div>Контракт до: <strong>{player.contractExpiry ? new Date(player.contractExpiry).toLocaleDateString('ru-RU') : '—'}</strong></div>
                 </div>
               </div>
             ))}

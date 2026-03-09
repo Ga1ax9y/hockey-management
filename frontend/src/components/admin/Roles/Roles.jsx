@@ -36,10 +36,11 @@ export default function Roles() {
     e.preventDefault();
     try {
       await createRole({
-        role_name: newRole.name.trim(),
+        name: newRole.name.trim(),
+        code: newRole.code.toUpperCase(),
         description: newRole.description.trim() || null,
       });
-      setNewRole({ name: '', description: '' });
+      setNewRole({ name: '', code: '', description: '' });
       loadRoles();
     } catch (err) {
       setError(err.response?.data?.error || 'Ошибка при создании роли');
@@ -48,14 +49,15 @@ export default function Roles() {
 
   const startEdit = (role) => {
     setEditingId(role.id);
-    setEditForm({ name: role.role_name, description: role.description || '' });
+    setEditForm({ name: role.name, description: role.description || '', code: role.code });
   };
 
   const handleUpdate = async (e) => {
     e.preventDefault();
     try {
       await updateRole(editingId, {
-        role_name: editForm.name.trim(),
+        name: editForm.name.trim(),
+        code: editForm.code.toUpperCase(),
         description: editForm.description.trim() || null,
       });
       setEditingId(null);
@@ -97,6 +99,13 @@ export default function Roles() {
           value={newRole.description}
           onChange={(e) => setNewRole({ ...newRole, description: e.target.value })}
         />
+        <input
+          type="text"
+          placeholder="Код роли"
+          value={newRole.code}
+          onChange={(e) => setNewRole({ ...newRole, code: e.target.value })}
+          required
+        />
         <button type="submit">Создать роль</button>
       </form>
 
@@ -121,6 +130,13 @@ export default function Roles() {
                       value={editForm.description}
                       onChange={(e) => setEditForm({ ...editForm, description: e.target.value })}
                     />
+                    <input
+                      type="text"
+                      placeholder="Код роли"
+                      value={editForm.code}
+                      onChange={(e) => setEditForm({ ...editForm, code: e.target.value })}
+                      required
+                    />
                     <button type="submit">Сохранить</button>
                     <button type="button" onClick={() => setEditingId(null)}>
                       Отмена
@@ -130,7 +146,7 @@ export default function Roles() {
                 <div className="role-display">
                     <div className="role-info">
                         <span className="role-id">ID: {role.id}</span>
-                        <strong>{role.role_name}</strong>
+                        <strong>{role.name}</strong>
                         {role.description && <span> — {role.description}</span>}
                     </div>
                     <div className="role-actions">

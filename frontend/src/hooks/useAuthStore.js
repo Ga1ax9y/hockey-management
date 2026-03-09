@@ -1,32 +1,40 @@
 import { create } from "zustand";
-import { parseJwt } from "../utils/auth";
+import { getMe } from "../services/api";
+export const useAuthStore = create((set, get) => ({
+  user: null,
+  token: localStorage.getItem("token") || null,
+  isLoading: true,
 
-const storedToken = localStorage.getItem("token");
-const initialUser = storedToken ? parseJwt(storedToken) : null;
-
-export const useAuthStore = create((set) => ({
-  user: initialUser?.email || null,
-  role: initialUser?.role_id || null,
-  token: storedToken || null,
-
-  get isAuthenticated() {
-    return !!this.token;
+  init: async () => {
+    const token  = get().token;
+    if (!token){
+      set({ isLoading: false });
+      return;
+    }
+    await get().fetchUser()
   },
 
-  login: (jwtToken) => {
-    const payload = parseJwt(jwtToken);
-    if (!payload) return;
+  fetchUser: async () => {
+    set({ isLoading: true });
+    try {
+      const response = await getMe()
+      set({ user: response.data, isLoading: false });
+    } catch (error) {
+      console.error("Ошибка при получении профиля", error);
+      get().logout();
+    } finally {
+      set({ isLoading: false });
+    }
+  },
+  login: async (jwtToken) => {
     localStorage.setItem("token", jwtToken);
-    set({
-      user: payload.email,
-      role: payload.role_id,
-      token: jwtToken,
-    });
+    set({ token: jwtToken });
+    await get().fetchUser();
   },
 
   logout: () => {
     localStorage.removeItem("token");
-    set({ user: null, role: null, token: null });
+    set({ user: null, token: null, isLoading: false });
   },
 
 }));

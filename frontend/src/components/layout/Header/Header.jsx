@@ -2,19 +2,19 @@ import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuthStore } from '../../../hooks/useAuthStore';
 import './Header.css';
+import { useRole } from '../../../hooks/useRole';
 
 export default function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const { role, logout } = useAuthStore();
+  const { logout } = useAuthStore()
   const isAuthenticated = useAuthStore((state) => state.token !== null);
+  const {isAdmin, isCoach, isManager} = useRole()
   const navigate = useNavigate();
   const toggleMenu = () => setIsMenuOpen(!isMenuOpen);
-  const isAdmin = role === 1;
-  const isManager = role === 7;
-  const isCoach = role === 2;
+
 
   const handleLogout = () => {
-    logout();
+    logout()
     navigate('/login', { replace: true });
   };
 
@@ -37,29 +37,67 @@ export default function Header() {
       </button>
 
       <nav className="header__nav-desktop">
-        <Link to="/">Главная</Link>
-        {!isAuthenticated && <Link to="/login">Войти</Link>}
-        {isAdmin && <Link to="/admin">Управление</Link>}
-        {(isManager || isAdmin) && <Link to="/manager/hierarchy">Иерархия</Link>}
-        {(isCoach || isAdmin) && <Link to="/coach/trainings">Тренировки</Link>}
-        {isAuthenticated && (
-          <>
-            <Link to="/profile">Профиль</Link>
-            <button onClick={handleLogout} className="header__logout-button">
-              Выйти
-            </button>
-          </>
-        )}
+        <ul>
+          <li>
+            <Link to="/">Главная</Link>
+          </li>
+          {!isAuthenticated && <li>
+            <Link to="/login">Войти</Link>
+          </li> }
+           {isAdmin && <li>
+            <Link to="/admin">Управление</Link>
+          </li>}
+          {(isManager || isAdmin) && <li>
+            <Link to="/manager/hierarchy">Иерархия</Link>
+          </li>}
+          {(isCoach || isAdmin) && <li>
+            <Link to="/coach/trainings">Тренировки</Link>
+          </li>}
+          {isAuthenticated && (
+            <>
+              <li>
+                <Link to="/profile">Профиль</Link>
+              </li>
+              <li>
+                <button onClick={handleLogout} className="header__logout-button">
+                  Выйти
+                </button>
+              </li>
+            </>
+          )}
+        </ul>
+
       </nav>
 
       <nav className={`header__nav-mobile ${isMenuOpen ? 'open' : ''}`}>
         <ul>
           <li>
-            <Link to="/" onClick={() => setIsMenuOpen(false)}>Главная</Link>
+            <Link to="/" onClick={toggleMenu}>Главная</Link>
           </li>
-          <li>
-            <Link to="/login" onClick={() => setIsMenuOpen(false)}>Войти</Link>
-          </li>
+          {!isAuthenticated && <li>
+            <Link to="/login" onClick={toggleMenu}>Войти</Link>
+          </li> }
+           {isAdmin && <li>
+            <Link to="/admin" onClick={toggleMenu}>Управление</Link>
+          </li>}
+          {(isManager || isAdmin) && <li>
+            <Link to="/manager/hierarchy" onClick={toggleMenu}>Иерархия</Link>
+          </li>}
+          {(isCoach || isAdmin) && <li>
+            <Link to="/coach/trainings" onClick={toggleMenu}>Тренировки</Link>
+          </li>}
+          {isAuthenticated && (
+            <>
+              <li>
+                <Link to="/profile" onClick={toggleMenu}>Профиль</Link>
+              </li>
+              <li>
+                <button onClick={handleLogout} className="header__logout-button mobile">
+                  Выйти
+                </button>
+              </li>
+            </>
+          )}
         </ul>
       </nav>
 

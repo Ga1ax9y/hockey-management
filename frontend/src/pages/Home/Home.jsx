@@ -1,55 +1,20 @@
-import { useState, useEffect } from 'react';
 import { useAuthStore } from '../../hooks/useAuthStore';
-import { getCurrentUser, getCurrentUserTeams } from '../../services/api';
 import { Link } from 'react-router-dom';
 import './Home.css';
 
 export default function Home() {
-  const { token } = useAuthStore();
-  const [user, setUser] = useState(null);
-  const [teams, setTeams] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState('');
+  const user = useAuthStore(state => state.user)
+  const isLoading = useAuthStore(state => state.isLoading)
 
-  useEffect(() => {
-    const loadData = async () => {
-      if (!token) {
-        setLoading(false);
-        return;
-      }
-
-      try {
-        setLoading(true);
-        setError('');
-
-        const [userRes, teamsRes] = await Promise.all([
-          getCurrentUser(),
-          getCurrentUserTeams()
-        ]);
-
-        setUser(userRes.data);
-        setTeams(teamsRes.data || []);
-      } catch (err) {
-        setError(err.response?.data?.error || 'Ошибка загрузки данных');
-        console.error(err);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    loadData();
-  }, [token]);
-
-  if (loading) return <div className="home-loading">Загрузка...</div>;
-  if (error) return <div className="home-error">{error}</div>;
+  if (isLoading) return <div className="home-loading">Загрузка...</div>;
   if (!user) return null;
 
   return (
     <div className="home">
       <div className="home__welcome">
-        <h1>Добро пожаловать, {user.full_name}!</h1>
+        <h1>Добро пожаловать, {user.fullName}!</h1>
         <p className="home__meta">
-          <span className="home__role">Роль: {user.description}</span>
+          <span className="home__role">Роль: {user.role.name}</span>
           <span className="home__email">Email: {user.email}</span>
         </p>
       </div>
@@ -57,14 +22,14 @@ export default function Home() {
       <div className="home__stats">
         <div className="stat-card">
           <h3>Ваши команды</h3>
-          {teams.length === 0 ? (
+          {user.userTeams?.length === 0 ? (
             <p className="home__no-teams">Вы не привязаны ни к одной команде.</p>
           ) : (
             <ul className="teams-list">
-              {teams.map(team => (
-                <li key={team.id}>
-                  <Link to={`/teams/${team.id}`} className="team-link">
-                    {team.team_name} <span className="team-league">({team.league || '—'})</span>
+              {user.userTeams.map(ut => (
+                <li key={ut.team?.id}>
+                  <Link to={`/teams/${ut.team?.id}`} className="team-link">
+                    {ut.team?.name} <span className="team-league">({ut.team?.league || '—'})</span>
                   </Link>
                 </li>
               ))}
@@ -75,16 +40,16 @@ export default function Home() {
           <div className="stat-card">
             <h3>Быстрый доступ</h3>
             <ul className="quick-links">
-              {user.role_id === 1 && (
+              {user.role.code === "ADMIN"  && (
                 <li><Link to="/admin">Панель управления</Link></li>
               )}
-              {user.role_id === 2 && (
+              {user.roleId === 2 && (
                 <li><Link to="/coach/trainings">Тренировки</Link></li>
               )}
-              {user.role_id === 3 && (
+              {user.roleId === 3 && (
                 <li><Link to="/admin/roles">Управление ролями</Link></li>
               )}
-              {user.role_id === 7 && (
+              {user.roleId === 7 && (
                 <li><Link to="/manager/hierarchy">Иерархия команд</Link></li>
               )}
             </ul>
@@ -92,8 +57,7 @@ export default function Home() {
       </div>
 
       <div className="home__footer">
-        <p>Дата регистрации: {new Date(user.created_at).toLocaleDateString('ru-RU')}</p>
-        <p>Аккаунт {user.is_active ? 'активен' : 'неактивен'}</p>
+        <p>Дата регистрации: {new Date(user.createdAt).toLocaleDateString('ru-RU')}</p>
       </div>
     </div>
   );

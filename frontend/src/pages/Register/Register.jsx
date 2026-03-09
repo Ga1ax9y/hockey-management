@@ -6,8 +6,8 @@ export default function Register() {
   const [form, setForm] = useState({
     email: "",
     password: "",
-    full_name: "",
-    role_id: 2, // TODO: поменять на другое
+    fullName: "",
+    roleId: 7,
   });
   const [error, setError] = useState("");
   const navigate = useNavigate();
@@ -32,9 +32,9 @@ export default function Register() {
       <form className="auth-form" onSubmit={handleSubmit}>
         <input
           className="auth-input"
-          name="full_name"
+          name="fullName"
           placeholder="ФИО"
-          value={form.full_name}
+          value={form.fullName}
           onChange={handleChange}
         />
         <input

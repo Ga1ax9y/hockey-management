@@ -17,6 +17,8 @@ import Profile from './pages/Profile/Profile';
 import PlayerProfile from './pages/PlayerProfile/PlayerProfile';
 import Trainings from './components/coach/Trainings/Trainings';
 import AddMedicalRecord from './components/medical/AddMedicalRecord/AddMedicalRecord';
+import { useEffect } from 'react';
+import { useAuthStore } from './hooks/useAuthStore';
 const Layout = () => (
   <>
     <Header />
@@ -80,7 +82,7 @@ const router = createBrowserRouter([
           </ProtectedRoute>
         ),
       },
-      { path: '/medical/add/:playerId', element: (
+      { path: '/players/:id/addMedical', element: (
         <ProtectedRoute>
           <AddMedicalRecord />
         </ProtectedRoute>
@@ -106,5 +108,8 @@ const router = createBrowserRouter([
 ]);
 
 export default function App() {
+  useEffect(() => {
+    useAuthStore.getState().init();
+  }, []);
   return <RouterProvider router={router} />;
 }

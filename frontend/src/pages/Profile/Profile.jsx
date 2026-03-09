@@ -1,30 +1,10 @@
-import { useState, useEffect } from 'react';
-import { getCurrentUser } from '../../services/api';
 import './Profile.css';
+import { useAuthStore } from '../../hooks/useAuthStore';
 
 export default function Profile() {
-  const [user, setUser] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState('');
+  const { user, isLoading } = useAuthStore();
 
-  useEffect(() => {
-    const fetchProfile = async () => {
-      try {
-        const res = await getCurrentUser();
-        setUser(res.data);
-      } catch (err) {
-        setError('Не удалось загрузить профиль');
-        console.error(err);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchProfile();
-  }, []);
-
-  if (loading) return <div className="profile-loading">Загрузка профиля...</div>;
-  if (error) return <div className="profile-error">{error}</div>;
+  if (isLoading) return <div className="profile-loading">Загрузка профиля...</div>;
   if (!user) return null;
 
   return (
@@ -33,7 +13,7 @@ export default function Profile() {
       <div className="profile__card">
         <div className="profile__field">
           <strong>ФИО:</strong>
-          <span>{user.full_name || '—'}</span>
+          <span>{user.fullName || '—'}</span>
         </div>
         <div className="profile__field">
           <strong>Email:</strong>
@@ -41,15 +21,11 @@ export default function Profile() {
         </div>
         <div className="profile__field">
           <strong>Роль:</strong>
-          <span>{user.role_name}</span>
-        </div>
-        <div className="profile__field">
-          <strong>Аккаунт активен:</strong>
-          <span>{user.is_active ? 'Да' : 'Нет'}</span>
+          <span>{user.role.name}</span>
         </div>
         <div className="profile__field">
           <strong>Дата регистрации:</strong>
-          <span>{new Date(user.created_at).toLocaleDateString('ru-RU')}</span>
+          <span>{new Date(user.createdAt).toLocaleDateString('ru-RU')}</span>
         </div>
       </div>
     </div>

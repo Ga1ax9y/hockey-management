@@ -7,7 +7,7 @@ import {
   getTeams
 } from '../../../services/api';
 import './Players.css';
-import { formatISOToDateInput } from '../../../utils/date';
+import { ruDateToISO, isoToRuDate } from '../../../utils/date';
 
 export default function Players() {
   const [players, setPlayers] = useState([]);
@@ -17,24 +17,25 @@ export default function Players() {
   const [isCreating, setIsCreating] = useState(false);
   const [editingId, setEditingId] = useState(null);
   const [formData, setFormData] = useState({
-    last_name: '',
-    first_name: '',
-    middle_name: '',
-    birth_date: '',
+    lastName: '',
+    firstName: '',
+    middleName: '',
+    birthDate: '',
     position: '',
     height: '',
     weight: '',
-    contract_expiry: '',
-    current_team_id: '',
+    contractExpiry: '',
+    currentTeamId: '',
   });
 
   const loadPlayers = async () => {
     try {
       setLoading(true);
-      const res = await getPlayers();
-      setPlayers(res.data);
+      const res = await getPlayers({includeCurrentTeam: true});
+      setPlayers(res.data.data);
       const teamsRes = await getTeams();
-      setTeams(teamsRes.data);
+      const teamsArray = teamsRes.data.data
+      setTeams(teamsArray);
       setError('');
     } catch (err) {
       setError('Не удалось загрузить игроков');
@@ -50,15 +51,15 @@ export default function Players() {
 
   const resetForm = () => {
     setFormData({
-      last_name: '',
-      first_name: '',
-      middle_name: '',
-      birth_date: '',
+      lastName: '',
+      firstName: '',
+      middleName: '',
+      birthDate: '',
       position: '',
       height: '',
       weight: '',
-      contract_expiry: '',
-      current_team_id: '',
+      contractExpiry: '',
+      currentTeamId: '',
     });
     setEditingId(null);
     setIsCreating(false);
@@ -70,13 +71,13 @@ export default function Players() {
       ...formData,
       height: formData.height ? Number(formData.height) : null,
       weight: formData.weight ? Number(formData.weight) : null,
-      current_team_id: formData.current_team_id ? Number(formData.current_team_id) : null,
-      birth_date: formData.birth_date,
-      contract_expiry: formData.contract_expiry,
+      currentTeamId: formData.currentTeamId ? Number(formData.currentTeamId) : null,
+      birthDate: ruDateToISO(formData.birthDate),
+      contractExpiry: ruDateToISO(formData.contractExpiry),
     };
 
-    if (!submitData.birth_date) {
-      setError('Некорректный формат даты рождения (ожидается ДД.ММ.ГГГГ)');
+    if (!submitData.birthDate) {
+      setError('Дата рождения должна быть в формате ДД.ММ.ГГГГ');
       return;
     }
 
@@ -95,15 +96,15 @@ export default function Players() {
 
   const handleEdit = (player) => {
     setFormData({
-      last_name: player.last_name || '',
-      first_name: player.first_name || '',
-      middle_name: player.middle_name || '',
-      birth_date: formatISOToDateInput(player.birth_date),
+      lastName: player.lastName || '',
+      firstName: player.firstName || '',
+      middleName: player.middleName || '',
+      birthDate: isoToRuDate(player.birthDate),
       position: player.position || '',
       height: player.height?.toString() || '',
       weight: player.weight?.toString() || '',
-      contract_expiry: formatISOToDateInput(player.contract_expiry),
-      current_team_id: player.current_team_id?.toString() || '',
+      contractExpiry: isoToRuDate(player.contractExpiry),
+      currentTeamId: player.currentTeamId?.toString() || '',
     });
     setEditingId(player.id);
     setIsCreating(true);
@@ -143,8 +144,8 @@ export default function Players() {
               <label>Фамилия</label>
               <input
                 type="text"
-                value={formData.last_name}
-                onChange={(e) => setFormData({ ...formData, last_name: e.target.value })}
+                value={formData.lastName}
+                onChange={(e) => setFormData({ ...formData, lastName: e.target.value })}
                 required
               />
             </div>
@@ -152,8 +153,8 @@ export default function Players() {
               <label>Имя</label>
               <input
                 type="text"
-                value={formData.first_name}
-                onChange={(e) => setFormData({ ...formData, first_name: e.target.value })}
+                value={formData.firstName}
+                onChange={(e) => setFormData({ ...formData, firstName: e.target.value })}
                 required
               />
             </div>
@@ -161,8 +162,8 @@ export default function Players() {
               <label>Отчество</label>
               <input
                 type="text"
-                value={formData.middle_name}
-                onChange={(e) => setFormData({ ...formData, middle_name: e.target.value })}
+                value={formData.middleName}
+                onChange={(e) => setFormData({ ...formData, middleName: e.target.value })}
               />
             </div>
           </div>
@@ -173,8 +174,8 @@ export default function Players() {
               <input
                 type="text"
                 placeholder="15.08.2005"
-                value={formData.birth_date}
-                onChange={(e) => setFormData({ ...formData, birth_date: e.target.value })}
+                value={formData.birthDate}
+                onChange={(e) => setFormData({ ...formData, birthDate: e.target.value })}
                 required
               />
             </div>
@@ -210,20 +211,20 @@ export default function Players() {
               <input
                 type="text"
                 placeholder="31.12.2026"
-                value={formData.contract_expiry}
-                onChange={(e) => setFormData({ ...formData, contract_expiry: e.target.value })}
+                value={formData.contractExpiry}
+                onChange={(e) => setFormData({ ...formData, contractExpiry: e.target.value })}
               />
             </div>
             <div className="players-form-group">
               <label>Команда</label>
               <select
-                value={formData.current_team_id || ''}
-                onChange={(e) => setFormData({ ...formData, current_team_id: e.target.value })}
+                value={formData.currentTeamId || ''}
+                onChange={(e) => setFormData({ ...formData, currentTeamId: e.target.value })}
               >
                 <option value="">Не выбрана</option>
                 {teams.map(team => (
                   <option key={team.id} value={team.id}>
-                    {team.team_name} (ID: {team.id})
+                    {team.name} (ID: {team.id})
                   </option>
                 ))}
               </select>
@@ -263,17 +264,17 @@ export default function Players() {
                 <tr key={player.id}>
                   <td>{player.id}</td>
                   <td>
-                    {player.last_name} {player.first_name}
-                    {player.middle_name && ` ${player.middle_name}`}
+                    {player.lastName} {player.firstName}
+                    {player.middleName && ` ${player.middleName}`}
                   </td>
-                  <td>{formatISOToDateInput(player.birth_date)}</td>
+                  <td>{isoToRuDate(player.birthDate)}</td>
                   <td>{player.position || '—'}</td>
                   <td>
                     {player.height && `${player.height} см`}
                     {player.weight && ` / ${player.weight} кг`}
                   </td>
-                  <td>{formatISOToDateInput(player.contract_expiry) || '—'}</td>
-                  <td>{player.current_team_id || '—'}</td>
+                  <td>{player.contractExpiry ? isoToRuDate(player.contractExpiry) : '—'}</td>
+                  <td>{player.currentTeam?.name || '—'}</td>
                   <td data-label="Действия">
                     <div className="players-actions">
                       <button onClick={() => handleEdit(player)} className="btn-edit">

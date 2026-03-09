@@ -4,11 +4,11 @@ import { addMedicalRecord } from '../../../services/api';
 import './AddMedicalRecord.css';
 
 export default function AddMedicalRecord() {
-  const { playerId } = useParams();
+  const { id } = useParams();
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
-    injury_date: '',
-    recovery_date: '',
+    injuryDate: '',
+    recoveryDate: '',
     diagnosis: '',
     status: 'Лечение',
   });
@@ -16,8 +16,8 @@ export default function AddMedicalRecord() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      await addMedicalRecord(playerId, formData);
-      navigate(`/players/${playerId}`);
+      await addMedicalRecord(id, formData);
+      navigate(`/players/${id}`);
     } catch (err) {
       alert('Ошибка при сохранении: ' + (err.response?.data?.error || err.message));
     }
@@ -32,7 +32,7 @@ export default function AddMedicalRecord() {
           <input
             type="date"
             value={formData.injury_date}
-            onChange={(e) => setFormData({ ...formData, injury_date: e.target.value })}
+            onChange={(e) => setFormData({ ...formData, injuryDate: e.target.value })}
             required
           />
         </div>
@@ -42,7 +42,7 @@ export default function AddMedicalRecord() {
           <input
             type="date"
             value={formData.recovery_date}
-            onChange={(e) => setFormData({ ...formData, recovery_date: e.target.value })}
+            onChange={(e) => setFormData({ ...formData, recoveryDate: e.target.value })}
           />
         </div>
 

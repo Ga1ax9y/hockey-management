@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { getTeamById, updateTeam, deleteTeam } from '../../services/api';
 import './TeamDetails.css';
-import { useAuthStore } from '../../hooks/useAuthStore';
+import { useRole } from '../../hooks/useRole';
 
 export default function TeamDetails() {
   const { id } = useParams();
@@ -12,14 +12,12 @@ export default function TeamDetails() {
   const [error, setError] = useState('');
   const [isEditing, setIsEditing] = useState(false);
   const [editForm, setEditForm] = useState({
-    team_name: '',
+    name: '',
     league: '',
     level: 1,
     season: '',
   });
-  const { role } = useAuthStore();
-  const isAdmin = role === 1;
-  const isManager = role === 7;
+  const {isAdmin, isManager} = useRole()
 
   const loadTeam = async () => {
     try {
@@ -67,7 +65,7 @@ export default function TeamDetails() {
 
   return (
     <div className="team-detail">
-      <h2>Команда: {team.team_name}</h2>
+      <h2>Команда: {team.name}</h2>
 
       {isEditing ? (
         <form className="team-edit-form" onSubmit={handleUpdate}>
@@ -75,8 +73,8 @@ export default function TeamDetails() {
             <label>Название команды *</label>
             <input
               type="text"
-              value={editForm.team_name}
-              onChange={(e) => setEditForm({ ...editForm, team_name: e.target.value })}
+              value={editForm.name}
+              onChange={(e) => setEditForm({ ...editForm, name: e.target.value })}
               required
             />
           </div>
@@ -118,7 +116,7 @@ export default function TeamDetails() {
       ) : (
         <div className="team-info">
           <p><strong>ID:</strong> {team.id}</p>
-          <p><strong>Название:</strong> {team.team_name}</p>
+          <p><strong>Название:</strong> {team.name}</p>
           <p><strong>Лига:</strong> {team.league || '—'}</p>
           <p><strong>Уровень:</strong> {team.level}</p>
           <p><strong>Сезон:</strong> {team.season}</p>
