@@ -115,7 +115,7 @@ model MedicalHistory {
   player Player @relation(fields: [playerId], references: [id], onDelete: Cascade)
   playerId Int
   injuryDate DateTime @db.Date
-  recoveryDate DateTime @db.Date
+  recoveryDate DateTime? @db.Date
   diagnosis String @db.Text
   status String @db.VarChar(50)
   createdAt     DateTime @default(now())
