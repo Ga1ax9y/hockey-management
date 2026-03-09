@@ -416,24 +416,59 @@ export const deletePlayer = async (req: Request, res: Response, next:  NextFunct
             message: `Игрок с id ${id} успешно удален`
         })
     } catch (error: any) {
-        // if (error.code === 'P2003') {
-        //    return next(new AppError(
-        //         commonErrorDict.badRequest.name,
-        //         commonErrorDict.badRequest.httpCode,
-        //         "Нельзя удалить игрока, так как он  имеет связи с другими таблицами",
-        //         "Ошибка при удалении игрока"
-        //     ))
-        // }
-        // else if (error.code === 'P2025') {
-        //     return next(
-        //         new AppError(
-        //             commonErrorDict.resourceNotFound.name,
-        //             commonErrorDict.resourceNotFound.httpCode,
-        //             "Игрок для удаления не найден",
-        //             "Ошибка при удалении игрока"
-        //         )
-        //     );
-        // }
+        next(new AppError(
+            commonErrorDict.serverError.name,
+            commonErrorDict.serverError.httpCode,
+            error.message,
+            "Ошибка при удалении игрока"
+        ))
+    }
+}
+
+export const addMedicalRecord = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+        const { id } = req.params
+
+        if (!id) {
+            return next(new AppError(
+                commonErrorDict.badRequest.name,
+                commonErrorDict.badRequest.httpCode,
+                "Поле userId обязательно",
+                "Ошибка при добавлении пользователя в команду"
+            ));
+        }
+        const { injuryDate, recoveryDate, diagnosis, status } = req.body
+
+        const newMedical = await prisma.medicalHistory.create({
+            data: {
+                playerId: Number(id),
+                injuryDate: new Date(injuryDate),
+                recoveryDate: recoveryDate ? new Date(recoveryDate) : null,
+                diagnosis: diagnosis,
+                status: status
+            },
+            include: {
+                player: {
+                    select: {
+                        lastName: true,
+                        firstName: true,
+                        position: true,
+                        currentTeam: {
+                            select: {
+                                name: true
+                            }
+                        }
+                    }
+                }
+            }
+        })
+         res.status(201).json({
+            success: true,
+            message: "Игроку успешно добавлена медицинская запись",
+            data: newMedical
+        });
+
+    } catch (error: any) {
         next(new AppError(
             commonErrorDict.serverError.name,
             commonErrorDict.serverError.httpCode,
