@@ -195,6 +195,7 @@ export const getPlayerById = async (req: Request, res: Response, next: NextFunct
         if (includeMedical === "true"){
             include.medicalHistory = {
                 select: {
+                    id: true,
                     injuryDate: true,
                     recoveryDate: true,
                     diagnosis: true,
@@ -210,6 +211,7 @@ export const getPlayerById = async (req: Request, res: Response, next: NextFunct
         if (includePhysical === "true"){
             include.physicalData = {
                 select: {
+                    id:true,
                     recordedDate: true,
                     metricType: true,
                     metricValue: true,
@@ -225,6 +227,7 @@ export const getPlayerById = async (req: Request, res: Response, next: NextFunct
         if (includeMatchStats === "true"){
             include.matchStats = {
                 select: {
+                    id: true,
                     match: {
                         select: {
                             opponentName: true,
@@ -249,6 +252,7 @@ export const getPlayerById = async (req: Request, res: Response, next: NextFunct
         if (includeTrainingStats === "true"){
             include.trainingStats = {
                 select: {
+                    id: true,
                     training: {
                         select: {
                             startTime: true,
@@ -273,6 +277,7 @@ export const getPlayerById = async (req: Request, res: Response, next: NextFunct
         if (includeReadinessIndex === "true"){
             include.readinessIndex =  {
                 select: {
+                    id: true,
                     readinessValue: true,
                     confidenceLevel: true,
                     createdAt: true,
