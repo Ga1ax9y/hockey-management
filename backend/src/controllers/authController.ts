@@ -9,7 +9,7 @@ const JWT_SECRET = process.env.JWT_SECRET as string;
 
 export const register  = async (req: Request, res: Response, next: NextFunction) => {
     try {
-        const {email, password, fullName, roleId} = req.body
+        const {email, password, fullName, roleId, organizationName, organizationId} = req.body
         const existingUser = await prisma.user.findUnique({
             where: {
                 email
@@ -22,26 +22,55 @@ export const register  = async (req: Request, res: Response, next: NextFunction)
                 commonErrorDict.badRequest.httpCode,
                 "email уже занят",
                 "Ошибка при создании пользователя"
-        ))
+            ))
         }
 
         const hashedPassword = await bcrypt.hash(password, 10)
+        let newUser;
 
-        const newUser = await prisma.user.create({
-            data: {
-                email,
-                fullName,
-                passwordHash: hashedPassword,
-                roleId: Number(roleId)
-            },
-            select: {
-                id: true,
-                email: true,
-                fullName: true,
-                roleId: true,
-                createdAt: true
-            }
-        })
+        if (!organizationId) {
+            const newOrganization = await prisma.organization.create({
+                data: {
+                    name: organizationName
+                }
+            })
+            const adminRole = await prisma.role.findUnique({ where: { code: "ADMIN" } });
+            if (!adminRole) throw new Error("Роль ADMIN не найдена");
+            newUser = await prisma.user.create({
+                data: {
+                    email,
+                    fullName,
+                    passwordHash: hashedPassword,
+                    roleId: adminRole.id,
+                    organizationId: newOrganization.id
+                },
+                select: {
+                    id: true,
+                    email: true,
+                    fullName: true,
+                    roleId: true,
+                    organization: true,
+                    createdAt: true
+                }
+            })
+        } else {
+            newUser = await prisma.user.create({
+                data: {
+                    email,
+                    fullName,
+                    passwordHash: hashedPassword,
+                    roleId: Number(roleId),
+                    organizationId: Number(organizationId)
+                },
+                select: {
+                    id: true,
+                    email: true,
+                    fullName: true,
+                    roleId: true,
+                    createdAt: true
+                }
+            })
+        }
 
         res.status(201).json(newUser)
     } catch (error: any) {
@@ -59,7 +88,7 @@ export const login = async (req: Request, res: Response, next: NextFunction) => 
         const {email, password} = req.body;
         const user = await prisma.user.findUnique({
             where: {email},
-            include: {role: true}
+            include: {role: true, organization: true}
         });
 
         if (!user) {
@@ -86,7 +115,8 @@ export const login = async (req: Request, res: Response, next: NextFunction) => 
             {
                 id: user.id,
                 email: user.email,
-                roleId: user.roleId
+                roleId: user.roleId,
+                organizationId: user.organizationId
             },
             JWT_SECRET,
             {expiresIn: "7d"}
@@ -100,7 +130,11 @@ export const login = async (req: Request, res: Response, next: NextFunction) => 
                 id: user.id,
                 email: user.email,
                 fullName: user.fullName,
-                role: user.role.name
+                role: user.role.name,
+                organization: {
+                    id: user.organizationId,
+                    name: user.organization.name
+                }
             }
         })
     }
@@ -137,6 +171,12 @@ export const getMe = async (req: AuthRequest, res: Response, next: NextFunction)
                     select: {
                         name: true,
                         code: true
+                    }
+                },
+                organization: {
+                    select: {
+                        id: true,
+                        name:true,
                     }
                 },
                 userTeams: {
