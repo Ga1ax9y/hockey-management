@@ -10,6 +10,10 @@ export interface AuthRequest extends Request {
             code: string;
             name: string;
         };
+        organization: {
+            id: number;
+            name: string;
+        };
     };
 }
 export default async function authMiddleware (req: AuthRequest, res: Response, next: NextFunction) {
@@ -37,13 +41,24 @@ export default async function authMiddleware (req: AuthRequest, res: Response, n
                 id: decoded.id
             },
             include: {
-                role: true
+                role: true,
+                organization: true
             }
         })
         if (!user || !user.isActive) {
             return res.status(401).json({ error: "Пользователь не найден или заблокирован" });
         }
-        req.user = user;
+        req.user = {
+            id: user.id,
+            email: user.email,
+            role: {
+                code: user.role.code,
+                name: user.role.name
+            },
+            organization: user.organization
+                ? { id: user.organization.id, name: user.organization.name }
+                : { id: 0, name: "Неизвестная организация" }
+        };
         next()
     } catch (error) {
         return res.status(401).json({ error: "Неверный или просроченный токен" });

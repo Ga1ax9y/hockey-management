@@ -132,7 +132,7 @@ export const login = async (req: Request, res: Response, next: NextFunction) => 
                 fullName: user.fullName,
                 role: user.role.name,
                 organization: {
-                    id: user.organizationId,
+                    id: user.organization.id,
                     name: user.organization.name
                 }
             }
