@@ -82,7 +82,7 @@ const router = createBrowserRouter([
           </ProtectedRoute>
         ),
       },
-      { path: '/players/:id/addMedical', element: (
+      { path: '/players/:id/medical', element: (
         <ProtectedRoute>
           <AddMedicalRecord />
         </ProtectedRoute>

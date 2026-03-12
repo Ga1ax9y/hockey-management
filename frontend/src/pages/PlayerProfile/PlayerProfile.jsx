@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import {getPlayerById,} from '../../services/api';
+import {getPlayerById, markPlayerRecovered,} from '../../services/api';
 import './PlayerProfile.css';
 import { useRole } from '../../hooks/useRole';
 
@@ -15,6 +15,11 @@ export default function PlayerProfile() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const { isDoctor } = useRole()
+  const MEDICAL_STATUS = {
+  injured: "Травмирован",
+  recovery: "Реабилитация",
+  recovered: "Восстановился"
+}
 
   const loadPlayerData = async () => {
     try {
@@ -43,7 +48,14 @@ export default function PlayerProfile() {
   useEffect(() => {
     loadPlayerData();
   }, [id]);
+const handleRecover = async (medicalId) => {
 
+  await markPlayerRecovered(medicalId);
+
+  const player = await getPlayerById(id, { includeMedical: true });
+
+  setMedicalHistory([...(player.data?.medicalHistory || [])]);
+};
   if (loading) return <div className="player-profile-loading">Загрузка профиля...</div>;
   if (error) return <div className="player-profile-error">{error}</div>;
   if (!player) return null;
@@ -103,7 +115,7 @@ export default function PlayerProfile() {
       </div>
 
       <div className="player-section">
-        <h2>Тренировки (последние 5)</h2>
+        <h2>Тренировки (последние 10)</h2>
         {trainingStats?.length === 0 ? (
           <p>Нет данных о тренировках</p>
         ) : (
@@ -150,11 +162,19 @@ export default function PlayerProfile() {
               <li key={rec.id} className="medical-item">
                 <div className="medical-header">
                   <span className="medical-date">{new Date(rec.injuryDate).toLocaleDateString('ru-RU')}</span>
-                  <span className="medical-status">{rec.status}</span>
+                  <span className="medical-status"> {MEDICAL_STATUS[rec.status]}</span>
                 </div>
                 <p><strong>Диагноз:</strong> {rec.diagnosis}</p>
                 {rec.recoveryDate && (
                   <p><strong>Восстановление:</strong> {new Date(rec.recoveryDate).toLocaleDateString('ru-RU')}</p>
+                )}
+                {rec.status !== "recovered" && (
+                  <button
+                    className="btn-recover"
+                    onClick={() => handleRecover(rec.id)}
+                  >
+                    Игрок восстановился
+                  </button>
                 )}
               </li>
             ))}
@@ -163,7 +183,7 @@ export default function PlayerProfile() {
         {isDoctor && (
           <button
             className="btn-medical-add"
-            onClick={() => navigate(`/players/${id}/addMedical`)}
+            onClick={() => navigate(`/players/${id}/medical`)}
           >
             Добавить медицинское заключение
           </button>
