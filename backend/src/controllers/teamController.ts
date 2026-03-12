@@ -4,6 +4,7 @@ import { AppError, commonErrorDict } from "../types/AppError";
 import { Prisma } from "../generated/prisma/client";
 import { getPagination } from "../services/pagination";
 import { paginatedResponse } from "../services/paginatedResponse";
+import type { AuthRequest } from "../middlewares/authMiddleware";
 
 const buildTeamWhereClause = (query: any) => {
     const where: Prisma.TeamWhereInput = {}
@@ -42,7 +43,7 @@ const buildTeamWhereClause = (query: any) => {
     return where
 
 }
-export const getAllTeams = async (req: Request, res: Response, next: NextFunction) => {
+export const getAllTeams = async (req: AuthRequest, res: Response, next: NextFunction) => {
     try{
         const {
             sortBy = "createdAt",
@@ -54,7 +55,16 @@ export const getAllTeams = async (req: Request, res: Response, next: NextFunctio
         const { page, limit, skip } = getPagination(req.query)
 
         const where = buildTeamWhereClause(filters)
-
+        
+        if (!req.user?.organization.id) {
+            return next(new AppError(
+                commonErrorDict.unauthorized.name,
+                commonErrorDict.unauthorized.httpCode,
+                "Пользователь не привязан к организации",
+                "Ошибка при получении команд"
+            ));
+        }
+        where.organizationId = req.user.organization.id;
         if (filters.hasPlayers === "true") {
             where.players = { some: {}}
         }
@@ -62,7 +72,9 @@ export const getAllTeams = async (req: Request, res: Response, next: NextFunctio
             where.players = { none: {}}
         }
 
-        const include: Prisma.TeamInclude = {}
+        const include: Prisma.TeamInclude = {
+            organization: true
+        }
 
         if (includePlayers === "true"){
             include.players = {
@@ -105,6 +117,11 @@ export const getAllTeams = async (req: Request, res: Response, next: NextFunctio
             league: team.league,
             season: team.season,
             level: team.level,
+            organizationId: team.organizationId,
+            organization: {
+                id: team.organization.id,
+                name: team.organization.name
+            },
             createdAt: team.createdAt,
             updatedAt: team.updatedAt,
             ...(includePlayers === "true") && {
@@ -131,7 +148,7 @@ export const getAllTeams = async (req: Request, res: Response, next: NextFunctio
     }
 }
 
-export const getTeamById = async (req: Request, res: Response, next: NextFunction) => {
+export const getTeamById = async (req: AuthRequest, res: Response, next: NextFunction) => {
     try {
         const { id } = req.params
         const {
@@ -229,25 +246,33 @@ export const getTeamById = async (req: Request, res: Response, next: NextFunctio
     }
 }
 
-export const createTeam = async (req: Request, res: Response, next: NextFunction) => {
+export const createTeam = async (req: AuthRequest, res: Response, next: NextFunction) => {
     try {
         const { name, league, level, season } = req.body
 
         if (!name || !level || !season) {
-            next(new AppError(
+            return next(new AppError(
                 commonErrorDict.serverError.name,
                 commonErrorDict.serverError.httpCode,
                 'Поля name, level и season обязательны для заполнения',
                 "Ошибка при создании команды"
             ))
         }
-
+        if (!req.user?.organization.id) {
+            return next(new AppError(
+                commonErrorDict.unauthorized.name,
+                commonErrorDict.unauthorized.httpCode,
+                "Пользователь не привязан к организации",
+                "Ошибка при получении команд"
+            ));
+        }
         const newTeam = await prisma.team.create({
             data: {
                 name,
                 league,
                 level,
-                season
+                season,
+                organizationId: req.user.organization.id
             }
         })
         res.status(201).json(newTeam)

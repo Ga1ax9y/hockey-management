@@ -4,8 +4,8 @@ import { checkRole } from "../middlewares/roleMiddleware";
 import { addUserToTeam, createTeam, deleteTeam, getAllTeams, getTeamById, removeUserFromTeam, updateTeam } from "../controllers/teamController";
 const router = Router()
 
-router.get("/", getAllTeams)
-router.get("/:id", getTeamById)
+router.get("/", authenticateToken, getAllTeams)
+router.get("/:id", authenticateToken, getTeamById)
 router.post("/:id/users", authenticateToken, checkRole(['ADMIN', 'MANAGER']), addUserToTeam)
 router.post("/", authenticateToken, checkRole(['ADMIN', 'MANAGER']), createTeam)
 router.put("/:id", authenticateToken, checkRole(['ADMIN', 'MANAGER']), updateTeam)
