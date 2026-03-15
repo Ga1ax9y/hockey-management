@@ -1,0 +1,55 @@
+.password-field {
+    margin-bottom: 16px;
+}
+
+.password-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.password-wrapper .auth-input {
+    flex: 1;
+    background-color: #f5f5f5;
+    cursor: default;
+    letter-spacing: 1px;
+    margin-bottom: 0;
+}
+
+.regenerate-btn {
+    color: black;
+    border: none;
+    padding: 12px 16px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 16px;
+    transition: all 0.2s;
+    white-space: nowrap;
+}
+
+.regenerate-btn:hover {
+    background-color: var(--color-light);
+    transform: scale(1.05);
+}
+
+.regenerate-btn:active {
+    transform: scale(0.95);
+}
+
+
+.regenerate-btn svg {
+    display: block;
+}
+
+.regenerate-btn.spinning svg {
+    animation: spin 0.5s ease-in-out;
+}
+
+@keyframes spin {
+    from {
+        transform: rotate(0deg);
+    }
+    to {
+        transform: rotate(360deg);
+    }
+}

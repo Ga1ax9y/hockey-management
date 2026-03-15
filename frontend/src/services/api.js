@@ -23,6 +23,7 @@ export const getUserById = (id, token) =>
   API.get(`/users/${id}`, {
     headers: { Authorization: `Bearer ${token}` },
   });
+export const createUser = (data) => API.post("/users", data);
 
 export const getRoles = () => API.get("/roles");
 export const getRoleById = (id) => API.get(`/roles/${id}`);

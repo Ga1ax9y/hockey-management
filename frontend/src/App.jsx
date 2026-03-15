@@ -19,6 +19,7 @@ import Trainings from './components/coach/Trainings/Trainings';
 import AddMedicalRecord from './components/medical/AddMedicalRecord/AddMedicalRecord';
 import { useEffect } from 'react';
 import { useAuthStore } from './hooks/useAuthStore';
+import Users from './components/manager/Users/Users';
 const Layout = () => (
   <>
     <Header />
@@ -51,7 +52,12 @@ const router = createBrowserRouter([
           </ProtectedRoute>
         ),
       },
-      { path: '/admin', element: <AdminPanel /> },
+      { path: '/admin/users', element: (
+          <ProtectedRoute>
+            <Users />
+          </ProtectedRoute>
+        ),
+      },
       { path: '/admin/roles', element: (
         <ProtectedRoute>
           <Roles />

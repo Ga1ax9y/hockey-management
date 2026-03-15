@@ -210,7 +210,7 @@ export default function Players() {
               <label>Окончание контракта</label>
               <input
                 type="text"
-                placeholder="31.12.2026"
+                placeholder="01.06.2026"
                 value={formData.contractExpiry}
                 onChange={(e) => setFormData({ ...formData, contractExpiry: e.target.value })}
               />

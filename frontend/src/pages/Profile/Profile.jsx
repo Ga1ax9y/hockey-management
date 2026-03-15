@@ -24,6 +24,10 @@ export default function Profile() {
           <span>{user.role.name}</span>
         </div>
         <div className="profile__field">
+          <strong>Организация:</strong>
+          <span>{user.organization.name || '—'}</span>
+        </div>
+        <div className="profile__field">
           <strong>Дата регистрации:</strong>
           <span>{new Date(user.createdAt).toLocaleDateString('ru-RU')}</span>
         </div>

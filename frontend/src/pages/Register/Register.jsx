@@ -7,7 +7,8 @@ export default function Register() {
     email: "",
     password: "",
     fullName: "",
-    roleId: 7,
+    organizationName: "",
+    // roleId: 7,
   });
   const [error, setError] = useState("");
   const navigate = useNavigate();
@@ -50,6 +51,13 @@ export default function Register() {
           name="password"
           placeholder="Пароль"
           value={form.password}
+          onChange={handleChange}
+        />
+        <input
+          className="auth-input"
+          name="organizationName"
+          placeholder="Название организации"
+          value={form.organizationName}
           onChange={handleChange}
         />
         <button className="auth-button" type="submit">

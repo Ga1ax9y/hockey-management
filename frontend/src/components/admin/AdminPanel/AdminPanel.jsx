@@ -30,15 +30,14 @@ export default function AdminPanel() {
           </>
         )}
 
-        {/* Сюда позже другие разделы */}
-        {/*
-        {isAdmin && (
+
+        {(isAdmin || isManager) && (
           <Link to="/admin/users" className="admin-panel__card">
             <h2>Пользователи</h2>
-            <p>Управление учётными записями</p>
+            <p>Создание учетной записи пользователя для дальнейшей передачи</p>
           </Link>
         )}
-        */}
+
       </div>
 
       {(!isAdmin && !isManager) && (
