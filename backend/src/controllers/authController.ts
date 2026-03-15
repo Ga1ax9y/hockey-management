@@ -9,7 +9,7 @@ const JWT_SECRET = process.env.JWT_SECRET as string;
 
 export const register  = async (req: Request, res: Response, next: NextFunction) => {
     try {
-        const {email, password, fullName, roleId, organizationName, organizationId} = req.body
+        const {email, password, fullName, organizationName} = req.body
         const existingUser = await prisma.user.findUnique({
             where: {
                 email
@@ -24,19 +24,15 @@ export const register  = async (req: Request, res: Response, next: NextFunction)
                 "Ошибка при создании пользователя"
             ))
         }
-
         const hashedPassword = await bcrypt.hash(password, 10)
-        let newUser;
-
-        if (!organizationId) {
-            const newOrganization = await prisma.organization.create({
+        const newOrganization = await prisma.organization.create({
                 data: {
                     name: organizationName
                 }
             })
-            const adminRole = await prisma.role.findUnique({ where: { code: "ADMIN" } });
-            if (!adminRole) throw new Error("Роль ADMIN не найдена");
-            newUser = await prisma.user.create({
+        const adminRole = await prisma.role.findUnique({ where: { code: "ADMIN" } });
+        if (!adminRole) throw new Error("Роль ADMIN не найдена");
+        const newUser = await prisma.user.create({
                 data: {
                     email,
                     fullName,
@@ -53,24 +49,6 @@ export const register  = async (req: Request, res: Response, next: NextFunction)
                     createdAt: true
                 }
             })
-        } else {
-            newUser = await prisma.user.create({
-                data: {
-                    email,
-                    fullName,
-                    passwordHash: hashedPassword,
-                    roleId: Number(roleId),
-                    organizationId: Number(organizationId)
-                },
-                select: {
-                    id: true,
-                    email: true,
-                    fullName: true,
-                    roleId: true,
-                    createdAt: true
-                }
-            })
-        }
 
         res.status(201).json(newUser)
     } catch (error: any) {
