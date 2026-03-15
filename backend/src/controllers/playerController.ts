@@ -5,6 +5,7 @@ import type { Prisma } from "../generated/prisma/client";
 import { getPagination } from "../services/pagination";
 import type { PlayerInclude, PlayerWhereInput } from "../generated/prisma/models";
 import { paginatedResponse } from "../services/paginatedResponse";
+import type { AuthRequest } from "../middlewares/authMiddleware";
 
 const buildPlayerWhereClause = (query: any) => {
     const where: Prisma.PlayerWhereInput = {}
@@ -52,7 +53,7 @@ const buildPlayerWhereClause = (query: any) => {
     return where
 
 }
-export const getAllPlayers = async (req: Request, res: Response, next: NextFunction) => {
+export const getAllPlayers = async (req: AuthRequest, res: Response, next: NextFunction) => {
     try {
         const {
             sortBy = "lastName",
@@ -64,6 +65,20 @@ export const getAllPlayers = async (req: Request, res: Response, next: NextFunct
         const { page, limit, skip } = getPagination(req.query)
 
         const where: PlayerWhereInput = buildPlayerWhereClause(filters)
+
+        if (!req.user?.organization.id) {
+            return next(new AppError(
+                commonErrorDict.unauthorized.name,
+                commonErrorDict.unauthorized.httpCode,
+                "Пользователь не привязан к организации",
+                "Ошибка при получении команд"
+            ));
+        }
+        where.currentTeam = {
+            is: {
+                organizationId: req.user.organization.id
+            }
+        }
 
         if (filters.hasTransfers === "true"){
             where.careerHistory = { some: {}}
@@ -338,7 +353,7 @@ export const getPlayerById = async (req: Request, res: Response, next: NextFunct
     }
 }
 
-export const createPlayer = async (req: Request, res: Response, next: NextFunction) => {
+export const createPlayer = async (req: AuthRequest, res: Response, next: NextFunction) => {
     try {
         const { firstName, lastName, middleName, birthDate, position, height, weight, contractExpiry, currentTeamId } = req.body
 
@@ -350,8 +365,8 @@ export const createPlayer = async (req: Request, res: Response, next: NextFuncti
                 "Ошибка при создании нового игрока"
             ))
         }
+        
 
-        //TODO: перевод даты
         const newPlayer = await prisma.player.create({
             data: {
                 firstName,

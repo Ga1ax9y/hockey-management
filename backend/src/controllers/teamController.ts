@@ -5,6 +5,7 @@ import { Prisma } from "../generated/prisma/client";
 import { getPagination } from "../services/pagination";
 import { paginatedResponse } from "../services/paginatedResponse";
 import type { AuthRequest } from "../middlewares/authMiddleware";
+import type { TeamWhereInput } from "../generated/prisma/models";
 
 const buildTeamWhereClause = (query: any) => {
     const where: Prisma.TeamWhereInput = {}
@@ -54,8 +55,8 @@ export const getAllTeams = async (req: AuthRequest, res: Response, next: NextFun
         } = req.query
         const { page, limit, skip } = getPagination(req.query)
 
-        const where = buildTeamWhereClause(filters)
-        
+        const where: TeamWhereInput = buildTeamWhereClause(filters)
+
         if (!req.user?.organization.id) {
             return next(new AppError(
                 commonErrorDict.unauthorized.name,
@@ -157,6 +158,15 @@ export const getTeamById = async (req: AuthRequest, res: Response, next: NextFun
             playerLimit = "50"
          } = req.query
 
+        if (!req.user?.organization.id) {
+            return next(new AppError(
+                commonErrorDict.unauthorized.name,
+                commonErrorDict.unauthorized.httpCode,
+                "Пользователь не привязан к организации",
+                "Ошибка при получении команд"
+            ));
+        }
+
         const include: Prisma.TeamInclude = {}
 
         if (includePlayers === "true"){
@@ -207,6 +217,7 @@ export const getTeamById = async (req: AuthRequest, res: Response, next: NextFun
         const team = await prisma.team.findUnique({
             where: {
                 id: Number(id),
+                organizationId: req.user.organization.id
             },
             include,
         })
