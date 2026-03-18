@@ -13,6 +13,13 @@ datasource db {
   provider = "postgresql"
 }
 
+enum ContractType {
+  ONE_WAY
+  TWO_WAY
+  ENTRY_LEVEL
+  TRY_OUT
+}
+
 model Organization {
   id        Int      @id @default(autoincrement())
   name      String   @db.VarChar(255)
@@ -84,6 +91,7 @@ model Player{
   position       String @db.VarChar(50)
   height         Int
   weight         Int
+  contractType   ContractType @default(ONE_WAY)
   contractExpiry DateTime @db.Date
   currentTeam    Team? @relation(fields: [currentTeamId], references: [id], onDelete: SetNull)
   currentTeamId  Int?
