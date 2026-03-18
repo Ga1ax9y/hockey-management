@@ -502,4 +502,85 @@ export const addMedicalRecord = async (req: Request, res: Response, next: NextFu
     }
 }
 
-// export const
+export const changePlayerTeam  = async (req: AuthRequest, res: Response, next: NextFunction) => {
+    try {
+        const { id: playerId} = req.params
+        const { newTeamId } = req.body
+
+        if (!req.user?.organization?.id) {
+            return next(new AppError(
+                commonErrorDict.unauthorized.name,
+                commonErrorDict.unauthorized.httpCode,
+                "Нет организации",
+                "Ошибка смены команды"
+            ))
+        }
+        const player = await prisma.player.findFirst({
+            where: {
+                id: Number(playerId),
+                currentTeam: {
+                    organizationId: req.user.organization.id
+                }
+            }
+        })
+
+        if (!player) {
+            return next(new AppError(
+                commonErrorDict.resourceNotFound.name,
+                commonErrorDict.resourceNotFound.httpCode,
+                "Игрок не найден",
+                "Ошибка смены команды"
+            ))
+        }
+        if (!["TWO_WAY", "ENTRY_LEVEL"].includes(player.contractType)) {
+            return next(new AppError(
+                commonErrorDict.badRequest.name,
+                commonErrorDict.badRequest.httpCode,
+                "Нельзя менять команду для этого типа контракта",
+                "Ошибка смены команды"
+            ))
+        }
+
+        const newTeam = await prisma.team.findFirst({
+            where: {
+                id: newTeamId,
+                organizationId: req.user.organization.id
+            }
+        })
+
+        if (!newTeam) {
+            return next(new AppError(
+                commonErrorDict.resourceNotFound.name,
+                commonErrorDict.resourceNotFound.httpCode,
+                "Команда не найдена",
+                "Ошибка смены команды"
+            ))
+        }
+        const updatedPlayer = await prisma.player.update({
+            where: { id: Number(playerId) },
+            data: {
+                currentTeamId: Number(newTeamId)
+            }
+        })
+
+        await prisma.playerCareerHistory.create({
+            data: {
+                playerId: Number(playerId),
+                transferDate: new Date(),
+                transferType: "internal",
+                fromTeamId: player.currentTeamId,
+                toTeamId: Number(newTeamId)
+            }
+        })
+
+        res.json(updatedPlayer)
+    } catch (error: any){
+        next(new AppError(
+            commonErrorDict.serverError.name,
+            commonErrorDict.serverError.httpCode,
+            error.message,
+            "Ошибка смены команды"
+        ))
+    }
+
+}
