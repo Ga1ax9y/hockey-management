@@ -8,6 +8,7 @@ import {
 } from '../../../services/api';
 import './Players.css';
 import { ruDateToISO, isoToRuDate } from '../../../utils/date';
+import { Link } from 'react-router-dom';
 
 export default function Players() {
   const [players, setPlayers] = useState([]);
@@ -24,6 +25,7 @@ export default function Players() {
     position: '',
     height: '',
     weight: '',
+    contractType: '',
     contractExpiry: '',
     currentTeamId: '',
   });
@@ -58,6 +60,7 @@ export default function Players() {
       position: '',
       height: '',
       weight: '',
+      contractType: '',
       contractExpiry: '',
       currentTeamId: '',
     });
@@ -103,6 +106,7 @@ export default function Players() {
       position: player.position || '',
       height: player.height?.toString() || '',
       weight: player.weight?.toString() || '',
+      contractType: player.contractType || '',
       contractExpiry: isoToRuDate(player.contractExpiry),
       currentTeamId: player.currentTeamId?.toString() || '',
     });
@@ -216,6 +220,19 @@ export default function Players() {
               />
             </div>
             <div className="players-form-group">
+              <label>Тип контракта</label>
+              <select
+                value={formData.contractType}
+                onChange={(e) => setFormData({ ...formData, contractType: e.target.value })}
+              >
+                <option value="">Не выбрана</option>
+                <option value="ONE_WAY">Односторонний</option>
+                <option value="TWO_WAY">Двусторонний</option>
+                <option value="ENTRY_LEVEL">Контракт новичка</option>
+                <option value="TRY_OUT">Просмотровый</option>
+              </select>
+            </div>
+            <div className="players-form-group">
               <label>Команда</label>
               <select
                 value={formData.currentTeamId || ''}
@@ -264,8 +281,10 @@ export default function Players() {
                 <tr key={player.id}>
                   <td>{player.id}</td>
                   <td>
+                  <Link to={`/players/${player.id}`}>
                     {player.lastName} {player.firstName}
                     {player.middleName && ` ${player.middleName}`}
+                  </Link>
                   </td>
                   <td>{isoToRuDate(player.birthDate)}</td>
                   <td>{player.position || '—'}</td>

@@ -3,6 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import {getPlayerById, markPlayerRecovered,} from '../../services/api';
 import './PlayerProfile.css';
 import { useRole } from '../../hooks/useRole';
+import { CONTRACT_TYPE, MEDICAL_STATUS } from '../../utils/dicts';
 
 export default function PlayerProfile() {
   const { id } = useParams();
@@ -15,11 +16,7 @@ export default function PlayerProfile() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const { isDoctor } = useRole()
-  const MEDICAL_STATUS = {
-  injured: "Травмирован",
-  recovery: "Реабилитация",
-  recovered: "Восстановился"
-}
+
 
   const loadPlayerData = async () => {
     try {
@@ -77,6 +74,7 @@ const handleRecover = async (medicalId) => {
           <span>Вес: {player.weight || '—'} кг</span>
           <span>Дата рождения: {player.birthDate ? new Date(player.birthDate).toLocaleDateString('ru-RU') : '—'}</span>
           <span>Контракт до: {player.contractExpiry ? new Date(player.contractExpiry).toLocaleDateString('ru-RU') : '—'}</span>
+          <span>Тип контракта: {CONTRACT_TYPE[player.contractType] || '—'}</span>
         </div>
       </div>
 
