@@ -131,6 +131,7 @@ export const getAllPlayers = async (req: AuthRequest, res: Response, next: NextF
             position: player.position,
             height: player.height,
             weight: player.weight,
+            contractType: player.contractType,
             contractExpiry: player.contractExpiry,
             currentTeamId: player.currentTeamId,
             createdAt: player.createdAt,
@@ -328,6 +329,7 @@ export const getPlayerById = async (req: Request, res: Response, next: NextFunct
             position: player.position,
             height: player.height,
             weight: player.weight,
+            contractType: player.contractType,
             contractExpiry: player.contractExpiry,
             currentTeamId: player.currentTeamId,
             createdAt: player.createdAt,
@@ -355,7 +357,7 @@ export const getPlayerById = async (req: Request, res: Response, next: NextFunct
 
 export const createPlayer = async (req: AuthRequest, res: Response, next: NextFunction) => {
     try {
-        const { firstName, lastName, middleName, birthDate, position, height, weight, contractExpiry, currentTeamId } = req.body
+        const { firstName, lastName, middleName, birthDate, position, height, weight, contractExpiry, contractType, currentTeamId } = req.body
 
         if (!lastName || !firstName || !birthDate) {
             return next(new AppError(
@@ -365,7 +367,7 @@ export const createPlayer = async (req: AuthRequest, res: Response, next: NextFu
                 "Ошибка при создании нового игрока"
             ))
         }
-        
+
 
         const newPlayer = await prisma.player.create({
             data: {
@@ -376,6 +378,7 @@ export const createPlayer = async (req: AuthRequest, res: Response, next: NextFu
                 position,
                 height,
                 weight,
+                contractType,
                 contractExpiry: new Date(contractExpiry),
                 currentTeamId
             }
@@ -395,7 +398,7 @@ export const createPlayer = async (req: AuthRequest, res: Response, next: NextFu
 export const updatePlayer = async (req: Request, res: Response, next: NextFunction) => {
     try {
         const { id } = req.params
-        const { firstName, lastName, middleName, birthDate, position, height, weight, contractExpiry, currentTeamId } = req.body
+        const { firstName, lastName, middleName, birthDate, position, height, weight, contractType, contractExpiry, currentTeamId } = req.body
         const updatedPlayer = await prisma.player.update({
             where: {
                 id: Number(id)
@@ -408,6 +411,7 @@ export const updatePlayer = async (req: Request, res: Response, next: NextFuncti
                 position,
                 height,
                 weight,
+                contractType,
                 contractExpiry: new Date(contractExpiry),
                 currentTeamId
             }
@@ -497,3 +501,5 @@ export const addMedicalRecord = async (req: Request, res: Response, next: NextFu
         ))
     }
 }
+
+// export const
