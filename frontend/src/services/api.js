@@ -55,6 +55,7 @@ export const getPlayerById = (id, params = {}) => {
 export const createPlayer = (data) => API.post("/players", data);
 export const updatePlayer = (id, data) => API.put(`/players/${id}`, data);
 export const deletePlayer = (id) => API.delete(`/players/${id}`);
+export const changePlayerTeam = (id, newTeamId) => API.patch(`/players/${id}/change-team`, {newTeamId});
 
 export const getTrainings = () => API.get("/trainings");
 export const getTrainingById = (id) => API.get(`/trainings/${id}`);

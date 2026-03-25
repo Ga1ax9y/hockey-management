@@ -10,3 +10,8 @@ export const CONTRACT_TYPE = {
     ENTRY_LEVEL: "Контракт новичка",
     TRY_OUT: "Просмотровый"
 }
+
+export const TRANSFER_TYPE = {
+    "internal": "Внутренний",
+    "external": "Внешний"
+}

@@ -1,9 +1,14 @@
-import { useState, useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
-import {getPlayerById, markPlayerRecovered,} from '../../services/api';
-import './PlayerProfile.css';
-import { useRole } from '../../hooks/useRole';
-import { CONTRACT_TYPE, MEDICAL_STATUS } from '../../utils/dicts';
+import { useState, useEffect } from "react";
+import { useParams, useNavigate } from "react-router-dom";
+import {
+  changePlayerTeam,
+  getPlayerById,
+  getTeams,
+  markPlayerRecovered,
+} from "../../services/api";
+import "./PlayerProfile.css";
+import { useRole } from "../../hooks/useRole";
+import { CONTRACT_TYPE, MEDICAL_STATUS, TRANSFER_TYPE } from "../../utils/dicts";
 
 export default function PlayerProfile() {
   const { id } = useParams();
@@ -13,29 +18,39 @@ export default function PlayerProfile() {
   const [trainingStats, setTrainingStats] = useState([]);
   const [careerHistory, setCareerHistory] = useState([]);
   const [medicalHistory, setMedicalHistory] = useState([]);
+  const [teams, setTeams] = useState([]);
+  const [selectedTeam, setSelectedTeam] = useState("");
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState('');
-  const { isDoctor } = useRole()
-
+  const [transferLoading, setTransferLoading] = useState(false);
+  const [error, setError] = useState("");
+  const { isDoctor } = useRole();
+  const isTransferAvailable =
+    player?.contractType === "TWO_WAY" ||
+    player?.contractType === "ENTRY_LEVEL";
 
   const loadPlayerData = async () => {
     try {
       setLoading(true);
-      const player = await getPlayerById(id, {includeTransfers: true,
-                                              includeMedical: true,
-                                              includePhysical:true,
-                                              includeMatchStats: true,
-                                              includeTrainingStats: true,
-                                              includeReadinessIndex: true} )
-
+      const [player, teamsData] = await Promise.all([
+        getPlayerById(id, {
+          includeTransfers: true,
+          includeMedical: true,
+          includePhysical: true,
+          includeMatchStats: true,
+          includeTrainingStats: true,
+          includeReadinessIndex: true,
+        }),
+        getTeams(),
+      ]);
       setPlayer(player.data);
       setMatchStats(player.data.matchStats);
       setTrainingStats(player.data.trainingStats);
       setCareerHistory(player.data.transfers);
       setMedicalHistory(player.data.medicalHistory);
-      setError('');
+      setTeams(teamsData.data.data || []);
+      setError("");
     } catch (err) {
-      setError('Не удалось загрузить профиль игрока');
+      setError("Не удалось загрузить профиль игрока");
       console.error(err);
     } finally {
       setLoading(false);
@@ -45,36 +60,65 @@ export default function PlayerProfile() {
   useEffect(() => {
     loadPlayerData();
   }, [id]);
-const handleRecover = async (medicalId) => {
 
-  await markPlayerRecovered(medicalId);
+  const handleTransfer = async () => {
+    if (!selectedTeam) return alert("Выберите команду");
 
-  const player = await getPlayerById(id, { includeMedical: true });
+    try {
+      setTransferLoading(true);
+      await changePlayerTeam(id, selectedTeam);
+      alert("Команда успешно изменена");
+      loadPlayerData();
+    } catch (err) {
+      alert(err.response?.data?.message || "Ошибка при смене команды");
+    } finally {
+      setTransferLoading(false);
+    }
+  };
+  const handleRecover = async (medicalId) => {
+    await markPlayerRecovered(medicalId);
 
-  setMedicalHistory([...(player.data?.medicalHistory || [])]);
-};
-  if (loading) return <div className="player-profile-loading">Загрузка профиля...</div>;
+    const player = await getPlayerById(id, { includeMedical: true });
+
+    setMedicalHistory([...(player.data?.medicalHistory || [])]);
+  };
+
+  if (loading)
+    return <div className="player-profile-loading">Загрузка профиля...</div>;
   if (error) return <div className="player-profile-error">{error}</div>;
   if (!player) return null;
 
   return (
     <div className="player-profile">
-      <button
-        className="player-profile-back"
-        onClick={() => navigate(-1)}
-      >
+      <button className="player-profile-back" onClick={() => navigate(-1)}>
         ← Назад
       </button>
 
       <div className="player-header">
-        <h1>{player.lastName} {player.firstName}</h1>
-        <p className="player-position">{player.position || 'Позиция не указана'}</p>
+        <h1>
+          {player.lastName} {player.firstName}
+        </h1>
+        <p className="player-position">
+          {player.position || "Позиция не указана"}
+        </p>
         <div className="player-basic-info">
-          <span>Рост: {player.height || '—'} см</span>
-          <span>Вес: {player.weight || '—'} кг</span>
-          <span>Дата рождения: {player.birthDate ? new Date(player.birthDate).toLocaleDateString('ru-RU') : '—'}</span>
-          <span>Контракт до: {player.contractExpiry ? new Date(player.contractExpiry).toLocaleDateString('ru-RU') : '—'}</span>
-          <span>Тип контракта: {CONTRACT_TYPE[player.contractType] || '—'}</span>
+          <span>Рост: {player.height || "—"} см</span>
+          <span>Вес: {player.weight || "—"} кг</span>
+          <span>
+            Дата рождения:{" "}
+            {player.birthDate
+              ? new Date(player.birthDate).toLocaleDateString("ru-RU")
+              : "—"}
+          </span>
+          <span>
+            Контракт до:{" "}
+            {player.contractExpiry
+              ? new Date(player.contractExpiry).toLocaleDateString("ru-RU")
+              : "—"}
+          </span>
+          <span>
+            Тип контракта: {CONTRACT_TYPE[player.contractType] || "—"}
+          </span>
         </div>
       </div>
 
@@ -98,8 +142,12 @@ const handleRecover = async (medicalId) => {
             <tbody>
               {matchStats.map((match, i) => (
                 <tr key={i}>
-                  <td>{new Date(match.match_date).toLocaleDateString('ru-RU')}</td>
-                  <td>{match.myTeam.name} – {match.opponentName}</td>
+                  <td>
+                    {new Date(match.match_date).toLocaleDateString("ru-RU")}
+                  </td>
+                  <td>
+                    {match.myTeam.name} – {match.opponentName}
+                  </td>
                   <td>{match.goals}</td>
                   <td>{match.assists}</td>
                   <td>{match.plusMinus}</td>
@@ -111,7 +159,43 @@ const handleRecover = async (medicalId) => {
           </table>
         )}
       </div>
-
+      <div className="player-section transfer-section">
+        <h2>Управление переводом</h2>
+        <div
+          className={`transfer-control ${!isTransferAvailable ? "disabled" : ""}`}
+        >
+          {isTransferAvailable ? (
+            <div className="transfer-form">
+              <select
+                value={selectedTeam}
+                onChange={(e) => setSelectedTeam(e.target.value)}
+                disabled={transferLoading}
+              >
+                <option value="">Выберите новую команду</option>
+                {teams
+                  .filter((t) => t.id !== player.currentTeamId)
+                  .map((team) => (
+                    <option key={team.id} value={team.id}>
+                      {team.name}
+                    </option>
+                  ))}
+              </select>
+              <button
+                onClick={handleTransfer}
+                disabled={transferLoading || !selectedTeam}
+                className="btn-transfer"
+              >
+                {transferLoading ? "Перевод..." : "Перевести игрока"}
+              </button>
+            </div>
+          ) : (
+            <p className="transfer-restriction-msg">
+              Доступно только для игроков с двусторонним контрактом или
+              контрактом новичка
+            </p>
+          )}
+        </div>
+      </div>
       <div className="player-section">
         <h2>Тренировки (последние 10)</h2>
         {trainingStats?.length === 0 ? (
@@ -121,11 +205,17 @@ const handleRecover = async (medicalId) => {
             {trainingStats.map((train, i) => (
               <div key={i} className="training-card">
                 <div className="training-header">
-                  <span className="training-date">{new Date(train.trainingDate).toLocaleDateString('ru-RU')}</span>
+                  <span className="training-date">
+                    {new Date(train.trainingDate).toLocaleDateString("ru-RU")}
+                  </span>
                   <span className="training-type">{train.trainingType}</span>
                 </div>
-                <p><strong>Тренер:</strong> {train.coachName || '—'}</p>
-                <p><strong>Оценка:</strong> {train.coachRating || '—'}</p>
+                <p>
+                  <strong>Тренер:</strong> {train.coachName || "—"}
+                </p>
+                <p>
+                  <strong>Оценка:</strong> {train.coachRating || "—"}
+                </p>
                 {train.description && <p>{train.description}</p>}
               </div>
             ))}
@@ -141,9 +231,13 @@ const handleRecover = async (medicalId) => {
           <ul className="career-list">
             {careerHistory.map((item) => (
               <li key={item.id} className="career-item">
-                <span className="career-date">{new Date(item.transferDate).toLocaleDateString('ru-RU')}</span>
-                <span className="career-type">{item.transferType}</span>
-                <span>из {item.fromTeam.name || '—'} → в {item.toTeam.name || '—'}</span>
+                <span className="career-date">
+                  {new Date(item.transferDate).toLocaleDateString("ru-RU")}
+                </span>
+                <span className="career-type">{TRANSFER_TYPE[item.transferType]}:</span>
+                <span>
+                  из {item.fromTeam.name || "—"} → в {item.toTeam.name || "—"}
+                </span>
               </li>
             ))}
           </ul>
@@ -159,15 +253,25 @@ const handleRecover = async (medicalId) => {
             {medicalHistory.map((rec) => (
               <li key={rec.id} className="medical-item">
                 <div className="medical-header">
-                  <span className="medical-date">{new Date(rec.injuryDate).toLocaleDateString('ru-RU')}</span>
-                  <span className="medical-status"> {MEDICAL_STATUS[rec.status]}</span>
+                  <span className="medical-date">
+                    {new Date(rec.injuryDate).toLocaleDateString("ru-RU")}
+                  </span>
+                  <span className="medical-status">
+                    {" "}
+                    {MEDICAL_STATUS[rec.status]}
+                  </span>
                 </div>
-                <p><strong>Диагноз:</strong> {rec.diagnosis}</p>
+                <p>
+                  <strong>Диагноз:</strong> {rec.diagnosis}
+                </p>
                 {rec.recoveryDate && (
-                  <p><strong>Восстановление:</strong> {new Date(rec.recoveryDate).toLocaleDateString('ru-RU')}</p>
+                  <p>
+                    <strong>Восстановление:</strong>{" "}
+                    {new Date(rec.recoveryDate).toLocaleDateString("ru-RU")}
+                  </p>
                 )}
 
-                {(rec.status !== "recovered" && isDoctor)  && (
+                {rec.status !== "recovered" && isDoctor && (
                   <button
                     className="btn-recover"
                     onClick={() => handleRecover(rec.id)}
