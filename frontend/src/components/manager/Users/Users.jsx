@@ -87,7 +87,6 @@ export default function Users() {
                 name="password"
                 value={form.password}
                 onChange={handleChange}
-                readOnly
             />
             <button
                 type="button"

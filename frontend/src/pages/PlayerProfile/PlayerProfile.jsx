@@ -143,7 +143,7 @@ const handleRecover = async (medicalId) => {
               <li key={item.id} className="career-item">
                 <span className="career-date">{new Date(item.transferDate).toLocaleDateString('ru-RU')}</span>
                 <span className="career-type">{item.transferType}</span>
-                <span>из {item.fromTeam || '—'} → в {item.toTeam || '—'}</span>
+                <span>из {item.fromTeam.name || '—'} → в {item.toTeam.name || '—'}</span>
               </li>
             ))}
           </ul>
@@ -166,7 +166,8 @@ const handleRecover = async (medicalId) => {
                 {rec.recoveryDate && (
                   <p><strong>Восстановление:</strong> {new Date(rec.recoveryDate).toLocaleDateString('ru-RU')}</p>
                 )}
-                {rec.status !== "recovered" && (
+
+                {(rec.status !== "recovered" && isDoctor)  && (
                   <button
                     className="btn-recover"
                     onClick={() => handleRecover(rec.id)}

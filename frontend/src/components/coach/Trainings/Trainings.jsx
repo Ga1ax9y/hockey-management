@@ -41,7 +41,7 @@ export default function Trainings() {
 
   const { isCoach, isAdmin, isManager } = useRole();
   const user = useAuthStore(state => state.user);
-  const canManage = isCoach || isAdmin || isManager;
+  const canManage =  isAdmin || isManager;
 
   useEffect(() => {
     const loadData = async () => {
@@ -201,7 +201,7 @@ export default function Trainings() {
     <div className="trainings">
       <h1>Управление тренировками</h1>
 
-      {canManage && (
+      {(canManage || isCoach) && (
         <button
           className="trainings-add-btn"
           onClick={() => {
@@ -216,7 +216,7 @@ export default function Trainings() {
         </button>
       )}
 
-      {isCreating && canManage && (
+      {isCreating && (canManage ||  isCoach) && (
         <form className="training-form" onSubmit={handleSubmit}>
           <div className="training-form-row">
             <input
@@ -261,7 +261,7 @@ export default function Trainings() {
               required
             >
               <option value="">Выберите команду</option>
-              {availableTeams.map(team => (
+                {availableTeams.map(team => (
                 <option key={team.id} value={team.id}>
                   {team.name}
                 </option>
@@ -309,7 +309,7 @@ export default function Trainings() {
                   </div>
                 </div>
 
-                {canManage && (
+                {(canManage || isCoach) && (
                   <div className="training-actions">
                     <button onClick={() => handleEdit(t)} className="btn-edit">
                       Редактировать
