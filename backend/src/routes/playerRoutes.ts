@@ -10,6 +10,6 @@ router.post("/", authenticateToken, checkRole(['ADMIN', 'MANAGER']), createPlaye
 router.put("/:id", authenticateToken, checkRole(['ADMIN', 'MANAGER']), updatePlayer)
 router.delete("/:id", authenticateToken, checkRole(['ADMIN', 'MANAGER']), deletePlayer)
 router.post("/:id/medical", authenticateToken, checkRole(['ADMIN', 'DOCTOR']), addMedicalRecord)
-router.patch("/:id/team", authenticateToken, checkRole(['ADMIN', 'MANAGER']), changePlayerTeam)
+router.patch("/:id/change-team", authenticateToken, checkRole(['ADMIN', 'MANAGER']), changePlayerTeam)
 
 export default router

@@ -543,7 +543,7 @@ export const changePlayerTeam  = async (req: AuthRequest, res: Response, next: N
 
         const newTeam = await prisma.team.findFirst({
             where: {
-                id: newTeamId,
+                id: Number(newTeamId),
                 organizationId: req.user.organization.id
             }
         })
