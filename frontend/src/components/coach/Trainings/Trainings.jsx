@@ -78,7 +78,7 @@ export default function Trainings() {
       const res = await getTeamById(teamId, { includeUsers: true });
       const teamData = res.data?.data || res.data || {};
 
-      const teamUsers = teamData.userTeams?.map(ut => ut.user).filter(Boolean) || [];
+      const teamUsers = teamData.users?.map(ut => ut.user).filter(Boolean) || [];
 
       const teamCoaches = teamUsers.filter(u => u.role?.code === 'COACH');
 
