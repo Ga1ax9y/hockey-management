@@ -71,3 +71,6 @@ export const markPlayerRecovered = (id, data) =>
 export const getMatchById = (id, params = {}) => {
   return API.get(`/matches/${id}${buildQuery(params)}`)
 }
+
+export const getSchedule = (teamId, params) =>
+    API.get(`/schedule/${teamId}${buildQuery(params)}`);

@@ -20,6 +20,7 @@ import AddMedicalRecord from './components/medical/AddMedicalRecord/AddMedicalRe
 import { useEffect } from 'react';
 import { useAuthStore } from './hooks/useAuthStore';
 import Users from './components/manager/Users/Users';
+import Schedule from './pages/Schedule/Schedule';
 const Layout = () => (
   <>
     <Header />
@@ -40,6 +41,7 @@ const router = createBrowserRouter([
       </ProtectedRoute> },
       { path: '/login', element: <Login /> },
       { path: '/register', element: <Register /> },
+      {path: '/schedule/:teamId', element: <Schedule />},
       { path: '/profile', element: (
           <ProtectedRoute>
             <Profile />
