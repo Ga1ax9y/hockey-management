@@ -152,6 +152,15 @@ export const getAllTeams = async (req: AuthRequest, res: Response, next: NextFun
 export const getTeamById = async (req: AuthRequest, res: Response, next: NextFunction) => {
     try {
         const { id } = req.params
+        const isStaff = ['ADMIN', 'MANAGER'].includes(req.user!.role.code);
+        if (!isStaff && req.user?.teamId !== Number(id)) {
+            return next(new AppError(
+                commonErrorDict.unauthorized.name,
+                commonErrorDict.unauthorized.httpCode,
+                "Пользователь не принадлежит к этой команде",
+                "Ошибка при получении команд"
+            ));
+        }
         const {
             includePlayers = "false",
             includeUsers = 'false',

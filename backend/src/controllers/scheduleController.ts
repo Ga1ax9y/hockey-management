@@ -60,9 +60,9 @@ export const getSchedule = async (
   next: NextFunction,
 ) => {
   try {
+    const teamIdFromParams = Number(req.params.teamId);
+    const user = req.user;
     const organizationId = req.user?.organization.id;
-    console.log(organizationId)
-
     if (!organizationId) {
       return next(
         new AppError(
@@ -73,8 +73,46 @@ export const getSchedule = async (
         ),
       );
     }
-    const matchWhere = buildMatchWhereClause(req.query, organizationId);
-    const trainingWhere = buildTrainingWhereClause(req.query, organizationId);
+
+    let targetTeamId: number;
+
+    const isStaff = ["ADMIN", "MANAGER"].includes(user!.role.code);
+
+    if (!isStaff && teamIdFromParams !== user?.teamId) {
+      return next(
+        new AppError(
+          commonErrorDict.unauthorized.name,
+          commonErrorDict.unauthorized.httpCode,
+          "У вас нет прав на просмотр расписания этой команды",
+          "Доступ запрещен",
+        ),
+      );
+    }
+    if (isStaff) {
+      targetTeamId = teamIdFromParams;
+    } else {
+      targetTeamId = user!.teamId;
+    }
+
+    if (!targetTeamId) {
+      return next(
+        new AppError(
+          commonErrorDict.badRequest.name,
+          commonErrorDict.badRequest.httpCode,
+          "Не указан ID команды",
+          "Ошибка при получении расписания",
+        ),
+      );
+    }
+    const effectiveQuery = {
+      ...req.query,
+      teamId: targetTeamId,
+    };
+    const matchWhere = buildMatchWhereClause(effectiveQuery, organizationId);
+    const trainingWhere = buildTrainingWhereClause(
+      effectiveQuery,
+      organizationId,
+    );
 
     const [matches, trainings] = await Promise.all([
       prisma.match.findMany({
@@ -112,9 +150,9 @@ export const getSchedule = async (
       })),
     ];
     res.json({
-            status: "success",
-            results: events.length,
-            data: events
+      status: "success",
+      results: events.length,
+      data: events,
     });
   } catch (error: any) {
     next(

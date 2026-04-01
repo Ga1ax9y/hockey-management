@@ -1,10 +1,14 @@
 import type { NextFunction, Request, Response } from "express";
 import { prisma } from "../lib/prisma";
 import { AppError, commonErrorDict } from "../types/AppError";
+import { getPagination } from "../services/pagination";
+import type { AuthRequest } from "../middlewares/authMiddleware";
 
-export const getAllTrainings = async (req: Request, res: Response, next: NextFunction) => {
+export const getAllTrainings = async (req: AuthRequest, res: Response, next: NextFunction) => {
     try{
+        const { page, limit, skip } = getPagination(req.query)
         const trainings = await prisma.training.findMany({
+            where: {team: {organizationId: req.user!.organization.id}},
             select: {
                 id: true,
                 startTime: true,
@@ -18,6 +22,7 @@ export const getAllTrainings = async (req: Request, res: Response, next: NextFun
 
             }
         })
+        // TODO:  ADD  PAGINATION
         res.json({
             data: trainings
         })

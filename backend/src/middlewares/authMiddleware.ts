@@ -14,6 +14,8 @@ export interface AuthRequest extends Request {
             id: number;
             name: string;
         };
+        teamId: number;
+
     };
 }
 export default async function authMiddleware (req: AuthRequest, res: Response, next: NextFunction) {
@@ -42,7 +44,8 @@ export default async function authMiddleware (req: AuthRequest, res: Response, n
             },
             include: {
                 role: true,
-                organization: true
+                organization: true,
+                userTeams: true
             }
         })
         if (!user || !user.isActive) {
@@ -57,7 +60,8 @@ export default async function authMiddleware (req: AuthRequest, res: Response, n
             },
             organization: user.organization
                 ? { id: user.organization.id, name: user.organization.name }
-                : { id: 0, name: "Неизвестная организация" }
+                : { id: 0, name: "Неизвестная организация" },
+            teamId: user.userTeams[0]?.teamId ?? 0
         };
         next()
     } catch (error) {

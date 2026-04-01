@@ -180,7 +180,6 @@ export const getMe = async (req: AuthRequest, res: Response, next: NextFunction)
                 "Ошибка при получении данных пользователя"
         ))
         }
-        console.log(user)
         res.json(user)
     }
     catch(error: any){
