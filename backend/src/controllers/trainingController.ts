@@ -85,7 +85,7 @@ export const createTraining = async (req: Request, res: Response, next: NextFunc
         const {startTime, endTime, location, trainingType, teamId, coachId } = req.body
          console.log('Received body:', req.body);
         if (!startTime || !endTime  || !location || !trainingType || !teamId || !coachId) {
-            next(new AppError(
+            return next(new AppError(
                 commonErrorDict.serverError.name,
                 commonErrorDict.serverError.httpCode,
                 'Поля trainingDate, location, trainingType, teamId, coachId обязательны для заполнения',
@@ -99,7 +99,7 @@ export const createTraining = async (req: Request, res: Response, next: NextFunc
                 endTime: new Date(endTime),
                 location,
                 trainingType,
-                teamId,
+                teamId: Number(teamId),
                 coachId
             }
         })
@@ -128,7 +128,7 @@ export const updateTraining = async (req: Request, res: Response, next: NextFunc
                 endTime: new Date(endTime),
                 location,
                 trainingType,
-                teamId,
+                teamId:  Number(teamId),
                 coachId
             }
         })
