@@ -126,19 +126,20 @@ export const getSchedule = async (
     ]);
     const events = [
       ...matches.map((m) => ({
-        id: `match-${m.id}`,
+        id: m.id,
         title: `Матч: ${m.opponentName}`,
+        opponentName: m.opponentName,
         start: m.matchDate,
         type: "MATCH",
         extendedProps: {
           location: m.location,
-          isHome: m.isHomeGame,
+          isHomeGame: m.isHomeGame,
           score: `${m.myScore}:${m.opponentScore}`,
           status: m.status,
         },
       })),
       ...trainings.map((t) => ({
-        id: `training-${t.id}`,
+        id: t.id,
         title: `Тренировка: ${t.trainingType}`,
         start: t.startTime,
         end: t.endTime,
@@ -146,6 +147,7 @@ export const getSchedule = async (
         extendedProps: {
           location: t.location,
           trainingType: t.trainingType,
+          coachId: t.coachId,
         },
       })),
     ];

@@ -127,16 +127,6 @@ export const deleteRole = async (req: Request, res: Response, next: NextFunction
             message: `Роль с id ${id} успешно удалена`
         })
     } catch (error: any) {
-        // if (error.code === 'P2003') {
-        //     return res.status(400).json({
-        //         error: error.message,
-        //         description: "Нельзя удалить роль, так как она назначена пользователям" });
-        // }
-        // else if (error.code === 'P2025') {
-        //     return res.status(404).json({
-        //         error: error.message,
-        //         description: `Роль не найдена` });
-        // }
         next(new AppError(
             commonErrorDict.serverError.name,
             commonErrorDict.serverError.httpCode,

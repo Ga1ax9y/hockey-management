@@ -16,7 +16,9 @@ export const getAllTrainings = async (req: AuthRequest, res: Response, next: Nex
                 location: true,
                 trainingType: true,
                 team: true,
+                teamId: true,
                 coach: true,
+                coachId: true,
                 createdAt: true,
                 updatedAt: true
 
@@ -52,7 +54,9 @@ export const getTrainingById = async (req: Request, res: Response, next: NextFun
                 location: true,
                 trainingType: true,
                 team: true,
+                teamId: true,
                 coach: true,
+                coachId: true,
                 createdAt: true,
                 updatedAt: true
 

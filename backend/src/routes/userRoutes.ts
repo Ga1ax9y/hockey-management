@@ -4,7 +4,7 @@ import authenticateToken from "../middlewares/authMiddleware"
 
 const router = Router();
 
-router.get("/", getAllUsers);
-router.get("/:id", getUserById);
+router.get("/",authenticateToken, getAllUsers);
+router.get("/:id", authenticateToken, getUserById);
 router.post("/", authenticateToken, createUser)
 export default router;

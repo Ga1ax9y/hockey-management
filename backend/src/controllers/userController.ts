@@ -4,9 +4,10 @@ import { AppError, commonErrorDict } from "../types/AppError";
 import type { AuthRequest } from "../middlewares/authMiddleware";
 import bcrypt from "bcrypt"
 
-export const getAllUsers = async (req: Request, res: Response, next: NextFunction) => {
+export const getAllUsers = async (req: AuthRequest, res: Response, next: NextFunction) => {
     try {
         const users = await prisma.user.findMany({
+            where: {organizationId: req.user!.organization.id},
             select: {
                 id: true,
                 email: true,
@@ -82,7 +83,7 @@ export const createUser = async (req: AuthRequest, res: Response, next: NextFunc
                 "Ошибка при создании пользователя"
             ))
         }
-        
+
         if (!req.user?.organization?.id) {
             return next(new AppError(
                 commonErrorDict.unauthorized.name,
