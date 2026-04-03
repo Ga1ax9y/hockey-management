@@ -10,7 +10,7 @@ import {
 import './Trainings.css';
 import { useRole } from '../../../hooks/useRole';
 import { useAuthStore } from '../../../hooks/useAuthStore';
-import { formatDateTimeToRU, toInputDateTime, inputDateTimeToISO } from '../../../utils/date';
+import { formatDateTimeToRU, formatToInputDateTime, inputDateTimeToISO } from '../../../utils/date';
 
 const TRAINING_TYPES = [
   { value: '', label: 'Выберите тип' },
@@ -155,8 +155,8 @@ export default function Trainings() {
     setEditingId(t.id);
 
     setFormData({
-      startTime: toInputDateTime(t.startTime),
-      endTime: toInputDateTime(t.endTime),
+      startTime: formatToInputDateTime(t.startTime),
+      endTime: formatToInputDateTime(t.endTime),
       location: t.location || '',
       trainingType: t.trainingType || '',
       teamId: t.teamId?.toString() || '',

@@ -87,7 +87,7 @@
 
 .calendar-event-wrapper {
     flex-grow: 1;
-    width: 100%;
+    width: 80%;
     display: flex;
     align-items: center;
     box-sizing: border-box;
@@ -106,7 +106,7 @@
 .calendar-event-wrapper.training {
     background-color: #dbeafe !important;
     color: #1e40af !important;
-    border-left: 3px solid #3b82f6 !important;
+    border-left: 1px solid #3b82f6 !important;
 }
 
 .event-icon {
@@ -135,6 +135,137 @@
     text-overflow: ellipsis;
 }
 
+.custom-context-menu {
+    position: fixed;
+    z-index: 1000;
+    background: white;
+    border: 1px solid #e2e8f0;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    border-radius: 8px;
+    padding: 5px 0;
+    min-width: 160px;
+    animation: fadeIn 0.1s ease-out;
+    pointer-events: auto;
+    will-change: transform;
+}
+
+.menu-item {
+    padding: 8px 16px;
+    cursor: pointer;
+    font-size: 14px;
+    color: #1e293b;
+    position: relative;
+}
+
+.menu-item:hover {
+    background: #f1f5f9;
+}
+
+.menu-item.disabled {
+    color: #94a3b8;
+    cursor: default;
+    font-weight: 600;
+    font-size: 12px;
+}
+
+.menu-separator {
+    height: 1px;
+    background: #e2e8f0;
+    margin: 4px 0;
+}
+
+.has-submenu::after {
+    content: '▶';
+    font-size: 10px;
+    float: right;
+    margin-top: 3px;
+}
+
+.submenu {
+    display: none;
+    position: absolute;
+    top: 0;
+    left: 100%;
+    background: white;
+    border: 1px solid #e2e8f0;
+    box-shadow: 4px 4px 12px rgba(0,0,0,0.1);
+    border-radius: 8px;
+    min-width: 140px;
+}
+
+.has-submenu:hover .submenu {
+    display: block;
+}
+
+.modal-overlay {
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(0,0,0,0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1100;
+    pointer-events: all;
+}
+
+.modal-content {
+    background: white;
+    padding: 30px;
+    border-radius: 16px;
+    width: 100%;
+    max-width: 400px;
+    box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1);
+}
+
+.create-event-form {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-top: 20px;
+}
+
+.create-event-form input, .create-event-form select {
+    padding: 10px;
+    border: 1px solid #e2e8f0;
+    border-radius: 6px;
+}
+
+.modal-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    margin-top: 20px;
+}
+
+.training-form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 15px;
+    margin-bottom: 10px;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+}
+
+.form-group label {
+    font-size: 12px;
+    margin-bottom: 4px;
+    color: #64748b;
+}
+
+.create-event-form label {
+    display: block;
+    margin-top: 10px;
+    margin-bottom: 5px;
+    font-weight: 600;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-5px); }
+    to { opacity: 1; transform: translateY(0); }
+}
 @media (max-width: 768px) {
     .schedule-container {
         padding: 10px;

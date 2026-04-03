@@ -8,7 +8,6 @@ export default function Register() {
     password: "",
     fullName: "",
     organizationName: "",
-    // roleId: 7,
   });
   const [error, setError] = useState("");
   const navigate = useNavigate();

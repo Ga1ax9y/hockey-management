@@ -1,25 +1,5 @@
-// YYYY-MM-DDTHH:mm (для input[type=datetime-local])
-export function toInputDateTime(value) {
-  if (!value) return '';
+import { format, parseISO, parse, isValid } from 'date-fns';
 
-  const date = new Date(value);
-
-  const pad = (n) => String(n).padStart(2, '0');
-
-  return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}T${pad(date.getHours())}:${pad(date.getMinutes())}`;
-}
-
-
-// ISO (для отправки в API)
-export function inputDateTimeToISO(value) {
-  if (!value) return null;
-
-  // value уже в формате YYYY-MM-DDTHH:mm
-  return new Date(value).toISOString();
-}
-
-
-// ДД.ММ.ГГГГ ЧЧ:ММ (для отображения)
 export function formatDateTimeToRU(value) {
   if (!value) return '';
 
@@ -30,27 +10,32 @@ export function formatDateTimeToRU(value) {
   return `${pad(date.getDate())}.${pad(date.getMonth() + 1)}.${date.getFullYear()} ${pad(date.getHours())}:${pad(date.getMinutes())}`;
 }
 
-// ДД.ММ.ГГГГ -> ISO
-export function ruDateToISO(value) {
+export const isoToRuDate = (isoString) => {
+  if (!isoString) return "";
+  return format(new Date(isoString), "dd.MM.yyyy");
+};
+
+export const ruDateToISO = (ruDateString) => {
+  if (!ruDateString) return null;
+  const parsedDate = parse(ruDateString, "dd.MM.yyyy", new Date());
+  return isValid(parsedDate) ? parsedDate.toISOString() : null;
+};
+
+export const formatToInput = (displayStr) => {
+  if (!displayStr) return "";
+  const [date, time] = displayStr.split(" ");
+  const [d, m, y] = date.split(".");
+  return `${y}-${m}-${d}T${time}`;
+};
+
+
+export const formatToInputDateTime = (date) => {
+  if (!date) return "";
+  const d = typeof date === 'string' ? parseISO(date) : date;
+  return format(d, "yyyy-MM-dd'T'HH:mm");
+};
+
+export const inputDateTimeToISO = (value) => {
   if (!value) return null;
-
-  const parts = value.split('.');
-  if (parts.length !== 3) return null;
-
-  const [day, month, year] = parts;
-  const isoString = new Date(`${year}-${month}-${day}T00:00:00`).toISOString();
-
-  return isoString;
-}
-
-
-// ISO -> ДД.ММ.ГГГГ
-export function isoToRuDate(value) {
-  if (!value) return '';
-
-  const date = new Date(value);
-
-  const pad = (n) => String(n).padStart(2, '0');
-
-  return `${pad(date.getDate())}.${pad(date.getMonth() + 1)}.${date.getFullYear()}`;
-}
+  return new Date(value).toISOString();
+};

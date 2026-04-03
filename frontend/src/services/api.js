@@ -68,9 +68,12 @@ export const addMedicalRecord = (id, data) =>
 export const markPlayerRecovered = (id, data) =>
   API.patch(`/medical/${id}/recover`, data)
 
+export const createMatch = (data) => API.post("/matches", data);
 export const getMatchById = (id, params = {}) => {
   return API.get(`/matches/${id}${buildQuery(params)}`)
 }
+export const updateMatch = (id, data) => API.put(`/matches/${id}`, data);
+export const deleteMatch = (id) => API.delete(`/matches/${id}`);
 
 export const getSchedule = (teamId, params) =>
     API.get(`/schedule/${teamId}${buildQuery(params)}`);

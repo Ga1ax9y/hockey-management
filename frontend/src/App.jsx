@@ -7,20 +7,20 @@ import NotFound from './pages/NotFound/NotFound';
 import Register from './pages/Register/Register';
 import Login from './pages/Login/Login';
 import ProtectedRoute from './components/helpers/ProtectedRoute';
-import Roles from './components/admin/Roles/Roles';
-import Hierarchy from './components/manager/Hierarchy/Hierarchy';
 import TeamDetails from './pages/TeamDetails/TeamDetails';
 import TeamMembers from './pages/TeamMembers/TeamMembers';
-import AdminPanel from './components/admin/AdminPanel/AdminPanel';
-import Players from './components/manager/Players/Players';
 import Profile from './pages/Profile/Profile';
 import PlayerProfile from './pages/PlayerProfile/PlayerProfile';
-import Trainings from './components/coach/Trainings/Trainings';
-import AddMedicalRecord from './components/medical/AddMedicalRecord/AddMedicalRecord';
 import { useEffect } from 'react';
 import { useAuthStore } from './hooks/useAuthStore';
-import Users from './components/manager/Users/Users';
-import Schedule from './pages/Schedule/Schedule';
+import AdminPanel from './pages/admin/AdminPanel/AdminPanel';
+import Roles from './pages/admin/Roles/Roles';
+import Users from './pages/manager/Users/Users';
+import Hierarchy from './pages/manager/Hierarchy/Hierarchy';
+import Players from './pages/manager/Players/Players';
+import Trainings from './pages/coach/Trainings/Trainings';
+import AddMedicalRecord from './pages/medical/AddMedicalRecord/AddMedicalRecord';
+import Schedule from './components/Schedule/Schedule';
 const Layout = () => (
   <>
     <Header />
