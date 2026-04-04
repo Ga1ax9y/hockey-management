@@ -3,6 +3,7 @@ import { prisma } from "../lib/prisma";
 import { AppError, commonErrorDict } from "../types/AppError";
 import type { Prisma } from "../generated/prisma/client";
 import type { AuthRequest } from "../middlewares/authMiddleware";
+import { updateFinishedMatches } from "../services/matchService";
 
 export const buildMatchWhereClause = (query: any, organizationId: number) => {
   const where: Prisma.MatchWhereInput = {
@@ -114,6 +115,8 @@ export const getSchedule = async (
       organizationId,
     );
 
+    await updateFinishedMatches();
+
     const [matches, trainings] = await Promise.all([
       prisma.match.findMany({
         where: matchWhere,
@@ -131,11 +134,13 @@ export const getSchedule = async (
         opponentName: m.opponentName,
         start: m.matchDate,
         type: "MATCH",
+        status: m.status,
         extendedProps: {
           location: m.location,
           isHomeGame: m.isHomeGame,
           score: `${m.myScore}:${m.opponentScore}`,
-          status: m.status,
+          myScore: m.myScore,
+          opponentScore: m.opponentScore,
         },
       })),
       ...trainings.map((t) => ({

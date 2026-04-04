@@ -7,7 +7,7 @@ import bcrypt from "bcrypt"
 export const getAllUsers = async (req: AuthRequest, res: Response, next: NextFunction) => {
     try {
         const users = await prisma.user.findMany({
-            where: {organizationId: req.user!.organization.id},
+            where: { organizationId: req.user!.organization.id },
             select: {
                 id: true,
                 email: true,
@@ -34,7 +34,7 @@ export const getAllUsers = async (req: AuthRequest, res: Response, next: NextFun
 
 export const getUserById = async (req: Request, res: Response, next: NextFunction) => {
     try {
-        const {id} = req.params;
+        const { id } = req.params;
         const user = await prisma.user.findUnique({
             where: {
                 id: Number(id)
@@ -75,7 +75,7 @@ export const createUser = async (req: AuthRequest, res: Response, next: NextFunc
             }
         })
 
-        if (existingUser){
+        if (existingUser) {
             return next(new AppError(
                 commonErrorDict.badRequest.name,
                 commonErrorDict.badRequest.httpCode,
@@ -96,21 +96,21 @@ export const createUser = async (req: AuthRequest, res: Response, next: NextFunc
         const hashedPassword = await bcrypt.hash(password, 10)
 
         const user = await prisma.user.create({
-                data: {
-                    email,
-                    fullName,
-                    passwordHash: hashedPassword,
-                    roleId: Number(roleId),
-                    organizationId: req.user.organization.id
-                },
-                select: {
-                    id: true,
-                    email: true,
-                    fullName: true,
-                    roleId: true,
-                    createdAt: true
-                }
-            })
+            data: {
+                email,
+                fullName,
+                passwordHash: hashedPassword,
+                roleId: Number(roleId),
+                organizationId: req.user.organization.id
+            },
+            select: {
+                id: true,
+                email: true,
+                fullName: true,
+                roleId: true,
+                createdAt: true
+            }
+        })
 
         res.status(201).json(user)
 
