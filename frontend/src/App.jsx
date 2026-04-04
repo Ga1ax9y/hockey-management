@@ -41,7 +41,6 @@ const router = createBrowserRouter([
       </ProtectedRoute> },
       { path: '/login', element: <Login /> },
       { path: '/register', element: <Register /> },
-      {path: '/schedule/:teamId', element: <Schedule />},
       { path: '/profile', element: (
           <ProtectedRoute>
             <Profile />

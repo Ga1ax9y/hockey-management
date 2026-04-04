@@ -30,6 +30,7 @@ export default function TeamDetails() {
     } catch (err) {
       setError("Не удалось загрузить команду");
       console.error(err);
+      console.log(err.response?.data);
     } finally {
       setLoading(false);
     }
@@ -46,7 +47,7 @@ export default function TeamDetails() {
       setTeam(editForm);
       setIsEditing(false);
     } catch (err) {
-      setError(err.response?.data?.error || "Ошибка при обновлении команды");
+      setError(err.response?.data?.message || "Ошибка при обновлении команды");
     }
   };
 

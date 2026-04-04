@@ -15,3 +15,16 @@ export const TRANSFER_TYPE = {
     "internal": "Внутренний",
     "external": "Внешний"
 }
+
+export const TRAINING_TYPES = [
+  { value: "ice", label: "Лед" },
+  { value: "gym", label: "Тренажерный зал" },
+  { value: "theory", label: "Теория" },
+  { value: "recovery", label: "Восстановление" },
+  { value: "game", label: "Игровая" },
+];
+export const MATCH_TYPES = [
+  { value: "league", label: "Лига" },
+  { value: "playoff", label: "Плей-офф" },
+  { value: "offseason", label: "Подготовительный" },
+];

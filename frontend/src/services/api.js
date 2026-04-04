@@ -73,6 +73,7 @@ export const getMatchById = (id, params = {}) => {
   return API.get(`/matches/${id}${buildQuery(params)}`)
 }
 export const updateMatch = (id, data) => API.put(`/matches/${id}`, data);
+export const completeMatch = (id, data) => API.patch(`/matches/${id}/complete`, data);
 export const deleteMatch = (id) => API.delete(`/matches/${id}`);
 
 export const getSchedule = (teamId, params) =>
