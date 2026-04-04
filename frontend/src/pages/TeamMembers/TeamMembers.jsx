@@ -35,7 +35,7 @@ export default function TeamMembers() {
     } catch (err) {
       setTeamUsers([]);
       setPlayers([]);
-      setError('Не удалось загрузить данные');
+      setError(err.response?.data.message);
       console.error(err);
     } finally {
       setLoading(false);
