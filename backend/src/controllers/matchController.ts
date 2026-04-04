@@ -3,10 +3,14 @@ import { prisma } from "../lib/prisma";
 import { AppError, commonErrorDict } from "../types/AppError";
 import { getPagination } from "../services/pagination";
 import type { AuthRequest } from "../middlewares/authMiddleware";
+import { updateFinishedMatches } from "../services/matchService";
 
 export const getAllMatches = async (req: AuthRequest, res: Response, next: NextFunction) => {
     try{
         const { page, limit, skip } = getPagination(req.query)
+
+        await updateFinishedMatches()
+
         const matches = await prisma.match.findMany({
             where: {myTeam: {organizationId: req.user!.organization.id}},
             select: {
@@ -155,6 +159,34 @@ export const updateMatch = async (req: Request, res: Response, next: NextFunctio
         ))
     }
 }
+
+export const completeMatch = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+        const { id } = req.params;
+        const { myScore, opponentScore } = req.body;
+        console.log(myScore, opponentScore);
+
+        const completedMatch = await prisma.match.update({
+            where: {
+                id: Number(id)
+            },
+            data: {
+                myScore: Number(myScore),
+                opponentScore: Number(opponentScore),
+            }
+        });
+
+        res.json(completedMatch);
+    }
+    catch (error: any) {
+        next(new AppError(
+            commonErrorDict.serverError.name,
+            commonErrorDict.serverError.httpCode,
+            error.message,
+            "Ошибка при сохранении результатов матча"
+        ));
+    }
+};
 
 export const deleteMatch = async (req: Request, res: Response, next:  NextFunction) => {
     try {
