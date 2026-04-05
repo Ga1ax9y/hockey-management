@@ -201,7 +201,7 @@ const Schedule = ({ teamId }) => {
 
 			setShowModal(false);
 			setEditingId(null);
-      setModalMode("EDIT");
+			setModalMode("EDIT");
 			calendarRef.current.getApi().refetchEvents();
 		} catch (err) {
 			alert(err.response?.data?.message || "Ошибка при сохранении");
@@ -227,8 +227,8 @@ const Schedule = ({ teamId }) => {
 					coachId: event.extendedProps.coachId,
 					isHomeGame: event.extendedProps.isHomeGame,
 					score: event.extendedProps.score,
-          myScore: event.extendedProps.myScore,
-          opponentScore: event.extendedProps.opponentScore,
+					myScore: event.extendedProps.myScore,
+					opponentScore: event.extendedProps.opponentScore,
 					...event.details,
 				},
 			}));
@@ -369,14 +369,13 @@ const Schedule = ({ teamId }) => {
 						className="modal-content"
 						onClick={(e) => e.stopPropagation()}
 					>
-
 						<form
 							className="create-event-form"
 							onSubmit={handleSubmit}
 						>
 							{modalType === "TRAINING" ? (
 								<>
-                <h3>Новая тренировка</h3>
+									<h3>Новая тренировка</h3>
 									<div className="training-form-row">
 										<div className="form-group">
 											<label>Начало</label>
@@ -501,7 +500,7 @@ const Schedule = ({ teamId }) => {
 														value={
 															MatchFormData.myScore
 														}
-                            min={0}
+														min={0}
 														onChange={(e) =>
 															setMatchFormData({
 																...MatchFormData,
@@ -522,7 +521,7 @@ const Schedule = ({ teamId }) => {
 														value={
 															MatchFormData.opponentScore
 														}
-                            min={0}
+														min={0}
 														onChange={(e) =>
 															setMatchFormData({
 																...MatchFormData,
@@ -539,7 +538,7 @@ const Schedule = ({ teamId }) => {
 										</>
 									) : (
 										<>
-                      <h3>Новый матч</h3>
+											<h3>Новый матч</h3>
 											<div className="training-form-row">
 												<div className="form-group">
 													<label>Начало</label>

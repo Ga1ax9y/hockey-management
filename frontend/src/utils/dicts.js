@@ -28,3 +28,9 @@ export const MATCH_TYPES = [
   { value: "playoff", label: "Плей-офф" },
   { value: "offseason", label: "Подготовительный" },
 ];
+
+export const SEASON_TYPES = Array.from({ length: 2050 - 2025 + 1 }, (_, i) => {
+  const startYear = 2025 + i;
+  const endYear = startYear + 1;
+  return `${startYear}/${endYear}`;
+});

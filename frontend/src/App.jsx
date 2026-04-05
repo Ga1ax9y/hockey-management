@@ -18,7 +18,7 @@ import Roles from './pages/admin/Roles/Roles';
 import Users from './pages/manager/Users/Users';
 import Hierarchy from './pages/manager/Hierarchy/Hierarchy';
 import Players from './pages/manager/Players/Players';
-import Trainings from './pages/coach/Trainings/Trainings';
+import Events from './pages/coach/Events/Events';
 import AddMedicalRecord from './pages/medical/AddMedicalRecord/AddMedicalRecord';
 import Schedule from './components/Schedule/Schedule';
 const Layout = () => (
@@ -77,9 +77,9 @@ const router = createBrowserRouter([
         </ProtectedRoute>
         ),
       },
-      { path: '/coach/trainings', element: (
+      { path: '/events', element: (
           <ProtectedRoute>
-            <Trainings />
+            <Events />
           </ProtectedRoute>
         ),
       },

@@ -22,14 +22,14 @@ export default function Home() {
       <div className="home__stats">
         <div className="stat-card">
           <h3>Ваши команды</h3>
-          {user.userTeams?.length === 0 ? (
+          {user.teams?.length === 0 ? (
             <p className="home__no-teams">Вы не привязаны ни к одной команде.</p>
           ) : (
             <ul className="teams-list">
-              {user.userTeams.map(ut => (
-                <li key={ut.team?.id}>
-                  <Link to={`/teams/${ut.team?.id}`} className="team-link">
-                    {ut.team?.name} <span className="team-league">({ut.team?.league || '—'})</span>
+              {user.teams.map(ut => (
+                <li key={ut.id}>
+                  <Link to={`/teams/${ut.id}`} className="team-link">
+                    {ut.name} <span className="team-league">({ut.league || '—'})</span>
                   </Link>
                 </li>
               ))}

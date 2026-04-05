@@ -51,7 +51,7 @@ export default function Header() {
             <Link to="/manager/hierarchy">Иерархия</Link>
           </li>}
           {(isCoach || isAdmin) && <li>
-            <Link to="/coach/trainings">Тренировки</Link>
+            <Link to="/events">События</Link>
           </li>}
           {isAuthenticated && (
             <>
@@ -84,7 +84,7 @@ export default function Header() {
             <Link to="/manager/hierarchy" onClick={toggleMenu}>Иерархия</Link>
           </li>}
           {(isCoach || isAdmin) && <li>
-            <Link to="/coach/trainings" onClick={toggleMenu}>Тренировки</Link>
+            <Link to="/events" onClick={toggleMenu}>Тренировки</Link>
           </li>}
           {isAuthenticated && (
             <>
