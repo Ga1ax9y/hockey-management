@@ -131,7 +131,6 @@ export const getSchedule = async (
       ...matches.map((m) => ({
         id: m.id,
         title: `Матч: ${m.opponentName}`,
-        opponentName: m.opponentName,
         start: m.matchDate,
         type: "MATCH",
         status: m.status,
@@ -140,6 +139,7 @@ export const getSchedule = async (
           isHomeGame: m.isHomeGame,
           score: `${m.myScore}:${m.opponentScore}`,
           myScore: m.myScore,
+          opponentName: m.opponentName,
           opponentScore: m.opponentScore,
         },
       })),

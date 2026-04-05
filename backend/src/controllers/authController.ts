@@ -178,9 +178,16 @@ export const getMe = async (req: AuthRequest, res: Response, next: NextFunction)
                 commonErrorDict.resourceNotFound.httpCode,
                 "Пользователь не найден",
                 "Ошибка при получении данных пользователя"
-        ))
+            ))
         }
-        res.json(user)
+        const { userTeams, ...userWithoutTeams } = user;
+
+        const formattedUser = {
+            ...userWithoutTeams,
+            teams: userTeams.map(ut => ut.team)
+        };
+
+        res.json(formattedUser)
     }
     catch(error: any){
             next(new AppError(
