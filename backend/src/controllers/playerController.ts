@@ -22,32 +22,32 @@ const buildPlayerWhereClause = (query: any) => {
         hasTransfers
     } = query
 
-    if (search){
-        where.lastName = { contains: search as string, mode: "insensitive"}
+    if (search) {
+        where.lastName = { contains: search as string, mode: "insensitive" }
     }
 
-    if (position){
+    if (position) {
         where.position = position as string
     }
 
-    if (currentTeamId){
+    if (currentTeamId) {
         where.currentTeamId = Number(currentTeamId)
     }
 
-    if (minHeight || maxHeight){
+    if (minHeight || maxHeight) {
         where.height = {}
         if (minHeight) where.height.gte = Number(minHeight)
         if (maxHeight) where.height.lte = Number(maxHeight)
     }
 
-    if (minWeight || maxWeight){
+    if (minWeight || maxWeight) {
         where.weight = {}
         if (minWeight) where.weight.gte = Number(minWeight)
         if (maxWeight) where.weight.lte = Number(maxWeight)
     }
 
-    if (contractExpiryLte){
-        where.contractExpiry = { lte: new Date(contractExpiryLte as string)}
+    if (contractExpiryLte) {
+        where.contractExpiry = { lte: new Date(contractExpiryLte as string) }
     }
 
     return where
@@ -80,16 +80,16 @@ export const getAllPlayers = async (req: AuthRequest, res: Response, next: NextF
             }
         }
 
-        if (filters.hasTransfers === "true"){
-            where.careerHistory = { some: {}}
+        if (filters.hasTransfers === "true") {
+            where.careerHistory = { some: {} }
         }
-        else if (filters.hasTransfers === "false"){
-            where.careerHistory = { none: {}}
+        else if (filters.hasTransfers === "false") {
+            where.careerHistory = { none: {} }
         }
 
         const include: PlayerInclude = {}
 
-        if (includeCurrentTeam === "true"){
+        if (includeCurrentTeam === "true") {
             include.currentTeam = {
                 select: {
                     id: true,
@@ -98,7 +98,7 @@ export const getAllPlayers = async (req: AuthRequest, res: Response, next: NextF
                 }
             }
         }
-        if (includeStats === "true"){
+        if (includeStats === "true") {
             include._count = {
                 select: {
                     careerHistory: true,
@@ -120,7 +120,7 @@ export const getAllPlayers = async (req: AuthRequest, res: Response, next: NextF
                     [sortBy as string]: order
                 }
             }),
-            prisma.player.count({where})
+            prisma.player.count({ where })
         ])
         const transformedPlayers = players.map(player => ({
             id: player.id,
@@ -151,7 +151,7 @@ export const getAllPlayers = async (req: AuthRequest, res: Response, next: NextF
         res.json(paginatedResponse(transformedPlayers, total, page, limit))
 
     }
-    catch(error: any){
+    catch (error: any) {
         next(new AppError(
             commonErrorDict.serverError.name,
             commonErrorDict.serverError.httpCode,
@@ -176,7 +176,7 @@ export const getPlayerById = async (req: Request, res: Response, next: NextFunct
         const limitNum = Math.min(25, Math.max(1, Number(limit)))
         const include: Prisma.PlayerInclude = {}
 
-        if (includeTransfers === "true"){
+        if (includeTransfers === "true") {
             include.careerHistory = {
                 select: {
                     id: true,
@@ -191,7 +191,7 @@ export const getPlayerById = async (req: Request, res: Response, next: NextFunct
                             level: true
                         }
                     },
-                    toTeam:{
+                    toTeam: {
                         select: {
                             id: true,
                             name: true,
@@ -203,12 +203,12 @@ export const getPlayerById = async (req: Request, res: Response, next: NextFunct
                     createdAt: true,
                     updatedAt: true
                 },
-                orderBy: { transferDate: 'desc'},
+                orderBy: { transferDate: 'desc' },
                 take: limitNum
             }
         }
 
-        if (includeMedical === "true"){
+        if (includeMedical === "true") {
             include.medicalHistory = {
                 select: {
                     id: true,
@@ -219,15 +219,15 @@ export const getPlayerById = async (req: Request, res: Response, next: NextFunct
                     createdAt: true,
                     updatedAt: true
                 },
-                orderBy: {injuryDate: 'desc'},
+                orderBy: { injuryDate: 'desc' },
                 take: Number(limitNum)
             }
         }
 
-        if (includePhysical === "true"){
+        if (includePhysical === "true") {
             include.physicalData = {
                 select: {
-                    id:true,
+                    id: true,
                     recordedDate: true,
                     metricType: true,
                     metricValue: true,
@@ -235,12 +235,12 @@ export const getPlayerById = async (req: Request, res: Response, next: NextFunct
                     createdAt: true,
                     updatedAt: true
                 },
-                orderBy: {recordedDate: 'desc'},
+                orderBy: { recordedDate: 'desc' },
                 take: limitNum
             }
         }
 
-        if (includeMatchStats === "true"){
+        if (includeMatchStats === "true") {
             include.matchStats = {
                 select: {
                     id: true,
@@ -260,12 +260,12 @@ export const getPlayerById = async (req: Request, res: Response, next: NextFunct
                     createdAt: true,
                     updatedAt: true
                 },
-                orderBy: { match: {matchDate: "desc"} },
+                orderBy: { match: { matchDate: "desc" } },
                 take: limitNum
             }
         }
 
-        if (includeTrainingStats === "true"){
+        if (includeTrainingStats === "true") {
             include.trainingStats = {
                 select: {
                     id: true,
@@ -285,13 +285,13 @@ export const getPlayerById = async (req: Request, res: Response, next: NextFunct
                     createdAt: true,
                     updatedAt: true
                 },
-                orderBy: {training: {startTime: 'desc'}},
+                orderBy: { training: { startTime: 'desc' } },
                 take: limitNum
             }
         }
 
-        if (includeReadinessIndex === "true"){
-            include.readinessIndex =  {
+        if (includeReadinessIndex === "true") {
+            include.readinessIndex = {
                 select: {
                     id: true,
                     readinessValue: true,
@@ -299,7 +299,7 @@ export const getPlayerById = async (req: Request, res: Response, next: NextFunct
                     createdAt: true,
                     updatedAt: true
                 },
-                orderBy: { createdAt: 'desc'}
+                orderBy: { createdAt: 'desc' }
             }
         }
 
@@ -310,7 +310,7 @@ export const getPlayerById = async (req: Request, res: Response, next: NextFunct
             include
         })
 
-        if (!player){
+        if (!player) {
             return next(
                 new AppError(
                     commonErrorDict.resourceNotFound.name,
@@ -428,7 +428,7 @@ export const updatePlayer = async (req: Request, res: Response, next: NextFuncti
     }
 }
 
-export const deletePlayer = async (req: Request, res: Response, next:  NextFunction) => {
+export const deletePlayer = async (req: Request, res: Response, next: NextFunction) => {
     try {
         const { id } = req.params
         await prisma.player.delete({
@@ -449,16 +449,49 @@ export const deletePlayer = async (req: Request, res: Response, next:  NextFunct
     }
 }
 
-export const addMedicalRecord = async (req: Request, res: Response, next: NextFunction) => {
+export const addMedicalRecord = async (req: AuthRequest, res: Response, next: NextFunction) => {
     try {
         const { id } = req.params
+        const currentUserOrgId = req.user?.organization.id
+        const isAdmin = req.user?.role.code === "ADMIN"
 
         if (!id) {
             return next(new AppError(
                 commonErrorDict.badRequest.name,
                 commonErrorDict.badRequest.httpCode,
                 "Поле userId обязательно",
-                "Ошибка при добавлении пользователя в команду"
+                "Ошибка при добавлении медицинской записи игроку"
+            ));
+        }
+        const player = await prisma.player.findUnique({
+            where: { id: Number(id) },
+            select: { currentTeam: { select: { organizationId: true } }, currentTeamId: true }
+        });
+
+        if (!player) {
+            return next(new AppError(
+                commonErrorDict.resourceNotFound.name,
+                commonErrorDict.resourceNotFound.httpCode,
+                "Игрок не найден",
+                "Ошибка при добавлении медицинской записи игроку"
+            ));
+        }
+
+        if (player.currentTeam?.organizationId !== currentUserOrgId) {
+            return next(new AppError(
+                commonErrorDict.unauthorized.name,
+                commonErrorDict.unauthorized.httpCode,
+                "Вы не можете добавлять медицинские записи игрокам чужой организации",
+                "Ошибка при добавлении медицинской записи игроку"
+            ));
+        }
+
+        if (!isAdmin && req.user?.teamId !== player.currentTeamId) {
+            return next(new AppError(
+                commonErrorDict.unauthorized.name,
+                commonErrorDict.unauthorized.httpCode,
+                "Вы не можете добавлять медицинские записи игрокам чужой команды",
+                "Ошибка при добавлении медицинской записи игроку"
             ));
         }
         const { injuryDate, recoveryDate, diagnosis, status } = req.body
@@ -486,7 +519,7 @@ export const addMedicalRecord = async (req: Request, res: Response, next: NextFu
                 }
             }
         })
-         res.status(201).json({
+        res.status(201).json({
             success: true,
             message: "Игроку успешно добавлена медицинская запись",
             data: newMedical
@@ -497,14 +530,101 @@ export const addMedicalRecord = async (req: Request, res: Response, next: NextFu
             commonErrorDict.serverError.name,
             commonErrorDict.serverError.httpCode,
             error.message,
-            "Ошибка при удалении игрока"
+            "Ошибка при добавлении медицинской записи игроку"
         ))
     }
 }
 
-export const changePlayerTeam  = async (req: AuthRequest, res: Response, next: NextFunction) => {
+export const addPhysicalRecord = async (req: AuthRequest, res: Response, next: NextFunction) => {
     try {
-        const { id: playerId} = req.params
+        const { id } = req.params
+        const currentUserOrgId = req.user?.organization.id
+        const isAdmin = req.user?.role.code === "ADMIN"
+
+        if (!id) {
+            return next(new AppError(
+                commonErrorDict.badRequest.name,
+                commonErrorDict.badRequest.httpCode,
+                "Поле userId обязательно",
+                "Ошибка при добавлении физического показателя игроку"
+            ));
+        }
+        const player = await prisma.player.findUnique({
+            where: { id: Number(id) },
+            select: { currentTeam: { select: { organizationId: true } }, currentTeamId: true }
+        });
+
+        if (!player) {
+            return next(new AppError(
+                commonErrorDict.resourceNotFound.name,
+                commonErrorDict.resourceNotFound.httpCode,
+                "Игрок не найден",
+                "Ошибка при добавлении физического показателя игроку"
+            ));
+        }
+        if (player.currentTeam?.organizationId !== currentUserOrgId) {
+            return next(new AppError(
+                commonErrorDict.unauthorized.name,
+                commonErrorDict.unauthorized.httpCode,
+                "Вы не можете добавлять показатели игрокам чужой организации",
+                "Ошибка при добавлении физического показателя игроку"
+            ));
+        }
+
+        if (!isAdmin && req.user?.teamId !== player.currentTeamId) {
+            return next(new AppError(
+                commonErrorDict.unauthorized.name,
+                commonErrorDict.unauthorized.httpCode,
+                "Вы не можете добавлять показатели игрокам чужой команды",
+                "Ошибка при добавлении физического показателя игроку"
+            ));
+        }
+
+
+        const { recordedDate, metricType, metricValue, unit } = req.body
+
+        const newPhysical = await prisma.physicalData.create({
+            data: {
+                playerId: Number(id),
+                recordedDate: new Date(recordedDate),
+                metricType,
+                metricValue: Number(metricValue),
+                unit
+            },
+            include: {
+                player: {
+                    select: {
+                        lastName: true,
+                        firstName: true,
+                        position: true,
+                        currentTeam: {
+                            select: {
+                                name: true
+                            }
+                        }
+                    }
+                }
+            }
+        })
+        res.status(201).json({
+            success: true,
+            message: "Игроку успешно добавлен физический показатель",
+            data: newPhysical
+        });
+
+    } catch (error: any) {
+        next(new AppError(
+            commonErrorDict.serverError.name,
+            commonErrorDict.serverError.httpCode,
+            error.message,
+            "Ошибка при добавлении физического показателя игроку"
+        ))
+    }
+}
+
+export const changePlayerTeam = async (req: AuthRequest, res: Response, next: NextFunction) => {
+    try {
+        const { id: playerId } = req.params
         const { newTeamId } = req.body
 
         if (!req.user?.organization?.id) {
@@ -574,7 +694,7 @@ export const changePlayerTeam  = async (req: AuthRequest, res: Response, next: N
         })
 
         res.json(updatedPlayer)
-    } catch (error: any){
+    } catch (error: any) {
         next(new AppError(
             commonErrorDict.serverError.name,
             commonErrorDict.serverError.httpCode,
