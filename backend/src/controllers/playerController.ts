@@ -2,9 +2,9 @@ import type { NextFunction, Request, Response } from "express";
 import { prisma } from "../lib/prisma";
 import { AppError, commonErrorDict } from "../types/AppError";
 import type { Prisma } from "../generated/prisma/client";
-import { getPagination } from "../services/pagination";
+import { getPagination } from "../helpers/pagination";
 import type { PlayerInclude, PlayerWhereInput } from "../generated/prisma/models";
-import { paginatedResponse } from "../services/paginatedResponse";
+import { paginatedResponse } from "../helpers/paginatedResponse";
 import type { AuthRequest } from "../middlewares/authMiddleware";
 
 const buildPlayerWhereClause = (query: any) => {

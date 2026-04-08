@@ -1,42 +1,35 @@
 import type { NextFunction, Request, Response } from "express";
 import { prisma } from "../lib/prisma";
 import { AppError, commonErrorDict } from "../types/AppError";
-import { getPagination } from "../services/pagination";
+import { getPagination } from "../helpers/pagination";
 import type { AuthRequest } from "../middlewares/authMiddleware";
-import { updateFinishedMatches } from "../services/matchService";
+import { MatchService } from "../services/matchService";
+import { paginatedResponse } from "../helpers/paginatedResponse";
+
 
 export const getAllMatches = async (req: AuthRequest, res: Response, next: NextFunction) => {
-    try{
-        const { page, limit, skip } = getPagination(req.query)
+    try {
+        const orgId = req.user?.organization.id;
+        if (!orgId) {
+            return next(new AppError(
+                commonErrorDict.unauthorized.name,
+                commonErrorDict.unauthorized.httpCode,
+                "Пользователь не авторизован",
+                "Ошибка при получении всех матчей"
+            ));
+        }
+        const pagination = getPagination(req.query)
 
-        await updateFinishedMatches()
-
-        const matches = await prisma.match.findMany({
-            where: {myTeam: {organizationId: req.user!.organization.id}},
-            select: {
-                id: true,
-                matchDate: true,
-                location: true,
-                myTeam: true,
-                myTeamId: true,
-                opponentName: true,
-                isHomeGame: true,
-                myScore: true,
-                opponentScore: true,
-                matchType: true,
-                season: true,
-                status: true,
-                createdAt: true,
-                updatedAt: true
-
-            }
+        const { matches, total } = await MatchService.findAll({
+            pagination,
+            organizationId: req.user!.organization.id
         })
-        // TODO:  ADD  PAGINATION
-        res.json({
-            data: matches
-        })
+
+        await MatchService.autoCloseOldMatches()
+
+        res.json(paginatedResponse(matches, total, pagination.page, pagination.limit))
     }
-    catch(error: any){
+    catch (error: any) {
         next(new AppError(
             commonErrorDict.serverError.name,
             commonErrorDict.serverError.httpCode,
@@ -46,33 +39,23 @@ export const getAllMatches = async (req: AuthRequest, res: Response, next: NextF
     }
 }
 
-export const getMatchById = async (req: Request, res: Response, next: NextFunction) => {
+export const getMatchById = async (req: AuthRequest, res: Response, next: NextFunction) => {
     try {
         const { id } = req.params
+        const includeStats = req.query.includeStats === "true";
+        const orgId = req.user?.organization.id;
 
-        const match = await prisma.match.findUnique({
-            where: {
-                id: Number(id)
-            },
-            select: {
-                id: true,
-                matchDate: true,
-                location: true,
-                myTeam: true,
-                myTeamId: true,
-                opponentName: true,
-                isHomeGame: true,
-                myScore: true,
-                opponentScore: true,
-                matchType: true,
-                season: true,
-                status: true,
-                createdAt: true,
-                updatedAt: true
+        if (!orgId) {
+            return next(new AppError(
+                commonErrorDict.unauthorized.name,
+                commonErrorDict.unauthorized.httpCode,
+                "Пользователь не авторизован",
+                "Ошибка при получении матча по id"
+            ));
+        }
 
-            },
-        })
-        if (!match){
+        const match = await MatchService.findById(Number(id), includeStats)
+        if (!match) {
             return next(
                 new AppError(
                     commonErrorDict.resourceNotFound.name,
@@ -94,10 +77,20 @@ export const getMatchById = async (req: Request, res: Response, next: NextFuncti
     }
 }
 
-export const createMatch = async (req: Request, res: Response, next: NextFunction) => {
+export const createMatch = async (req: AuthRequest, res: Response, next: NextFunction) => {
     try {
-        const {matchDate, location, myTeamId, opponentName, isHomeGame, matchType, season  } = req.body
-        console.log(matchDate, location, myTeamId, opponentName, isHomeGame, matchType, season)
+        const { matchDate, location, myTeamId, opponentName, isHomeGame, matchType, season } = req.body
+        const orgId = req.user?.organization.id;
+
+        if (!orgId) {
+            return next(new AppError(
+                commonErrorDict.unauthorized.name,
+                commonErrorDict.unauthorized.httpCode,
+                "Пользователь не авторизован",
+                "Ошибка при создании матча"
+            ));
+        }
+
         if (!matchDate || !location || myTeamId === undefined || !opponentName || isHomeGame === undefined || !matchType || !season) {
             return next(new AppError(
                 commonErrorDict.serverError.name,
@@ -107,17 +100,7 @@ export const createMatch = async (req: Request, res: Response, next: NextFunctio
             ));
         }
 
-        const newMatch = await prisma.match.create({
-            data: {
-                matchDate: new Date(matchDate),
-                location,
-                myTeamId: Number(myTeamId),
-                opponentName,
-                isHomeGame: Boolean(isHomeGame),
-                matchType,
-                season,
-            }
-        })
+        const newMatch = await MatchService.create(req.body, req.user!.organization.id)
         res.status(201).json(newMatch)
 
     } catch (error: any) {
@@ -130,24 +113,21 @@ export const createMatch = async (req: Request, res: Response, next: NextFunctio
     }
 }
 
-export const updateMatch = async (req: Request, res: Response, next: NextFunction) => {
+export const updateMatch = async (req: AuthRequest, res: Response, next: NextFunction) => {
     try {
         const { id } = req.params
-        const {matchDate, location, myTeamId, opponentName, isHomeGame, matchType, season  } = req.body
-        const updatedMatch = await prisma.match.update({
-            where: {
-                id: Number(id)
-            },
-            data: {
-                matchDate: new Date(matchDate),
-                location,
-                myTeamId: Number(myTeamId),
-                opponentName,
-                isHomeGame: Boolean(isHomeGame),
-                matchType,
-                season,
-            }
-        })
+        const { matchDate, location, myTeamId, opponentName, isHomeGame, matchType, season } = req.body
+        const orgId = req.user?.organization.id;
+
+        if (!orgId) {
+            return next(new AppError(
+                commonErrorDict.unauthorized.name,
+                commonErrorDict.unauthorized.httpCode,
+                "Пользователь не авторизован",
+                "Ошибка при обновлении матча"
+            ));
+        }
+        const updatedMatch = await MatchService.update(Number(id), req.body, req.user!.organization.id)
         res.json(updatedMatch)
     }
     catch (error: any) {
@@ -160,21 +140,21 @@ export const updateMatch = async (req: Request, res: Response, next: NextFunctio
     }
 }
 
-export const completeMatch = async (req: Request, res: Response, next: NextFunction) => {
+export const completeMatch = async (req: AuthRequest, res: Response, next: NextFunction) => {
     try {
         const { id } = req.params;
         const { myScore, opponentScore } = req.body;
-        console.log(myScore, opponentScore);
+        const orgId = req.user?.organization.id;
 
-        const completedMatch = await prisma.match.update({
-            where: {
-                id: Number(id)
-            },
-            data: {
-                myScore: Number(myScore),
-                opponentScore: Number(opponentScore),
-            }
-        });
+        if (!orgId) {
+            return next(new AppError(
+                commonErrorDict.unauthorized.name,
+                commonErrorDict.unauthorized.httpCode,
+                "Пользователь не авторизован",
+                "Ошибка при обновлении матча"
+            ));
+        }
+        const completedMatch = await MatchService.complete(Number(id), { myScore, opponentScore });
 
         res.json(completedMatch);
     }
@@ -188,14 +168,20 @@ export const completeMatch = async (req: Request, res: Response, next: NextFunct
     }
 };
 
-export const deleteMatch = async (req: Request, res: Response, next:  NextFunction) => {
+export const deleteMatch = async (req: AuthRequest, res: Response, next: NextFunction) => {
     try {
         const { id } = req.params
-        await prisma.match.delete({
-            where: {
-                id: Number(id)
-            }
-        })
+        const orgId = req.user?.organization.id;
+
+        if (!orgId) {
+            return next(new AppError(
+                commonErrorDict.unauthorized.name,
+                commonErrorDict.unauthorized.httpCode,
+                "Пользователь не авторизован",
+                "Ошибка при обновлении матча"
+            ));
+        }
+        await MatchService.delete(Number(id), req.user?.organization.id)
         res.json({
             message: `Матч с id ${id} успешно удален`
         })

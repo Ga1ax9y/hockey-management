@@ -14,7 +14,8 @@ export const errorHandler  = (err: Error, req: Request, res: Response, next: Nex
 
         return res.status(err.httpCode).json({
             error: err.name,
-            message: err.message
+            message: err.message,
+            context: err.context || null
         })
     }
 

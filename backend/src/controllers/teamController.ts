@@ -2,8 +2,8 @@ import type { NextFunction, Request, Response } from "express";
 import { prisma } from "../lib/prisma";
 import { AppError, commonErrorDict } from "../types/AppError";
 import { Prisma } from "../generated/prisma/client";
-import { getPagination } from "../services/pagination";
-import { paginatedResponse } from "../services/paginatedResponse";
+import { getPagination } from "../helpers/pagination";
+import { paginatedResponse } from "../helpers/paginatedResponse";
 import type { AuthRequest } from "../middlewares/authMiddleware";
 import type { TeamWhereInput } from "../generated/prisma/models";
 

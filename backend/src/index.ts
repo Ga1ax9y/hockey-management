@@ -1,7 +1,6 @@
 import express, { type NextFunction, type Request, type Response } from "express";
 import cors from "cors";
 import apiRouter from "./routes/index.js";
-import { AppError } from "./types/AppError.js";
 import { httpLogger } from "./config/httpLogger.js";
 import { errorHandler } from "./middlewares/errorMiddleware.js";
 import { logger } from "./config/logger.js";

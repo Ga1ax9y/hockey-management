@@ -17,6 +17,7 @@ export interface AuthRequest extends Request {
         teamId: number;
 
     };
+    orgId?: number
 }
 export default async function authMiddleware (req: AuthRequest, res: Response, next: NextFunction) {
     const header = req.headers.authorization;

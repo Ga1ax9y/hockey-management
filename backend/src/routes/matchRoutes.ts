@@ -7,7 +7,7 @@ const router = Router()
 router.get("/", authenticateToken, getAllMatches)
 router.get("/:id", authenticateToken, getMatchById)
 router.post("/", authenticateToken, checkRole(['ADMIN', 'MANAGER']), createMatch)
-router.put("/:id", authenticateToken, checkRole(['ADMIN', 'MANAGER']), updateMatch)
+router.patch("/:id", authenticateToken, checkRole(['ADMIN', 'MANAGER']), updateMatch)
 router.delete("/:id", authenticateToken, checkRole(['ADMIN', 'MANAGER']), deleteMatch)
 router.patch("/:id/complete", authenticateToken, checkRole(['ADMIN', 'MANAGER']), completeMatch)
 

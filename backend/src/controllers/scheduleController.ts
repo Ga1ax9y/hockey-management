@@ -3,7 +3,7 @@ import { prisma } from "../lib/prisma";
 import { AppError, commonErrorDict } from "../types/AppError";
 import type { Prisma } from "../generated/prisma/client";
 import type { AuthRequest } from "../middlewares/authMiddleware";
-import { updateFinishedMatches } from "../services/matchService";
+import { MatchService } from "../services/matchService";
 
 export const buildMatchWhereClause = (query: any, organizationId: number) => {
   const where: Prisma.MatchWhereInput = {
@@ -115,7 +115,7 @@ export const getSchedule = async (
       organizationId,
     );
 
-    await updateFinishedMatches();
+    await MatchService.autoCloseOldMatches();
 
     const [matches, trainings] = await Promise.all([
       prisma.match.findMany({

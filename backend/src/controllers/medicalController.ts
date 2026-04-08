@@ -3,8 +3,8 @@ import { prisma } from "../lib/prisma";
 import { AppError, commonErrorDict } from "../types/AppError";
 import type { MedicalHistoryWhereInput } from "../generated/prisma/models";
 import type { AuthRequest } from "../middlewares/authMiddleware";
-import { getPagination } from "../services/pagination";
-import { paginatedResponse } from "../services/paginatedResponse";
+import { getPagination } from "../helpers/pagination";
+import { paginatedResponse } from "../helpers/paginatedResponse";
 
 const buildMedicalWhereClause = (query: any, playerId: number) => {
     const where: MedicalHistoryWhereInput = {}
