@@ -3,31 +3,27 @@ import { prisma } from "../lib/prisma";
 import { AppError, commonErrorDict } from "../types/AppError";
 import { getPagination } from "../helpers/pagination";
 import type { AuthRequest } from "../middlewares/authMiddleware";
+import { TrainingService } from "../services/trainingService";
+import { paginatedResponse } from "../helpers/paginatedResponse";
 
 export const getAllTrainings = async (req: AuthRequest, res: Response, next: NextFunction) => {
     try{
-        const { page, limit, skip } = getPagination(req.query)
-        const trainings = await prisma.training.findMany({
-            where: {team: {organizationId: req.user!.organization.id}},
-            select: {
-                id: true,
-                startTime: true,
-                endTime: true,
-                location: true,
-                trainingType: true,
-                team: true,
-                teamId: true,
-                coach: true,
-                coachId: true,
-                createdAt: true,
-                updatedAt: true
+        const orgId = req.user?.organization.id;
+        if (!orgId) {
+            return next(new AppError(
+                commonErrorDict.unauthorized.name,
+                commonErrorDict.unauthorized.httpCode,
+                "Пользователь не авторизован",
+                "Ошибка при получении всех матчей"
+            ));
+        }
+        const pagination = getPagination(req.query)
+        const { trainings, total } = await TrainingService.findAll({
+            pagination,
+            organizationId: orgId
+        })
 
-            }
-        })
-        // TODO:  ADD  PAGINATION
-        res.json({
-            data: trainings
-        })
+        res.json(paginatedResponse(trainings, total, pagination.page, pagination.limit))
     }
     catch(error: any){
         next(new AppError(
@@ -39,29 +35,21 @@ export const getAllTrainings = async (req: AuthRequest, res: Response, next: Nex
     }
 }
 
-export const getTrainingById = async (req: Request, res: Response, next: NextFunction) => {
+export const getTrainingById = async (req: AuthRequest, res: Response, next: NextFunction) => {
     try {
         const { id } = req.params
+        const includeStats = req.query.includeStats === "true";
+        const orgId = req.user?.organization.id;
 
-        const training = await prisma.training.findUnique({
-            where: {
-                id: Number(id)
-            },
-            select: {
-                id: true,
-                startTime: true,
-                endTime: true,
-                location: true,
-                trainingType: true,
-                team: true,
-                teamId: true,
-                coach: true,
-                coachId: true,
-                createdAt: true,
-                updatedAt: true
-
-            }
-        })
+        if (!orgId) {
+            return next(new AppError(
+                commonErrorDict.unauthorized.name,
+                commonErrorDict.unauthorized.httpCode,
+                "Пользователь не авторизован",
+                "Ошибка при получении матча по id"
+            ));
+        }
+        const training = await TrainingService.findById(Number(id), includeStats)
         if (!training){
             return next(
                 new AppError(
@@ -84,10 +72,9 @@ export const getTrainingById = async (req: Request, res: Response, next: NextFun
     }
 }
 
-export const createTraining = async (req: Request, res: Response, next: NextFunction) => {
+export const createTraining = async (req: AuthRequest, res: Response, next: NextFunction) => {
     try {
         const {startTime, endTime, location, trainingType, teamId, coachId } = req.body
-         console.log('Received body:', req.body);
         if (!startTime || !endTime  || !location || !trainingType || !teamId || !coachId) {
             return next(new AppError(
                 commonErrorDict.serverError.name,
@@ -96,17 +83,18 @@ export const createTraining = async (req: Request, res: Response, next: NextFunc
                 "Ошибка при создании тренировки"
             ))
         }
+        const orgId = req.user?.organization.id;
 
-        const newTraining = await prisma.training.create({
-            data: {
-                startTime: new Date(startTime),
-                endTime: new Date(endTime),
-                location,
-                trainingType,
-                teamId: Number(teamId),
-                coachId
-            }
-        })
+        if (!orgId) {
+            return next(new AppError(
+                commonErrorDict.unauthorized.name,
+                commonErrorDict.unauthorized.httpCode,
+                "Пользователь не авторизован",
+                "Ошибка при создании матча"
+            ));
+        }
+
+        const newTraining = await TrainingService.create(req.body, orgId)
         res.status(201).json(newTraining)
 
     } catch (error: any) {
@@ -119,23 +107,21 @@ export const createTraining = async (req: Request, res: Response, next: NextFunc
     }
 }
 
-export const updateTraining = async (req: Request, res: Response, next: NextFunction) => {
+export const updateTraining = async (req: AuthRequest, res: Response, next: NextFunction) => {
     try {
         const { id } = req.params
         const {  startTime, endTime, location, trainingType, teamId, coachId } = req.body
-        const updatedTraining = await prisma.training.update({
-            where: {
-                id: Number(id)
-            },
-            data: {
-                startTime: new Date(startTime),
-                endTime: new Date(endTime),
-                location,
-                trainingType,
-                teamId:  Number(teamId),
-                coachId
-            }
-        })
+        const orgId = req.user?.organization.id;
+
+        if (!orgId) {
+            return next(new AppError(
+                commonErrorDict.unauthorized.name,
+                commonErrorDict.unauthorized.httpCode,
+                "Пользователь не авторизован",
+                "Ошибка при обновлении матча"
+            ));
+        }
+        const updatedTraining = await TrainingService.update(Number(id), req.body, orgId)
         res.json(updatedTraining)
     }
     catch (error: any) {
@@ -148,14 +134,20 @@ export const updateTraining = async (req: Request, res: Response, next: NextFunc
     }
 }
 
-export const deleteTraining = async (req: Request, res: Response, next:  NextFunction) => {
+export const deleteTraining = async (req: AuthRequest, res: Response, next:  NextFunction) => {
     try {
         const { id } = req.params
-        await prisma.training.delete({
-            where: {
-                id: Number(id)
-            }
-        })
+        const orgId = req.user?.organization.id;
+
+        if (!orgId) {
+            return next(new AppError(
+                commonErrorDict.unauthorized.name,
+                commonErrorDict.unauthorized.httpCode,
+                "Пользователь не авторизован",
+                "Ошибка при обновлении матча"
+            ));
+        }
+        await TrainingService.delete(Number(id), orgId)
         res.json({
             message: `Тренировка с id ${id} успешно удален`
         })

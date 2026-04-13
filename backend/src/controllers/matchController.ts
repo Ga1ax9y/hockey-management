@@ -25,6 +25,7 @@ export const getAllMatches = async (req: AuthRequest, res: Response, next: NextF
             organizationId: req.user!.organization.id
         })
 
+        // TODO: CHANGE TO CRON
         await MatchService.autoCloseOldMatches()
 
         res.json(paginatedResponse(matches, total, pagination.page, pagination.limit))

@@ -7,7 +7,7 @@ const router = Router()
 router.get("/", authenticateToken, getAllTrainings)
 router.get("/:id", authenticateToken, getTrainingById)
 router.post("/", authenticateToken, checkRole(['ADMIN', 'COACH']), createTraining)
-router.put("/:id", authenticateToken, checkRole(['ADMIN', 'COACH']), updateTraining)
+router.patch("/:id", authenticateToken, checkRole(['ADMIN', 'COACH']), updateTraining)
 router.delete("/:id", authenticateToken, checkRole(['ADMIN', 'COACH']), deleteTraining)
 
 export default router

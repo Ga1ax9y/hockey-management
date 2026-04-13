@@ -115,6 +115,7 @@ export const getSchedule = async (
       organizationId,
     );
 
+    //  TODO: move to another service
     await MatchService.autoCloseOldMatches();
 
     const [matches, trainings] = await Promise.all([
