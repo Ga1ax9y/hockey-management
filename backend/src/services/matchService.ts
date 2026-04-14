@@ -5,7 +5,6 @@ import { prisma } from "../lib/prisma";
 export const MatchService = {
   async findAll({ pagination, organizationId }: any) {
     const { skip, limit } = pagination
-    console.log(pagination)
     const where: Prisma.MatchWhereInput = { myTeam: { organizationId } };
 
     const [matches, total] = await Promise.all([

@@ -179,7 +179,7 @@ export const deleteMatch = async (req: AuthRequest, res: Response, next: NextFun
                 commonErrorDict.unauthorized.name,
                 commonErrorDict.unauthorized.httpCode,
                 "Пользователь не авторизован",
-                "Ошибка при обновлении матча"
+                "Ошибка при удалении матча"
             ));
         }
         await MatchService.delete(Number(id), req.user?.organization.id)
