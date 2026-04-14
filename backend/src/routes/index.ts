@@ -10,6 +10,7 @@ import scheduleRoutes from "./scheduleRoutes"
 import matchRoutes from "./matchRoutes"
 import physicalRoutes from "./physicalRoutes"
 import matchStatsRoutes from "./matchStatsRoutes"
+import trainingStatsRoutes from "./trainingStatsRoutes"
 
 const apiRouter = Router();
 
@@ -24,5 +25,6 @@ apiRouter.use("/schedule", scheduleRoutes)
 apiRouter.use("/matches", matchRoutes)
 apiRouter.use("/physicals", physicalRoutes)
 apiRouter.use("/match-stats", matchStatsRoutes)
+apiRouter.use("/training-stats", trainingStatsRoutes)
 
 export default apiRouter;
