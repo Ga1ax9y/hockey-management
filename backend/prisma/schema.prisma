@@ -217,6 +217,7 @@ model MatchStats {
   penaltyMinutes Int @default(0)
   plusMinus Int @default(0)
   faceoffWins Int @default(0)
+  timeOnIce       Int      @default(0)
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
 
