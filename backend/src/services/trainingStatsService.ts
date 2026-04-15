@@ -4,13 +4,13 @@ import { prisma } from "../lib/prisma";
 
 export const TrainingStatsService = {
 
-  async create(matchData: any, organizationId?: number) {
+  async create(trainingData: any, organizationId?: number) {
     const {
       trainingId,
       playerId,
       coachRating,
       description,
-    } = matchData
+    } = trainingData
     const newTrainingStats = await prisma.trainingStats.create({
       data: {
         trainingId: Number(trainingId),
@@ -23,13 +23,13 @@ export const TrainingStatsService = {
     return newTrainingStats
   },
 
-async update(id: number, matchData: any, organizationId?: number) {
+async update(id: number, trainingData: any, organizationId?: number) {
     const {
       trainingId,
       playerId,
       coachRating,
       description,
-    } = matchData
+    } = trainingData
 
     const updatedTrainingStats = await prisma.trainingStats.update({
       where: { id },
@@ -44,6 +44,36 @@ async update(id: number, matchData: any, organizationId?: number) {
     return updatedTrainingStats;
   },
 
+    async upsert(trainingData: any, organizationId?: number) {
+      const {
+        trainingId,
+        playerId,
+        coachRating,
+        description,
+      } = trainingData
+
+      return await prisma.trainingStats.upsert({
+        where: {
+          trainingId_playerId: {
+            trainingId: Number(trainingId),
+            playerId: Number(playerId),
+          },
+        },
+        update: {
+        ...(trainingId !== undefined && { trainingId: Number(trainingId) }),
+        ...(playerId !== undefined && { playerId: Number(playerId) }),
+        ...(coachRating !== undefined && { coachRating: Number(coachRating) }),
+        ...(description !== undefined && { description }),
+        },
+        create: {
+          trainingId: Number(trainingId),
+          playerId: Number(playerId),
+          coachRating: Number(coachRating ?? 10),
+          description
+        },
+      });
+    },
+
 
   async delete(id: number, organizationId?: number) {
     await prisma.trainingStats.delete({
@@ -52,7 +82,7 @@ async update(id: number, matchData: any, organizationId?: number) {
   },
 
 
-  _transformMatchData(match: any) {
+  _transformTrainingData(training: any) {
   }
 
 }

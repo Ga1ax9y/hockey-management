@@ -66,6 +66,32 @@ export const updateTrainingStats = async (req: AuthRequest, res: Response, next:
     }
 }
 
+export const upsertTrainingStats = async (req: AuthRequest, res: Response, next: NextFunction) => {
+    try {
+        const { trainingId, playerId } = req.body;
+        const orgId = req.user?.organization.id;
+
+        if (!orgId || !trainingId || !playerId) {
+            return next(new AppError(
+                commonErrorDict.unauthorized.name,
+                commonErrorDict.unauthorized.httpCode,
+                "Пользователь не авторизован",
+                "Ошибка при создании и обновлении статистики тренировки"
+            ));
+        }
+
+        const result = await TrainingStatsService.upsert(req.body, orgId);
+        res.status(200).json(result);
+    } catch (error: any) {
+        next(new AppError(
+            commonErrorDict.serverError.name,
+            commonErrorDict.serverError.httpCode,
+            error.message,
+            "Ошибка при создании и обновлении статистики тренировки"
+        ))
+    }
+}
+
 export const deleteTrainingStats = async (req: AuthRequest, res: Response, next: NextFunction) => {
     try {
         const { id } = req.params

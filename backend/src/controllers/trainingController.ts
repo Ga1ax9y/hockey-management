@@ -1,5 +1,4 @@
 import type { NextFunction, Request, Response } from "express";
-import { prisma } from "../lib/prisma";
 import { AppError, commonErrorDict } from "../types/AppError";
 import { getPagination } from "../helpers/pagination";
 import type { AuthRequest } from "../middlewares/authMiddleware";

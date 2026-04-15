@@ -35,39 +35,85 @@ export const MatchStatsService = {
     return newMatchStats
   },
 
-async update(id: number, matchData: any, organizationId?: number) {
-    const {
-      matchId,
-      playerId,
-      goals,
-      assists,
-      shots,
-      hits,
-      penaltyMinutes,
-      plusMinus,
-      faceoffWins,
-      timeOnIce
-    } = matchData
+  async update(id: number, matchData: any, organizationId?: number) {
+      const {
+        matchId,
+        playerId,
+        goals,
+        assists,
+        shots,
+        hits,
+        penaltyMinutes,
+        plusMinus,
+        faceoffWins,
+        timeOnIce
+      } = matchData
 
-    const updatedMatchStats = await prisma.matchStats.update({
-      where: { id },
-      data: {
-        ...(matchId !== undefined && { matchId: Number(matchId) }),
-        ...(playerId !== undefined && { playerId: Number(playerId) }),
-        ...(goals !== undefined && { goals: Number(goals) }),
-        ...(assists !== undefined && { assists: Number(assists) }),
-        ...(shots !== undefined && { shots: Number(shots) }),
-        ...(hits !== undefined && { hits: Number(hits) }),
-        ...(penaltyMinutes !== undefined && { penaltyMinutes: Number(penaltyMinutes) }),
-        ...(plusMinus !== undefined && { plusMinus: Number(plusMinus) }),
-        ...(faceoffWins !== undefined && { faceoffWins: Number(faceoffWins) }),
-        ...(timeOnIce !== undefined && { timeOnIce: Number(timeOnIce) }),
-      }
-    });
+      const updatedMatchStats = await prisma.matchStats.update({
+        where: { id },
+        data: {
+          ...(matchId !== undefined && { matchId: Number(matchId) }),
+          ...(playerId !== undefined && { playerId: Number(playerId) }),
+          ...(goals !== undefined && { goals: Number(goals) }),
+          ...(assists !== undefined && { assists: Number(assists) }),
+          ...(shots !== undefined && { shots: Number(shots) }),
+          ...(hits !== undefined && { hits: Number(hits) }),
+          ...(penaltyMinutes !== undefined && { penaltyMinutes: Number(penaltyMinutes) }),
+          ...(plusMinus !== undefined && { plusMinus: Number(plusMinus) }),
+          ...(faceoffWins !== undefined && { faceoffWins: Number(faceoffWins) }),
+          ...(timeOnIce !== undefined && { timeOnIce: Number(timeOnIce) }),
+        }
+      });
 
-    return updatedMatchStats;
-  },
+      return updatedMatchStats;
+    },
+  async upsert(matchData: any, organizationId?: number) {
+      const {
+        matchId,
+        playerId,
+        goals,
+        assists,
+        shots,
+        hits,
+        penaltyMinutes,
+        plusMinus,
+        faceoffWins,
+        timeOnIce
+      } = matchData;
 
+      return await prisma.matchStats.upsert({
+        where: {
+          matchId_playerId: {
+            matchId: Number(matchId),
+            playerId: Number(playerId),
+          },
+        },
+        update: {
+          ...(matchId !== undefined && { matchId: Number(matchId) }),
+          ...(playerId !== undefined && { playerId: Number(playerId) }),
+          ...(goals !== undefined && { goals: Number(goals) }),
+          ...(assists !== undefined && { assists: Number(assists) }),
+          ...(shots !== undefined && { shots: Number(shots) }),
+          ...(hits !== undefined && { hits: Number(hits) }),
+          ...(penaltyMinutes !== undefined && { penaltyMinutes: Number(penaltyMinutes) }),
+          ...(plusMinus !== undefined && { plusMinus: Number(plusMinus) }),
+          ...(faceoffWins !== undefined && { faceoffWins: Number(faceoffWins) }),
+          ...(timeOnIce !== undefined && { timeOnIce: Number(timeOnIce) }),
+        },
+        create: {
+          matchId: Number(matchId),
+          playerId: Number(playerId),
+          goals: Number(goals ?? 0),
+          assists: Number(assists ?? 0),
+          shots: Number(shots ?? 0),
+          hits: Number(hits ?? 0),
+          penaltyMinutes: Number(penaltyMinutes ?? 0),
+          plusMinus: Number(plusMinus ?? 0),
+          faceoffWins: Number(faceoffWins ?? 0),
+          timeOnIce: Number(timeOnIce ?? 0),
+        },
+      });
+    },
 
   async delete(id: number, organizationId?: number) {
     await prisma.matchStats.delete({

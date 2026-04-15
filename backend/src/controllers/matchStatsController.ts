@@ -66,6 +66,32 @@ export const updateMatchStats = async (req: AuthRequest, res: Response, next: Ne
     }
 }
 
+export const upsertMatchStats = async (req: AuthRequest, res: Response, next: NextFunction) => {
+    try {
+        const { matchId, playerId } = req.body;
+        const orgId = req.user?.organization.id;
+
+        if (!orgId || !matchId || !playerId) {
+            return next(new AppError(
+                commonErrorDict.unauthorized.name,
+                commonErrorDict.unauthorized.httpCode,
+                "Пользователь не авторизован",
+                "Ошибка при создании и обновлении статистики матча"
+            ));
+        }
+
+        const result = await MatchStatsService.upsert(req.body, orgId);
+        res.status(200).json(result);
+    } catch (error: any) {
+        next(new AppError(
+            commonErrorDict.serverError.name,
+            commonErrorDict.serverError.httpCode,
+            error.message,
+            "Ошибка при создании и обновлении статистики матча"
+        ))
+    }
+}
+
 export const deleteMatchStats = async (req: AuthRequest, res: Response, next: NextFunction) => {
     try {
         const { id } = req.params

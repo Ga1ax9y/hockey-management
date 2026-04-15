@@ -32,11 +32,38 @@ export const MatchService = {
     const match = await prisma.match.findUnique({
       where: { id },
       include: {
-        myTeam: true,
+        myTeam: {
+          select: {
+            id: true,
+            name: true,
+            league: true,
+            season: true,
+            players: {
+              select: {
+                id: true,
+                firstName: true,
+                lastName: true,
+                position: true
+                // TODO: number: true
+              },
+              orderBy: {
+                lastName: "asc"
+              }
+            }
+          }
+        },
         ...(includeStats && {
           playerStats: {
             include: {
-              player: true
+              player: {
+                select: {
+                  firstName: true,
+                  lastName: true,
+                  middleName: true,
+                  position: true,
+                  currentTeamId: true
+                }
+              }
             },
             orderBy: {
               player: { lastName: "asc" }
