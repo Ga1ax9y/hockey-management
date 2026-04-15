@@ -1,15 +1,17 @@
 import { useAuthStore } from '../../hooks/useAuthStore';
 import { Link } from 'react-router-dom';
 import './Home.css';
+import Loader from '../../components/layout/Loader/Loader';
 
 export default function Home() {
   const user = useAuthStore(state => state.user)
   const isLoading = useAuthStore(state => state.isLoading)
 
-  if (isLoading) return <div className="home-loading">Загрузка...</div>;
+  if (isLoading) return <Loader />;
   if (!user) return null;
 
   return (
+
     <div className="home">
       <div className="home__welcome">
         <h1>Добро пожаловать, {user.fullName}!</h1>

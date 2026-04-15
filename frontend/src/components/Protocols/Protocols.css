@@ -1,0 +1,120 @@
+.protocol {
+    padding-block: 40px;
+}
+
+.protocol__header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 30px;
+    border-bottom: 2px solid var(--color-dark);
+    padding-bottom: 15px;
+}
+
+.protocol__title {
+    font-family: var(--font-family-alternate);
+    text-transform: uppercase;
+    font-size: 28px;
+    margin: 0;
+}
+
+.protocol__btn {
+    background-color: var(--color-dark);
+    color: var(--color-light);
+    border: none;
+    padding: 12px 24px;
+    font-weight: 700;
+    text-transform: uppercase;
+    cursor: pointer;
+}
+
+.protocol__btn:hover { background-color: var(--color-dark-alternate); }
+
+.protocol__table-wrapper {
+    overflow-x: auto;
+    border: 1px solid var(--color-dark);
+}
+
+.protocol-table {
+    width: 100%;
+    border-collapse: collapse;
+    background: var(--color-light);
+}
+
+.protocol-table__th {
+    background-color: var(--color-dark);
+    color: var(--color-light);
+    padding: 12px;
+    font-size: 11px;
+    text-transform: uppercase;
+    text-align: left;
+}
+
+.protocol-table__td {
+    padding: 10px;
+    border-bottom: 1px solid var(--color-gray);
+    font-size: 14px;
+}
+
+.protocol-table__td--name {
+    font-weight: 700;
+    white-space: nowrap;
+}
+
+.protocol-table__input {
+    width: 50px;
+    padding: 6px;
+    border: 1px solid var(--color-dark);
+    text-align: center;
+    font-family: var(--font-family-base);
+}
+
+.protocol-table__textarea {
+    width: 100%;
+    min-height: 40px;
+    padding: 8px;
+    border: 1px solid var(--color-dark);
+    font-family: var(--font-family-base);
+    resize: vertical;
+}
+
+.protocol__loader {
+    padding: 50px;
+    text-align: center;
+    font-weight: 700;
+    text-transform: uppercase;
+    color: var(--color-dark-hover);
+}
+.protocol-table__input--rating {
+    width: 60px;
+    font-weight: 700;
+    font-size: 16px;
+    border: 2px solid var(--color-dark);
+}
+
+.protocol-table__textarea {
+    width: 100%;
+    min-height: 40px;
+    max-height: 120px;
+    padding: 10px;
+    border: 1px solid var(--color-gray);
+    font-family: var(--font-family-base);
+    font-size: 14px;
+    resize: vertical;
+    transition: border-color var(--transition-duration);
+}
+
+.protocol-table__textarea:focus {
+    border-color: var(--color-dark);
+    outline: none;
+    background-color: #fcfcfc;
+}
+
+.protocol-table__row--saving {
+    background-color: rgba(0, 0, 0, 0.02);
+}
+
+.protocol-table__td--status {
+    width: 40px;
+    text-align: center;
+}

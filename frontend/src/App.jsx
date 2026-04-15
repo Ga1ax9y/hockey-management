@@ -21,6 +21,9 @@ import Players from './pages/manager/Players/Players';
 import Events from './pages/coach/Events/Events';
 import AddMedicalRecord from './pages/medical/AddMedicalRecord/AddMedicalRecord';
 import Schedule from './components/Schedule/Schedule';
+import AddPhysicalRecord from './pages/Physicals/AddPhysicalRecord/AddPhysicalRecord';
+import MatchStats from './pages/MatchStats/MatchStats';
+import TrainingStats from './pages/TrainingStats/TrainingStats';
 const Layout = () => (
   <>
     <Header />
@@ -83,15 +86,33 @@ const router = createBrowserRouter([
           </ProtectedRoute>
         ),
       },
+      { path: '/matches/:id/stats', element: (
+          <ProtectedRoute>
+            <MatchStats />
+          </ProtectedRoute>
+        ),
+      },
+      { path: '/trainings/:id/stats', element: (
+          <ProtectedRoute>
+            <TrainingStats />
+          </ProtectedRoute>
+        ),
+      },
       { path: '/players/:id', element: (
           <ProtectedRoute>
             <PlayerProfile />
           </ProtectedRoute>
         ),
       },
-      { path: '/players/:id/medical', element: (
+      { path: '/players/:id/medicals', element: (
         <ProtectedRoute>
           <AddMedicalRecord />
+        </ProtectedRoute>
+        ),
+      },
+      { path: '/players/:id/physicals', element: (
+        <ProtectedRoute>
+          <AddPhysicalRecord />
         </ProtectedRoute>
         ),
       },

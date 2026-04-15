@@ -16,6 +16,7 @@ import {
 	SEASON_TYPES,
 	TRAINING_TYPES,
 } from "../../../utils/dicts";
+import Loader from '../../../components/layout/Loader/Loader'
 
 export default function Events() {
 	const { user } = useAuthStore();
@@ -56,7 +57,6 @@ export default function Events() {
 				setTeams(availableTeams);
 				if (availableTeams.length > 0) {
 					const defaultId = availableTeams[0].id;
-					console.log(defaultId);
 					setViewTeamId(defaultId.toString());
 				}
 			} catch (err) {
@@ -360,9 +360,7 @@ export default function Events() {
 
 			<main className="events-page__content">
 				{loading ? (
-					<div className="events-page__loader">
-						Обновление данных...
-					</div>
+					<Loader />
 				) : (
 					<>
 						<section className="events-page__section">

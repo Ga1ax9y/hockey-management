@@ -55,18 +55,23 @@ export const getPlayerById = (id, params = {}) => {
 export const createPlayer = (data) => API.post("/players", data);
 export const updatePlayer = (id, data) => API.put(`/players/${id}`, data);
 export const deletePlayer = (id) => API.delete(`/players/${id}`);
-export const changePlayerTeam = (id, newTeamId) => API.patch(`/players/${id}/change-team`, {newTeamId});
+export const changePlayerTeam = (id, newTeamId) => API.patch(`/players/${id}/transfer`, {newTeamId});
 
 export const getTrainings = () => API.get("/trainings");
-export const getTrainingById = (id) => API.get(`/trainings/${id}`);
+export const getTrainingById = (id, params = {}) => {
+  return API.get(`/trainings/${id}${buildQuery(params)}`)
+}
 export const createTraining = (data) => API.post("/trainings", data);
 export const updateTraining = (id, data) => API.put(`/trainings/${id}`, data);
 export const deleteTraining = (id) => API.delete(`/trainings/${id}`);
 
+export const getMedicalRecords = (id, params = {}) => {
+  return API.get(`/medicals/${id}/${buildQuery(params)}`)
+}
 export const addMedicalRecord = (id, data) =>
-  API.post(`/players/${id}/medical`, data);
+  API.post(`/players/${id}/medicals`, data);
 export const markPlayerRecovered = (id, data) =>
-  API.patch(`/medical/${id}/recover`, data)
+  API.patch(`/medicals/${id}/recover`, data)
 
 export const createMatch = (data) => API.post("/matches", data);
 export const getMatchById = (id, params = {}) => {
@@ -78,3 +83,12 @@ export const deleteMatch = (id) => API.delete(`/matches/${id}`);
 
 export const getSchedule = (teamId, params) =>
     API.get(`/schedule/${teamId}${buildQuery(params)}`);
+
+export const getPhysicalRecords = (id, params = {}) => {
+  return API.get(`/physicals/${id}/${buildQuery(params)}`)
+}
+export const addPhysicalRecord = (id, data) =>
+  API.post(`/players/${id}/physicals`, data);
+
+export const syncMatchStats = (data) => API.put("/match-stats/sync", data);
+export const syncTrainingStats = (data) => API.put("/training-stats/sync", data);

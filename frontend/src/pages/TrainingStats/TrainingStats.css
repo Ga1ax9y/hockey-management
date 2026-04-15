@@ -1,0 +1,86 @@
+.training-stats {
+    padding-top: 40px;
+    padding-bottom: 80px;
+}
+
+.training-summary {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    padding: 24px;
+    background-color: var(--color-dark);
+    color: var(--color-light);
+    border-radius: 4px;
+    margin-bottom: 20px;
+}
+
+.training-summary__title {
+    font-size: 28px;
+    text-transform: uppercase;
+    margin-bottom: 4px;
+    color: var(--color-light);
+}
+
+.training-summary__team {
+    font-size: 16px;
+    opacity: 0.8;
+}
+
+.training-summary__meta {
+    text-align: right;
+}
+
+.training-summary__type {
+    font-weight: 700;
+    font-size: 14px;
+    background: var(--color-light);
+    color: var(--color-dark);
+    padding: 2px 8px;
+    display: inline-block;
+    margin-bottom: 8px;
+}
+
+.training-info {
+    display: flex;
+    gap: 40px;
+    margin-bottom: 30px;
+    padding: 0 10px;
+}
+
+.training-info__label {
+    font-weight: 700;
+    margin-right: 8px;
+    color: var(--color-dark-hover);
+}
+
+
+.player-stats__rating {
+    width: 100px;
+    text-align: center;
+}
+
+.rating-badge {
+    display: inline-block;
+    width: 36px;
+    height: 36px;
+    line-height: 36px;
+    border-radius: 50%;
+    font-weight: 700;
+    color: var(--color-light);
+    background-color: var(--color-dark);
+}
+
+.rating-badge--8, .rating-badge--9, .rating-badge--10 { background-color: #27ae60; }
+.rating-badge--6, .rating-badge--7 { background-color: #f1c40f; color: var(--color-dark); }
+.rating-badge--1, .rating-badge--2, .rating-badge--3, .rating-badge--4, .rating-badge--5 { background-color: #e74c3c; }
+
+.player-stats__description {
+    font-style: italic;
+    color: #555;
+    max-width: 400px;
+    line-height: 1.4;
+}
+
+.text-muted {
+    color: #999;
+}

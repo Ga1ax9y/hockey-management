@@ -16,9 +16,11 @@ import {
 import { inputDateTimeToISO, formatToInputDateTime } from "../../utils/date";
 import "./Schedule.css";
 import { MATCH_TYPES, TRAINING_TYPES } from "../../utils/dicts";
+import { useNavigate } from "react-router-dom";
 
 const Schedule = ({ teamId }) => {
 	const calendarRef = useRef(null);
+	const navigate = useNavigate();
 	const [contextMenu, setContextMenu] = useState(null);
 	const [showModal, setShowModal] = useState(false);
 	const [modalType, setModalType] = useState("");
@@ -61,6 +63,17 @@ const Schedule = ({ teamId }) => {
 			console.error("Ошибка загрузки тренеров:", err);
 		}
 	}, [teamId]);
+
+	const handleEventClick = (clickInfo) => {
+    const { id, extendedProps } = clickInfo.event;
+    const type = extendedProps.type?.toLowerCase();
+
+    if (type === 'match') {
+        navigate(`/matches/${id}/stats`);
+    } else {
+        navigate(`/trainings/${id}/stats`);
+    }
+};
 
 	const handleContextMenu = (e, date, eventData = null) => {
 		e.preventDefault();
@@ -276,6 +289,7 @@ const Schedule = ({ teamId }) => {
 				firstDay={1}
 				events={fetchEvents}
 				eventContent={renderEventContent}
+				eventClick={handleEventClick}
 				dayCellDidMount={(arg) => {
 					arg.el.addEventListener("contextmenu", (e) =>
 						handleContextMenu(e, arg.date, null),

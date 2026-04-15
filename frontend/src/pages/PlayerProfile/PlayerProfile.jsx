@@ -8,7 +8,7 @@ import {
 } from "../../services/api";
 import "./PlayerProfile.css";
 import { useRole } from "../../hooks/useRole";
-import { CONTRACT_TYPE, MEDICAL_STATUS, TRANSFER_TYPE } from "../../utils/dicts";
+import { CONTRACT_TYPE, getMedicalLabel, TRANSFER_TYPE } from "../../utils/dicts";
 
 export default function PlayerProfile() {
   const { id } = useParams();
@@ -23,7 +23,7 @@ export default function PlayerProfile() {
   const [loading, setLoading] = useState(true);
   const [transferLoading, setTransferLoading] = useState(false);
   const [error, setError] = useState("");
-  const { isDoctor } = useRole();
+  const { isDoctor, isAdmin, isCoach } = useRole();
   const isTransferAvailable =
     player?.contractType === "TWO_WAY" ||
     player?.contractType === "ENTRY_LEVEL";
@@ -140,19 +140,20 @@ export default function PlayerProfile() {
               </tr>
             </thead>
             <tbody>
-              {matchStats.map((match, i) => (
+              {matchStats.map((matchStat, i) => (
                 <tr key={i}>
                   <td>
-                    {new Date(match.match_date).toLocaleDateString("ru-RU")}
+                    {new Date(matchStat.match.matchDate).toLocaleDateString("ru-RU")}
                   </td>
                   <td>
-                    {match.myTeam.name} – {match.opponentName}
+                    {matchStat.match.opponentName}
                   </td>
-                  <td>{match.goals}</td>
-                  <td>{match.assists}</td>
-                  <td>{match.plusMinus}</td>
-                  <td>{match.shots}</td>
-                  <td>{match.hits}</td>
+                  <td>{matchStat.goals}</td>
+                  <td>{matchStat.assists}</td>
+                  <td>{matchStat.plusMinus}</td>
+                  <td>{matchStat.shots}</td>
+                  <td>{matchStat.hits}</td>
+                  <td>{matchStat.timeOnIce}</td>
                 </tr>
               ))}
             </tbody>
@@ -202,21 +203,21 @@ export default function PlayerProfile() {
           <p>Нет данных о тренировках</p>
         ) : (
           <div className="trainings-list">
-            {trainingStats.map((train, i) => (
+            {trainingStats.map((trainingStat, i) => (
               <div key={i} className="training-card">
                 <div className="training-header">
                   <span className="training-date">
-                    {new Date(train.trainingDate).toLocaleDateString("ru-RU")}
+                    {new Date(trainingStat.training.startTime).toLocaleDateString("ru-RU")}
                   </span>
-                  <span className="training-type">{train.trainingType}</span>
+                  <span className="training-type">{trainingStat.training.trainingType}</span>
                 </div>
                 <p>
-                  <strong>Тренер:</strong> {train.coachName || "—"}
+                  <strong>Тренер:</strong> {trainingStat.training.coach.fullName || "—"}
                 </p>
                 <p>
-                  <strong>Оценка:</strong> {train.coachRating || "—"}
+                  <strong>Оценка:</strong> {trainingStat.coachRating || "—"}
                 </p>
-                {train.description && <p>{train.description}</p>}
+                {trainingStat.description && <p>{trainingStat.description}</p>}
               </div>
             ))}
           </div>
@@ -258,7 +259,7 @@ export default function PlayerProfile() {
                   </span>
                   <span className="medical-status">
                     {" "}
-                    {MEDICAL_STATUS[rec.status]}
+                    {getMedicalLabel(rec.status)}
                   </span>
                 </div>
                 <p>
@@ -283,12 +284,21 @@ export default function PlayerProfile() {
             ))}
           </ul>
         )}
-        {isDoctor && (
+
+        {(isDoctor || isAdmin) && (
           <button
             className="btn-medical-add"
-            onClick={() => navigate(`/players/${id}/medical`)}
+            onClick={() => navigate(`/players/${id}/medicals`)}
           >
-            Добавить медицинское заключение
+            Смотреть полную медицинскую историю
+          </button>
+        )}
+        {(isCoach || isAdmin) && (
+          <button
+            className="btn-medical-add"
+            onClick={() => navigate(`/players/${id}/physicals`)}
+          >
+            Смотреть все физические данные
           </button>
         )}
       </div>

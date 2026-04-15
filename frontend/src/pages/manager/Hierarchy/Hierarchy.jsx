@@ -62,8 +62,8 @@ export default function Hierarchy() {
   if (error) return <div className="hierarchy-error">{error}</div>;
 
   return (
-    <div className="hierarchy">
-      <h2>Иерархия команд</h2>
+    <section className="hierarchy">
+      <h2 className="hierarchy__header">Иерархия команд</h2>
       {(isAdmin || isManager) && (
         <button
           className="hierarchy-add-btn"
@@ -74,39 +74,43 @@ export default function Hierarchy() {
       )}
 
       {isCreating && (
-        <form className="hierarchy-create-form" onSubmit={handleCreate}>
-          <div className="form-group">
-            <label>Название команды *</label>
+        <form className="hierarchy-create__form form-block" onSubmit={handleCreate}>
+          <div className="hierarchy-create__field form-block__field">
+            <label className="hierarchy-create__label form-block__label">Название команды *</label>
             <input
               type="text"
+              className="hierarchy-create__input form-block__input"
               value={newTeam.name}
               onChange={(e) => setNewTeam({ ...newTeam, name: e.target.value })}
               required
             />
           </div>
-          <div className="form-group">
-            <label>Лига (опционально)</label>
+          <div className="hierarchy-create__field form-block__field">
+            <label className="hierarchy-create__label form-block__label">Лига (опционально)</label>
             <input
               type="text"
+              className="hierarchy-create__input form-block__input"
               value={newTeam.league}
               onChange={(e) => setNewTeam({ ...newTeam, league: e.target.value })}
             />
           </div>
-          <div className="form-group">
-            <label>Уровень *</label>
+          <div className="hierarchy-create__field form-block__field">
+            <label className="hierarchy-create__label form-block__label">Уровень *</label>
             <input
               type="number"
               min="1"
+              className="hierarchy-create__input form-block__input"
               value={newTeam.level}
               onChange={(e) => setNewTeam({ ...newTeam, level: Number(e.target.value) })}
               required
             />
             <small>Уровни иерархии идут по убыванию, начиная с 1</small>
           </div>
-          <div className="form-group">
-            <label>Сезон *</label>
+          <div className="hierarchy-create__field form-block__field">
+            <label className="hierarchy-create__label form-block__label">Сезон *</label>
             <input
               type="text"
+              className="hierarchy-create__input form-block__input"
               placeholder="Например: 2025/25"
               pattern="\d{4}/\d{2}"
               value={newTeam.season}
@@ -114,7 +118,7 @@ export default function Hierarchy() {
               required
             />
           </div>
-          <button type="submit" className="hierarchy-submit-btn">Создать команду</button>
+          <button type="submit" className="hierarchy-create__submit form-block__submit">Создать команду</button>
         </form>
       )}
 
@@ -146,6 +150,6 @@ export default function Hierarchy() {
             ))}
         </div>
       )}
-    </div>
+    </section>
   );
 }

@@ -9,7 +9,6 @@ import {
 import './Players.css';
 import { ruDateToISO, isoToRuDate } from '../../../utils/date';
 import { Link } from 'react-router-dom';
-// BUG: DATE OF CONTRACT IS 1 DAY SHORTER
 export default function Players() {
   const [players, setPlayers] = useState([]);
   const [teams, setTeams] = useState([]);
@@ -142,8 +141,8 @@ export default function Players() {
       </button>
 
       {isCreating && (
-        <form className="players-form" onSubmit={handleSubmit}>
-          <div className="players-form-row">
+        <form className="players__form form-block" onSubmit={handleSubmit}>
+          <div className="players__field form-block__field">
             <div className="players-form-group">
               <label>Фамилия</label>
               <input

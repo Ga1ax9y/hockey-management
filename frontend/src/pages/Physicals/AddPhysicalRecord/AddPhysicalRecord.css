@@ -1,0 +1,18 @@
+.physical-record__form {
+    margin-bottom: 60px;
+}
+
+.physical-record__card .event-card__side-indicator {
+    background-color: var(--color-dark-alternate);
+}
+
+.event-card__unit {
+    font-size: 14px;
+    color: var(--color-dark-alternate);
+    text-transform: lowercase;
+    font-weight: 400;
+}
+
+.physical-record__list-section {
+    margin-top: 40px;
+}

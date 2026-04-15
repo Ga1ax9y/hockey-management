@@ -1,0 +1,192 @@
+.match-stats {
+    padding-top: 40px;
+    padding-bottom: 80px;
+}
+
+.match-stats__loader {
+    text-align: center;
+    padding: 100px;
+    font-family: var(--font-family-alternate);
+    text-transform: uppercase;
+    font-weight: 700;
+}
+
+.match-score {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: var(--color-dark);
+    color: var(--color-light);
+    padding: 40px;
+    margin-bottom: 20px;
+}
+
+.match-score__team {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+.match-score__team--home { align-items: flex-start; }
+.match-score__team--away { align-items: flex-end; }
+
+.match-score__name {
+    font-family: var(--font-family-alternate);
+    color: var(--color-light);
+    font-size: 36px;
+    margin: 0;
+    text-transform: uppercase;
+}
+
+.match-score__city {
+    font-size: 14px;
+    opacity: 0.7;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+}
+
+.match-score__board {
+    text-align: center;
+    padding: 0 40px;
+}
+
+.match-score__result {
+    font-family: var(--font-family-alternate);
+    font-size: 64px;
+    font-weight: 700;
+    line-height: 1;
+    margin-bottom: 10px;
+}
+
+.match-score__status {
+    font-size: 12px;
+    text-transform: uppercase;
+    background: var(--color-light);
+    color: var(--color-dark);
+    padding: 2px 10px;
+    font-weight: 900;
+}
+
+.match-info {
+    display: flex;
+    gap: 40px;
+    padding: 20px;
+    background: var(--color-light-alternate);
+    border: 1px solid var(--color-gray);
+    margin-bottom: 40px;
+}
+
+.match-info__label {
+    font-size: 12px;
+    font-weight: 700;
+    text-transform: uppercase;
+    margin-right: 8px;
+    color: var(--color-dark-alternate);
+}
+
+.match-info__value {
+    font-weight: 600;
+}
+
+.player-stats__title {
+    font-family: var(--font-family-alternate);
+    font-size: 24px;
+    text-transform: uppercase;
+    border-bottom: 2px solid var(--color-dark);
+    padding-bottom: 10px;
+    margin-bottom: 20px;
+}
+
+.player-stats__table-wrapper {
+    overflow-x: auto;
+}
+
+.player-stats__table {
+    width: 100%;
+    border-collapse: collapse;
+    text-align: left;
+}
+
+.player-stats__table th {
+    background-color: var(--color-gray);
+    padding: 12px 15px;
+    font-size: 12px;
+    text-transform: uppercase;
+    font-weight: 900;
+}
+
+.player-stats__table td {
+    padding: 15px;
+    border-bottom: 1px solid var(--color-gray);
+    font-size: 15px;
+}
+
+.player-stats__table tr:hover {
+    background-color: var(--color-light-alternate);
+}
+
+.player-stats__name {
+    font-weight: 700;
+    text-transform: uppercase;
+}
+
+.player-stats__placeholder {
+    display: flex;
+    justify-content: center;
+    padding: 60px 0;
+    border: 1px dashed var(--color-dark);
+}
+
+.player-stats__load-btn,
+.player-stats__hide-btn {
+    padding: 15px 30px;
+    background-color: var(--color-dark);
+    color: var(--color-light);
+    border: none;
+    font-family: var(--font-family-base);
+    font-weight: 700;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: background-color var(--transition-duration);
+}
+
+.player-stats__load-btn:hover,
+.player-stats__hide-btn:hover {
+    background-color: var(--color-dark-alternate);
+}
+
+.player-stats__load-btn:disabled {
+    background-color: var(--color-dark-hover);
+    cursor: not-allowed;
+}
+
+.player-stats__hide-btn {
+    margin-top: 30px;
+    background-color: transparent;
+    color: var(--color-dark);
+    border: 1px solid var(--color-dark);
+}
+
+.player-stats__hide-btn:hover {
+    background-color: var(--color-gray);
+    color: var(--color-dark);
+}
+
+.player-stats__empty {
+    padding: 40px;
+    text-align: center;
+    font-family: var(--font-family-alternate);
+    text-transform: uppercase;
+    font-size: 14px;
+    color: var(--color-dark-hover);
+    border-top: 1px solid var(--color-gray);
+}
+@media (max-width: 768px) {
+    .match-score {
+        flex-direction: column;
+        gap: 20px;
+        text-align: center;
+    }
+    .match-score__team { align-items: center; }
+    .match-score__result { font-size: 48px; }
+}
