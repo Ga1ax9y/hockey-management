@@ -8,6 +8,7 @@ import {
 } from '../../services/api';
 import './TeamMembers.css';
 import { useRole } from '../../hooks/useRole';
+import ErrorPage from '../Error/ErrorPage';
 
 export default function TeamMembers() {
   const { id: teamId } = useParams();
@@ -35,7 +36,7 @@ export default function TeamMembers() {
     } catch (err) {
       setTeamUsers([]);
       setPlayers([]);
-      setError(err.response?.data.message);
+      setError(err.response?.data);
       console.error(err);
     } finally {
       setLoading(false);
@@ -53,7 +54,7 @@ export default function TeamMembers() {
       loadTeamData();
       setSelectedUserId('');
     } catch (err) {
-      setError(err.response?.data?.error || 'Не удалось привязать пользователя');
+      setError(err.response?.data);
     }
   };
 
@@ -63,12 +64,12 @@ export default function TeamMembers() {
       await removeTeamUser(teamId, userId);
       loadTeamData();
     } catch (err) {
-      setError(err.response?.data?.error || 'Не удалось отвязать пользователя');
+      setError(err.response?.data);
     }
   };
 
   if (loading) return <div className="members-loading">Загрузка...</div>;
-  if (error) return <div className="members-error">{error}</div>;
+  if (error) return <ErrorPage error={error} />;
 
   return (
     <div className="team-members">

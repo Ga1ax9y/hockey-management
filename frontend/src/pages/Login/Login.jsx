@@ -23,7 +23,7 @@ export default function Login() {
 
       navigate("/");
     } catch (err) {
-      setError(err.response?.data?.error || "Ошибка входа");
+      setError(err.response?.data);
     }
   };
 

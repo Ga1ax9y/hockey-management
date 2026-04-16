@@ -9,6 +9,7 @@ import {
 import "./PlayerProfile.css";
 import { useRole } from "../../hooks/useRole";
 import { CONTRACT_TYPE, getMedicalLabel, TRANSFER_TYPE } from "../../utils/dicts";
+import ErrorPage from "../Error/ErrorPage";
 
 export default function PlayerProfile() {
   const { id } = useParams();
@@ -50,7 +51,7 @@ export default function PlayerProfile() {
       setTeams(teamsData.data.data || []);
       setError("");
     } catch (err) {
-      setError("Не удалось загрузить профиль игрока");
+      setError(err.response?.data);
       console.error(err);
     } finally {
       setLoading(false);
@@ -70,7 +71,8 @@ export default function PlayerProfile() {
       alert("Команда успешно изменена");
       loadPlayerData();
     } catch (err) {
-      alert(err.response?.data?.message || "Ошибка при смене команды");
+      setError(err.response?.data);
+      console.error(err);
     } finally {
       setTransferLoading(false);
     }
@@ -85,7 +87,7 @@ export default function PlayerProfile() {
 
   if (loading)
     return <div className="player-profile-loading">Загрузка профиля...</div>;
-  if (error) return <div className="player-profile-error">{error}</div>;
+  if (error) return <ErrorPage error={error} />;
   if (!player) return null;
 
   return (
