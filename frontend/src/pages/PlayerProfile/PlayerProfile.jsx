@@ -274,7 +274,7 @@ export default function PlayerProfile() {
                   </p>
                 )}
 
-                {rec.status !== "recovered" && isDoctor && (
+                {rec.status !== "recovered" && (isDoctor || isAdmin) && (
                   <button
                     className="btn-recover"
                     onClick={() => handleRecover(rec.id)}

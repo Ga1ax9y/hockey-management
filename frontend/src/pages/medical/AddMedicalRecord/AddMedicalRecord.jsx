@@ -27,6 +27,7 @@ export default function AddMedicalRecord() {
 				diagnosis: data.diagnosis,
 				status: data.status,
 			});
+			console.log(data)
 			reset();
 			loadMedicalRecords();
 		} catch (err) {
@@ -88,7 +89,7 @@ export default function AddMedicalRecord() {
 								</label>
 								<select
 									className="medical-record__input form-block__input"
-									{...register("metricType", {
+									{...register("status", {
 										required: true,
 									})}
 								>

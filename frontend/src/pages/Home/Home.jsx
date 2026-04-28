@@ -2,10 +2,11 @@ import { useAuthStore } from '../../hooks/useAuthStore';
 import { Link } from 'react-router-dom';
 import './Home.css';
 import Loader from '../../components/layout/Loader/Loader';
-
+import { useRole } from "../../hooks/useRole";
 export default function Home() {
   const user = useAuthStore(state => state.user)
   const isLoading = useAuthStore(state => state.isLoading)
+  const  {isCoach,  isManager, isAdmin} = useRole()
 
   if (isLoading) return <Loader />;
   if (!user) return null;
@@ -42,16 +43,16 @@ export default function Home() {
           <div className="stat-card">
             <h3>Быстрый доступ</h3>
             <ul className="quick-links">
-              {user.role.code === "ADMIN"  && (
+              {isAdmin  && (
                 <li><Link to="/admin">Панель управления</Link></li>
               )}
-              {user.roleId === 2 && (
+              {isCoach && (
                 <li><Link to="/coach/trainings">Тренировки</Link></li>
               )}
-              {user.roleId === 3 && (
+              {isAdmin && (
                 <li><Link to="/admin/roles">Управление ролями</Link></li>
               )}
-              {user.roleId === 7 && (
+              {isManager && (
                 <li><Link to="/manager/hierarchy">Иерархия команд</Link></li>
               )}
             </ul>
