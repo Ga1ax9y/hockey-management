@@ -359,7 +359,7 @@ export const createPlayer = async (req: AuthRequest, res: Response, next: NextFu
     try {
         const { firstName, lastName, middleName, birthDate, position, height, weight, contractExpiry, contractType, currentTeamId } = req.body
 
-        if (!lastName || !firstName || !birthDate) {
+        if (!lastName || !firstName || !birthDate || !contractExpiry || !contractType) {
             return next(new AppError(
                 commonErrorDict.badRequest.name,
                 commonErrorDict.badRequest.httpCode,

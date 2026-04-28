@@ -4,54 +4,22 @@ import bcrypt from "bcrypt"
 import jwt from "jsonwebtoken"
 import type { AuthRequest } from "../middlewares/authMiddleware";
 import { AppError, commonErrorDict } from "../types/AppError";
+import { AuthService } from "../services/authService";
 
 const JWT_SECRET = process.env.JWT_SECRET as string;
 
-export const register  = async (req: Request, res: Response, next: NextFunction) => {
+export const register = async (req: Request, res: Response, next: NextFunction) => {
     try {
-        const {email, password, fullName, organizationName} = req.body
-        const existingUser = await prisma.user.findUnique({
-            where: {
-                email
-            }
-        })
-
-        if (existingUser){
-            return next(new AppError(
-                commonErrorDict.badRequest.name,
-                commonErrorDict.badRequest.httpCode,
-                "email уже занят",
-                "Ошибка при создании пользователя"
-            ))
-        }
-        const hashedPassword = await bcrypt.hash(password, 10)
-        const newOrganization = await prisma.organization.create({
-                data: {
-                    name: organizationName
-                }
-            })
-        const adminRole = await prisma.role.findUnique({ where: { code: "ADMIN" } });
-        if (!adminRole) throw new Error("Роль ADMIN не найдена");
-        const newUser = await prisma.user.create({
-                data: {
-                    email,
-                    fullName,
-                    passwordHash: hashedPassword,
-                    roleId: adminRole.id,
-                    organizationId: newOrganization.id
-                },
-                select: {
-                    id: true,
-                    email: true,
-                    fullName: true,
-                    roleId: true,
-                    organization: true,
-                    createdAt: true
-                }
-            })
+        const newUser = await AuthService.registerUser(req.body)
 
         res.status(201).json(newUser)
+
     } catch (error: any) {
+
+        if (error instanceof AppError) {
+            return next(error);
+        }
+
         next(new AppError(
             commonErrorDict.serverError.name,
             commonErrorDict.serverError.httpCode,
@@ -63,60 +31,21 @@ export const register  = async (req: Request, res: Response, next: NextFunction)
 
 export const login = async (req: Request, res: Response, next: NextFunction) => {
     try {
-        const {email, password} = req.body;
-        const user = await prisma.user.findUnique({
-            where: {email},
-            include: {role: true, organization: true}
-        });
+        const { email, password } = req.body;
 
-        if (!user) {
-            return next(new AppError(
-                commonErrorDict.unauthorized.name,
-                commonErrorDict.unauthorized.httpCode,
-                "Неверный почтовый адрес или пароль",
-                "Ошибка сервера при входе"
-        ))
-        }
-
-        const isPasswordValid = bcrypt.compare(password, user.passwordHash)
-
-        if (!isPasswordValid) {
-            return next(new AppError(
-                commonErrorDict.unauthorized.name,
-                commonErrorDict.unauthorized.httpCode,
-                "Неверный почтовый адрес или пароль",
-                "Ошибка сервера при входе"
-        ))
-        }
-
-        const token = jwt.sign(
-            {
-                id: user.id,
-                email: user.email,
-                roleId: user.roleId,
-                organizationId: user.organizationId
-            },
-            JWT_SECRET,
-            {expiresIn: "7d"}
-
-        );
+        const result = await AuthService.loginUser({ email, password })
 
         res.json({
             message: "Вход выполнен успешно",
-            token,
-            user: {
-                id: user.id,
-                email: user.email,
-                fullName: user.fullName,
-                role: user.role.name,
-                organization: {
-                    id: user.organization.id,
-                    name: user.organization.name
-                }
-            }
-        })
+            ...result
+        });
     }
-    catch (error: any){
+    catch (error: any) {
+
+        if (error instanceof AppError) {
+            return next(error);
+        }
+
         next(new AppError(
             commonErrorDict.serverError.name,
             commonErrorDict.serverError.httpCode,
@@ -127,74 +56,30 @@ export const login = async (req: Request, res: Response, next: NextFunction) => 
 }
 
 export const getMe = async (req: AuthRequest, res: Response, next: NextFunction) => {
-    try{
+    try {
         const userId = req.user?.id
 
-        if (!userId){
+        if (!userId) {
             return next(new AppError(
                 commonErrorDict.unauthorized.name,
                 commonErrorDict.unauthorized.httpCode,
                 "Пользователь не авторизован",
                 "Ошибка при получении данных пользователя"
-        ))
-        }
-        const user = await prisma.user.findUnique({
-            where: {id: userId},
-            select: {
-                id: true,
-                email: true,
-                fullName: true,
-                createdAt: true,
-                role: {
-                    select: {
-                        name: true,
-                        code: true
-                    }
-                },
-                organization: {
-                    select: {
-                        id: true,
-                        name:true,
-                    }
-                },
-                userTeams: {
-                    select: {
-                        team: {
-                            select: {
-                                id: true,
-                                name: true,
-                                league: true
-                            }
-                        }
-                    }
-                }
-
-            }
-        })
-
-        if (!user){
-            return next(new AppError(
-                commonErrorDict.resourceNotFound.name,
-                commonErrorDict.resourceNotFound.httpCode,
-                "Пользователь не найден",
-                "Ошибка при получении данных пользователя"
             ))
         }
-        const { userTeams, ...userWithoutTeams } = user;
+        const user = await AuthService.getUserInfo(Number(userId))
 
-        const formattedUser = {
-            ...userWithoutTeams,
-            teams: userTeams.map(ut => ut.team)
-        };
-
-        res.json(formattedUser)
+        res.json(user)
     }
-    catch(error: any){
-            next(new AppError(
-                commonErrorDict.serverError.name,
-                commonErrorDict.serverError.httpCode,
-                error.message,
-                "Ошибка при получении данных пользователя"
+    catch (error: any) {
+        if (error instanceof AppError) {
+            return next(error);
+        }
+        next(new AppError(
+            commonErrorDict.serverError.name,
+            commonErrorDict.serverError.httpCode,
+            error.message,
+            "Ошибка при получении данных пользователя"
         ))
     }
 }

@@ -1,59 +1,22 @@
 import type { NextFunction, Request, Response } from "express";
-import { prisma } from "../lib/prisma";
 import { AppError, commonErrorDict } from "../types/AppError";
-import type { MedicalHistoryWhereInput } from "../generated/prisma/models";
 import type { AuthRequest } from "../middlewares/authMiddleware";
 import { getPagination } from "../helpers/pagination";
 import { paginatedResponse } from "../helpers/paginatedResponse";
-
-const buildMedicalWhereClause = (query: any, playerId: number) => {
-    const where: MedicalHistoryWhereInput = {}
-
-    const { recoveryDate } = query
-
-    where.playerId = Number(playerId)
-
-    if (recoveryDate) {
-        where.recoveryDate = new Date(recoveryDate as string)
-    }
-
-    return where
-}
+import { MedicalService } from "../services/medicalService";
 
 export const getMedicalHistory = async (req: AuthRequest, res: Response, next: NextFunction) => {
     try {
-        const {
-            sortBy = "recoveryDate",
-            order = "desc",
-            ...filters
-        } = req.query
+
         const { id } = req.params
         const { page, limit, skip } = getPagination(req.query);
-        const where: MedicalHistoryWhereInput = buildMedicalWhereClause(filters, Number(id))
-        const [medicalRecords, total] = await Promise.all([
-            prisma.medicalHistory.findMany({
-                where,
-                skip,
-                take: limit,
-                orderBy: {
-                    [sortBy as string]: order
-                }
-            }),
-            prisma.medicalHistory.count({ where })
-        ])
-        const transformedMedicalRecords = medicalRecords.map(medical => ({
-            id: medical.id,
-            playerId: medical.playerId,
-            injuryDate: medical.injuryDate,
-            recoveryDate: medical.recoveryDate,
-            diagnosis: medical.diagnosis,
-            status: medical.status,
-            createdAt: medical.createdAt,
-            updatedAt: medical.updatedAt
+        const { records, total } = await MedicalService.findByPlayer({
+            playerId: id,
+            pagination: {skip,limit},
+            filters: req.query
+        })
 
-        }));
-
-        res.json(paginatedResponse(transformedMedicalRecords, total, page, limit));
+        res.json(paginatedResponse(records, total, page, limit));
     } catch (error: any) {
         next(new AppError(
             commonErrorDict.serverError.name,
@@ -67,21 +30,21 @@ export const getMedicalHistory = async (req: AuthRequest, res: Response, next: N
 export const markPlayerRecovered = async (req: Request, res: Response, next: NextFunction) => {
     try {
         const { id } = req.params
+        if (!id) {
+            return next(new AppError(
+                commonErrorDict.badRequest.name,
+                commonErrorDict.badRequest.httpCode,
+                "ID записи не предоставлен",
+                "Ошибка при получении медицинской истории игрока"
+            ));
+        }
 
-        const medicalRecord = await prisma.medicalHistory.update({
-            where:{
-                id: Number(id)
-            },
-            data: {
-                status: "recovered",
-                recoveryDate: new Date()
-            }
-        })
+        const record = await MedicalService.recoverPlayer(id as string)
 
         res.json({
             success: true,
             message: "Игрок отмечен как восстановившийся",
-            data: medicalRecord
+            data: record
         })
     } catch (error: any) {
         next(new AppError(
@@ -90,6 +53,6 @@ export const markPlayerRecovered = async (req: Request, res: Response, next: Nex
             error.message,
             "Ошибка при обновлении медицинской записи"
         ))
-  }
+    }
 
 }
