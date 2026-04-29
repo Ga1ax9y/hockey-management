@@ -55,7 +55,7 @@ export const getPlayerById = (id, params = {}) => {
 export const createPlayer = (data) => API.post("/players", data);
 export const updatePlayer = (id, data) => API.put(`/players/${id}`, data);
 export const deletePlayer = (id) => API.delete(`/players/${id}`);
-export const changePlayerTeam = (id, newTeamId) => API.patch(`/players/${id}/transfer`, {newTeamId});
+export const changePlayerTeam = (id, newTeamId) => API.patch(`/transfers/add/${id}`, {newTeamId});
 
 export const getTrainings = () => API.get("/trainings");
 export const getTrainingById = (id, params = {}) => {
@@ -69,7 +69,7 @@ export const getMedicalRecords = (id, params = {}) => {
   return API.get(`/medicals/${id}/${buildQuery(params)}`)
 }
 export const addMedicalRecord = (id, data) =>
-  API.post(`/players/${id}/medicals`, data);
+  API.post(`/medicals/add/${id}`, data);
 export const markPlayerRecovered = (id, data) =>
   API.patch(`/medicals/${id}/recover`, data)
 
@@ -88,7 +88,7 @@ export const getPhysicalRecords = (id, params = {}) => {
   return API.get(`/physicals/${id}/${buildQuery(params)}`)
 }
 export const addPhysicalRecord = (id, data) =>
-  API.post(`/players/${id}/physicals`, data);
+  API.post(`/physicals/add/${id}`, data);
 
 export const syncMatchStats = (data) => API.put("/match-stats/sync", data);
 export const syncTrainingStats = (data) => API.put("/training-stats/sync", data);

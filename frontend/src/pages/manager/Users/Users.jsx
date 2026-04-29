@@ -29,7 +29,7 @@ export default function Users() {
         try {
             setLoading(true);
             const res = await getRoles();
-            setRoles(res.data);
+            setRoles(res.data.data);
             setError('');
         } catch (err) {
             setError('Не удалось загрузить роли');

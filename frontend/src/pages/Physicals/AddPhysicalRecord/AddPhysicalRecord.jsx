@@ -56,8 +56,8 @@ export default function AddPhysicalRecord() {
 			<header className="events-page__header">
 				<h1 className="events-page__title">Физические показатели</h1>
 			</header>
-			{isAdmin ||
-				(isCoach && (
+			{
+				((isAdmin || isCoach) && (
 					<section className="physical-record__form form-block">
 						<form onSubmit={handleSubmit(onSubmit)}>
 							<div className="physical-record__field form-block__field">
