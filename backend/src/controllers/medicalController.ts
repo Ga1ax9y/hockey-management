@@ -56,3 +56,41 @@ export const markPlayerRecovered = async (req: Request, res: Response, next: Nex
     }
 
 }
+
+export const addMedicalRecord = async (req: AuthRequest, res: Response, next: NextFunction) => {
+    try {
+        const { id } = req.params
+        const organizationId = req.user?.organization.id
+        const currentUserTeam = req.user?.teamId
+        const isAdmin = req.user?.role.code === "ADMIN"
+
+        if (!id) {
+            return next(new AppError(
+                commonErrorDict.badRequest.name,
+                commonErrorDict.badRequest.httpCode,
+                "Поле userId обязательно",
+                "Ошибка при добавлении медицинской записи игроку"
+            ));
+        }
+
+        const newMedical = await MedicalService.create(Number(id), req.body,{
+            organizationId,
+            currentUserTeam,
+            isAdmin
+        })
+
+        res.status(201).json({
+            success: true,
+            message: "Игроку успешно добавлена медицинская запись",
+            data: newMedical
+        });
+
+    } catch (error: any) {
+        next(new AppError(
+            commonErrorDict.serverError.name,
+            commonErrorDict.serverError.httpCode,
+            error.message,
+            "Ошибка при добавлении медицинской записи игроку"
+        ))
+    }
+}

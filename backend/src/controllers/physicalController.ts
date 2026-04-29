@@ -26,3 +26,41 @@ export const getAllPhysicalData = async (req: AuthRequest, res: Response, next: 
         ));
     }
 };
+
+export const addPhysicalRecord = async (req: AuthRequest, res: Response, next: NextFunction) => {
+    try {
+        const { id } = req.params
+        const organizationId = req.user?.organization.id
+        const currentUserTeam = req.user?.teamId
+        const isAdmin = req.user?.role.code === "ADMIN"
+
+        if (!id) {
+            return next(new AppError(
+                commonErrorDict.badRequest.name,
+                commonErrorDict.badRequest.httpCode,
+                "Поле userId обязательно",
+                "Ошибка при добавлении физического показателя игроку"
+            ));
+        }
+
+        const newPhysical = await PhysicalService.create(Number(id), req.body,
+        {
+            organizationId,
+            currentUserTeam,
+            isAdmin
+        })
+        res.status(201).json({
+            success: true,
+            message: "Игроку успешно добавлен физический показатель",
+            data: newPhysical
+        });
+
+    } catch (error: any) {
+        next(new AppError(
+            commonErrorDict.serverError.name,
+            commonErrorDict.serverError.httpCode,
+            error.message,
+            "Ошибка при добавлении физического показателя игроку"
+        ))
+    }
+}
