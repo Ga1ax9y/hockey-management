@@ -3,26 +3,26 @@ import { prisma } from "../lib/prisma"
 import { AppError, commonErrorDict } from "../types/AppError";
 import type { AuthRequest } from "../middlewares/authMiddleware";
 import bcrypt from "bcrypt"
+import { getPagination } from "../helpers/pagination";
+import { paginatedResponse } from "../helpers/paginatedResponse";
+import { UserService } from "../services/userService";
 
 export const getAllUsers = async (req: AuthRequest, res: Response, next: NextFunction) => {
     try {
-        const users = await prisma.user.findMany({
-            where: { organizationId: req.user!.organization.id },
-            select: {
-                id: true,
-                email: true,
-                fullName: true,
-                role: {
-                    select: {
-                        name: true
-                    }
-                }
+        const { page, limit, skip } = getPagination(req.query)
+        const organizationId = req.user!.organization.id
 
-            }
-        });
-        res.json(users);
+        const { users, total } = await UserService.findAll({
+            pagination: { skip, limit },
+            organizationId
+        })
+
+        res.json(paginatedResponse(users, total, page, limit));
     }
     catch (error: any) {
+        if (error instanceof AppError) {
+            return next(error);
+        }
         next(new AppError(
             commonErrorDict.serverError.name,
             commonErrorDict.serverError.httpCode,
@@ -35,26 +35,15 @@ export const getAllUsers = async (req: AuthRequest, res: Response, next: NextFun
 export const getUserById = async (req: Request, res: Response, next: NextFunction) => {
     try {
         const { id } = req.params;
-        const user = await prisma.user.findUnique({
-            where: {
-                id: Number(id)
-            },
-            select: {
-                id: true,
-                email: true,
-                fullName: true,
-                role: {
-                    select: {
-                        name: true,
-                        code: true
-                    }
-                }
 
-            }
-        })
+        const user = await UserService.findById(Number(id))
+
         res.json(user);
 
     } catch (error: any) {
+        if (error instanceof AppError) {
+            return next(error);
+        }
         next(new AppError(
             commonErrorDict.serverError.name,
             commonErrorDict.serverError.httpCode,
@@ -67,24 +56,9 @@ export const getUserById = async (req: Request, res: Response, next: NextFunctio
 }
 export const createUser = async (req: AuthRequest, res: Response, next: NextFunction) => {
     try {
-        const { email, password, fullName, roleId } = req.body
+        const organizationId = req.user?.organization?.id
 
-        const existingUser = await prisma.user.findUnique({
-            where: {
-                email
-            }
-        })
-
-        if (existingUser) {
-            return next(new AppError(
-                commonErrorDict.badRequest.name,
-                commonErrorDict.badRequest.httpCode,
-                "email уже занят",
-                "Ошибка при создании пользователя"
-            ))
-        }
-
-        if (!req.user?.organization?.id) {
+        if (!organizationId) {
             return next(new AppError(
                 commonErrorDict.unauthorized.name,
                 commonErrorDict.unauthorized.httpCode,
@@ -93,28 +67,19 @@ export const createUser = async (req: AuthRequest, res: Response, next: NextFunc
             ))
         }
 
-        const hashedPassword = await bcrypt.hash(password, 10)
-
-        const user = await prisma.user.create({
-            data: {
-                email,
-                fullName,
-                passwordHash: hashedPassword,
-                roleId: Number(roleId),
-                organizationId: req.user.organization.id
-            },
-            select: {
-                id: true,
-                email: true,
-                fullName: true,
-                roleId: true,
-                createdAt: true
-            }
-        })
+        const user = await UserService.create(req.body, Number(organizationId))
 
         res.status(201).json(user)
 
     } catch (error: any) {
-        next(error)
+        if (error instanceof AppError) {
+            return next(error);
+        }
+        next(new AppError(
+            commonErrorDict.serverError.name,
+            commonErrorDict.serverError.httpCode,
+            error.message,
+            "Ошибка при создании пользователя"
+        ))
     }
 }
