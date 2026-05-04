@@ -246,6 +246,7 @@ export const PlayerService = {
             lastName: player.lastName,
             firstName: player.firstName,
             middleName: player.middleName,
+            photoUrl: player.photoUrl,
             birthDate: player.birthDate,
             position: player.position,
             height: player.height,
@@ -297,6 +298,7 @@ export const PlayerService = {
             lastName: player.lastName,
             firstName: player.firstName,
             middleName: player.middleName,
+            photoUrl: player.photoUrl,
             birthDate: player.birthDate,
             position: player.position,
             height: player.height,
@@ -319,7 +321,7 @@ export const PlayerService = {
     },
 
     async create(data: any) {
-        const { firstName, lastName, middleName, birthDate, position, height, weight, contractExpiry, contractType, currentTeamId } = data
+        const { firstName, lastName, middleName, birthDate, position, height, weight, contractExpiry, contractType, currentTeamId, photoUrl } = data
         if (!lastName || !firstName || !birthDate || !contractExpiry || !contractType) {
             throw new AppError(
                 commonErrorDict.badRequest.name,
@@ -335,6 +337,7 @@ export const PlayerService = {
                 middleName,
                 birthDate: new Date(birthDate),
                 position,
+                photoUrl: photoUrl || null,
                 height: Number(height),
                 weight: Number(weight),
                 contractType,

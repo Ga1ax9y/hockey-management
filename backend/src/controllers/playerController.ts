@@ -69,10 +69,31 @@ export const getPlayerById = async (req: Request, res: Response, next: NextFunct
 
 export const createPlayer = async (req: AuthRequest, res: Response, next: NextFunction) => {
     try {
-        const newPlayer = await PlayerService.create(req.body)
+        let photoUrl = null;
+
+        try {
+            photoUrl = req.file ? req.file.path : null;
+        } catch (uploadError: any) {
+            return next(new AppError(
+                "CloudinaryError",
+                commonErrorDict.serverError.httpCode,
+                "Ошибка при получении файла из облачного хранилища",
+                "Ошибка при создании нового игрока"
+            ));
+        }
+
+        const playerData = {
+            ...req.body,
+            photoUrl: photoUrl || req.body.photoUrl
+        }
+
+        const newPlayer = await PlayerService.create(playerData);
         res.status(201).json(newPlayer)
     }
     catch (error: any) {
+        if (error instanceof AppError) {
+            return next(error);
+        }
         next(new AppError(
             commonErrorDict.serverError.name,
             commonErrorDict.serverError.httpCode,
@@ -85,10 +106,32 @@ export const createPlayer = async (req: AuthRequest, res: Response, next: NextFu
 export const updatePlayer = async (req: Request, res: Response, next: NextFunction) => {
     try {
         const { id } = req.params
-        const updatedPlayer = await PlayerService.update(Number(id), req.body )
+
+        let photoUrl = null;
+
+        try {
+            photoUrl = req.file ? req.file.path : null;
+        } catch (uploadError: any) {
+            return next(new AppError(
+                "CloudinaryError",
+                commonErrorDict.serverError.httpCode,
+                "Ошибка при получении файла из облачного хранилища",
+                "Ошибка при создании нового игрока"
+            ));
+        }
+        const updateData = { ...req.body };
+
+        if (photoUrl) {
+            updateData.photoUrl = photoUrl;
+        }
+
+        const updatedPlayer = await PlayerService.update(Number(id), updateData)
         res.json(updatedPlayer)
     }
     catch (error: any) {
+        if (error instanceof AppError) {
+            return next(error);
+        }
         next(new AppError(
             commonErrorDict.serverError.name,
             commonErrorDict.serverError.httpCode,
