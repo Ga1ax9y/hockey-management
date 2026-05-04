@@ -44,6 +44,7 @@ model User {
   email        String @unique @db.VarChar(255)
   passwordHash String @db.VarChar(255)
   fullName     String @db.VarChar(255)
+  avatarUrl      String?      @db.VarChar(500)
   isActive     Boolean @default(true)
   role         Role @relation(fields: [roleId], references: [id], onDelete: Restrict)
   roleId       Int
@@ -87,6 +88,7 @@ model Player{
   lastName       String @db.VarChar(100)
   firstName      String @db.VarChar(100)
   middleName     String? @db.VarChar(100)
+  photoUrl       String?      @db.VarChar(500)
   birthDate      DateTime @db.Date
   position       String @db.VarChar(50)
   height         Int
