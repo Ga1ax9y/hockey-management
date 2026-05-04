@@ -89,6 +89,7 @@ export const AuthService = {
                 id: user.id,
                 email: user.email,
                 fullName: user.fullName,
+                avatarUrl: user.avatarUrl,  
                 role: user.role.name,
                 organization: {
                     id: user.organization.id,
@@ -105,6 +106,7 @@ export const AuthService = {
                 id: true,
                 email: true,
                 fullName: true,
+                avatarUrl: true,
                 createdAt: true,
                 role: {
                     select: {

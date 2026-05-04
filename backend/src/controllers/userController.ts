@@ -67,7 +67,25 @@ export const createUser = async (req: AuthRequest, res: Response, next: NextFunc
             ))
         }
 
-        const user = await UserService.create(req.body, Number(organizationId))
+        let avatarUrl = null;
+
+        try {
+            avatarUrl = req.file ? req.file.path : null;
+        } catch (uploadError: any) {
+            return next(new AppError(
+                "CloudinaryError",
+                commonErrorDict.serverError.httpCode,
+                "Ошибка при получении файла из облачного хранилища",
+                "Ошибка при создании нового игрока"
+            ));
+        }
+
+        const userData = {
+            ...req.body,
+            avatarUrl: avatarUrl || req.body.avatarUrl
+        }
+
+        const user = await UserService.create(userData, Number(organizationId))
 
         res.status(201).json(user)
 

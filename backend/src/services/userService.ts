@@ -15,11 +15,13 @@ export const UserService = {
                     id: true,
                     email: true,
                     fullName: true,
+                    avatarUrl: true,
                     role: {
                         select: {
                             name: true
                         }
-                    }
+                    },
+                    createdAt: true
 
                 }
             }),
@@ -41,12 +43,14 @@ export const UserService = {
                 id: true,
                 email: true,
                 fullName: true,
+                avatarUrl: true,
                 role: {
                     select: {
                         name: true,
                         code: true
                     }
-                }
+                },
+                createdAt: true
 
             }
         })
@@ -64,7 +68,7 @@ export const UserService = {
     },
 
     async create(data: any, organizationId: number) {
-        const { email, password, fullName, roleId } = data
+        const { email, password, fullName, roleId, avatarUrl } = data
         const existingUser = await prisma.user.findUnique({
             where: {
                 email
@@ -86,6 +90,7 @@ export const UserService = {
             data: {
                 email,
                 fullName,
+                avatarUrl: avatarUrl || null,
                 passwordHash: hashedPassword,
                 roleId: Number(roleId),
                 organizationId
@@ -95,6 +100,7 @@ export const UserService = {
                 email: true,
                 fullName: true,
                 roleId: true,
+                avatarUrl: true,
                 createdAt: true
             }
         })
