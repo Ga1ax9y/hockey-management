@@ -1,314 +1,453 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from "react";
 import {
-  getPlayers,
-  createPlayer,
-  updatePlayer,
-  deletePlayer,
-  getTeams
-} from '../../../services/api';
-import './Players.css';
-import { ruDateToISO, isoToRuDate } from '../../../utils/date';
-import { Link } from 'react-router-dom';
+	getPlayers,
+	createPlayer,
+	updatePlayer,
+	deletePlayer,
+	getTeams,
+} from "../../../services/api";
+import "./Players.css";
+import { ruDateToISO, isoToRuDate } from "../../../utils/date";
+import { Link } from "react-router-dom";
+import Loader from "../../../components/layout/Loader/Loader";
+import ErrorPage from "../../Error/ErrorPage";
+import { CONTRACT_TYPE } from "../../../utils/dicts";
 export default function Players() {
-  const [players, setPlayers] = useState([]);
-  const [teams, setTeams] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState('');
-  const [isCreating, setIsCreating] = useState(false);
-  const [editingId, setEditingId] = useState(null);
-  const [formData, setFormData] = useState({
-    lastName: '',
-    firstName: '',
-    middleName: '',
-    birthDate: '',
-    position: '',
-    height: '',
-    weight: '',
-    contractType: '',
-    contractExpiry: '',
-    currentTeamId: '',
-  });
+	const [players, setPlayers] = useState([]);
+	const [teams, setTeams] = useState([]);
+	const [loading, setLoading] = useState(true);
+	const [isSubmitting, setIsSubmitting] = useState(false);
+	const [error, setError] = useState("");
+	const [isCreating, setIsCreating] = useState(false);
+	const [editingId, setEditingId] = useState(null);
+	const [preview, setPreview] = useState(null);
 
-  const loadPlayers = async () => {
-    try {
-      setLoading(true);
-      const res = await getPlayers({includeCurrentTeam: true});
-      setPlayers(res.data.data);
-      const teamsRes = await getTeams();
-      const teamsArray = teamsRes.data.data
-      setTeams(teamsArray);
-      setError('');
-    } catch (err) {
-      setError('Не удалось загрузить игроков');
-      console.error(err);
-    } finally {
-      setLoading(false);
-    }
-  };
+	const [formData, setFormData] = useState({
+		lastName: "",
+		firstName: "",
+		middleName: "",
+		birthDate: "",
+		position: "",
+		height: "",
+		weight: "",
+		contractType: "",
+		contractExpiry: "",
+		currentTeamId: "",
+		photo: null,
+	});
 
-  useEffect(() => {
-    loadPlayers();
-  }, []);
+	const loadData = useCallback(async () => {
+		try {
+			setLoading(true);
+			const [playersRes, teamsRes] = await Promise.all([
+				getPlayers({ includeCurrentTeam: true }),
+				getTeams(),
+			]);
+			setPlayers(playersRes.data.data);
+			setTeams(teamsRes.data.data);
+		} catch (err) {
+			setError(err.response?.data);
+		} finally {
+			setLoading(false);
+		}
+	}, []);
 
-  const resetForm = () => {
-    setFormData({
-      lastName: '',
-      firstName: '',
-      middleName: '',
-      birthDate: '',
-      position: '',
-      height: '',
-      weight: '',
-      contractType: '',
-      contractExpiry: '',
-      currentTeamId: '',
-    });
-    setEditingId(null);
-    setIsCreating(false);
-  };
+	useEffect(() => {
+		loadData();
+	}, [loadData]);
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    const submitData = {
-      ...formData,
-      height: formData.height ? Number(formData.height) : null,
-      weight: formData.weight ? Number(formData.weight) : null,
-      currentTeamId: formData.currentTeamId ? Number(formData.currentTeamId) : null,
-      birthDate: ruDateToISO(formData.birthDate),
-      contractExpiry: ruDateToISO(formData.contractExpiry),
-    };
+	const resetForm = () => {
+		setFormData({
+			lastName: "",
+			firstName: "",
+			middleName: "",
+			birthDate: "",
+			position: "",
+			height: "",
+			weight: "",
+			contractType: "",
+			contractExpiry: "",
+			currentTeamId: "",
+			photo: null,
+		});
+		setPreview(null);
+		setEditingId(null);
+		setIsCreating(false);
+	};
 
-    if (!submitData.birthDate) {
-      setError('Дата рождения должна быть в формате ДД.ММ.ГГГГ');
-      return;
-    }
+	const handleFileChange = (e) => {
+		const file = e.target.files[0];
+		if (file) {
+			setFormData({ ...formData, photo: file });
+			setPreview(URL.createObjectURL(file));
+		}
+	};
 
-    try {
-      if (editingId) {
-        await updatePlayer(editingId, submitData);
-      } else {
-        await createPlayer(submitData);
-      }
-      resetForm();
-      loadPlayers();
-    } catch (err) {
-      setError(err.response?.data?.error || 'Ошибка при сохранении игрока');
-    }
-  };
+	const handleSubmit = async (e) => {
+		e.preventDefault();
+		setIsSubmitting(true);
+		setError("");
 
-  const handleEdit = (player) => {
-    setFormData({
-      lastName: player.lastName || '',
-      firstName: player.firstName || '',
-      middleName: player.middleName || '',
-      birthDate: isoToRuDate(player.birthDate),
-      position: player.position || '',
-      height: player.height?.toString() || '',
-      weight: player.weight?.toString() || '',
-      contractType: player.contractType || '',
-      contractExpiry: isoToRuDate(player.contractExpiry),
-      currentTeamId: player.currentTeamId?.toString() || '',
-    });
-    setEditingId(player.id);
-    setIsCreating(true);
-  };
+		const data = new FormData();
+		Object.keys(formData).forEach((key) => {
+			if (key === "photo") {
+				if (formData.photo) data.append("photo", formData.photo);
+			} else if (key === "birthDate" || key === "contractExpiry") {
+				data.append(key, ruDateToISO(formData[key]));
+			} else {
+				data.append(key, formData[key]);
+			}
+		});
 
-  const handleDelete = async (id) => {
-    if (!confirm('Удалить игрока? Это действие нельзя отменить.')) return;
-    try {
-      await deletePlayer(id);
-      loadPlayers();
-    } catch (err) {
-      setError(err.response?.data?.error || 'Ошибка при удалении игрока');
-    }
-  };
+		try {
+			if (editingId) {
+				await updatePlayer(editingId, data);
+			} else {
+				await createPlayer(data);
+			}
+			resetForm();
+			loadData();
+		} catch (err) {
+			setError(err.response?.data);
+		} finally {
+			setIsSubmitting(false);
+		}
+	};
 
-  if (loading) return <div className="players-loading">Загрузка игроков...</div>;
-  if (error) return <div className="players-error">{error}</div>;
+	const handleEdit = (player) => {
+		setFormData({
+			lastName: player.lastName || "",
+			firstName: player.firstName || "",
+			middleName: player.middleName || "",
+			birthDate: isoToRuDate(player.birthDate),
+			position: player.position || "",
+			height: player.height?.toString() || "",
+			weight: player.weight?.toString() || "",
+			contractType: player.contractType || "",
+			contractExpiry: isoToRuDate(player.contractExpiry),
+			currentTeamId: player.currentTeamId?.toString() || "",
+			photo: null,
+		});
+		setPreview(player.photoUrl);
+		setEditingId(player.id);
+		setIsCreating(true);
+	};
 
-  return (
-    <div className="players">
-      <h2>Управление игроками</h2>
+	if (loading) return <Loader />;
 
-      <button
-        className="players-add-btn"
-        onClick={() => {
-          resetForm();
-          setIsCreating(!isCreating);
-        }}
-      >
-        {isCreating ? 'Отменить' : 'Добавить игрока'}
-      </button>
+	if (error) return <div>{error}</div>;
 
-      {isCreating && (
-        <form className="players__form form-block" onSubmit={handleSubmit}>
-          <div className="players__field form-block__field">
-            <div className="players-form-group">
-              <label>Фамилия</label>
-              <input
-                type="text"
-                value={formData.lastName}
-                onChange={(e) => setFormData({ ...formData, lastName: e.target.value })}
-                required
-              />
-            </div>
-            <div className="players-form-group">
-              <label>Имя</label>
-              <input
-                type="text"
-                value={formData.firstName}
-                onChange={(e) => setFormData({ ...formData, firstName: e.target.value })}
-                required
-              />
-            </div>
-            <div className="players-form-group">
-              <label>Отчество</label>
-              <input
-                type="text"
-                value={formData.middleName}
-                onChange={(e) => setFormData({ ...formData, middleName: e.target.value })}
-              />
-            </div>
-          </div>
+	return (
+		<div className="players-page container">
+			<header className="players-page__header">
+				<h1 className="players-page__title">Состав</h1>
+				<button
+					className={`players-page__toggle-btn ${isCreating ? "players-page__toggle-btn--cancel" : ""}`}
+					onClick={() =>
+						isCreating ? resetForm() : setIsCreating(true)
+					}
+          type="button"
+				>
+					{isCreating ? "Отмена" : "+ Добавить"}
+				</button>
+			</header>
 
-          <div className="players-form-row">
-            <div className="players-form-group">
-              <label>Дата рождения</label>
-              <input
-                type="text"
-                placeholder="15.08.2005"
-                value={formData.birthDate}
-                onChange={(e) => setFormData({ ...formData, birthDate: e.target.value })}
-                required
-              />
-            </div>
-            <div className="players-form-group">
-              <label>Позиция</label>
-              <input
-                type="text"
-                value={formData.position}
-                onChange={(e) => setFormData({ ...formData, position: e.target.value })}
-              />
-            </div>
-            <div className="players-form-group">
-              <label>Рост (см)</label>
-              <input
-                type="number"
-                value={formData.height}
-                onChange={(e) => setFormData({ ...formData, height: e.target.value })}
-              />
-            </div>
-            <div className="players-form-group">
-              <label>Вес (кг)</label>
-              <input
-                type="number"
-                value={formData.weight}
-                onChange={(e) => setFormData({ ...formData, weight: e.target.value })}
-              />
-            </div>
-          </div>
+			{isCreating && (
+				<form
+					className="players-page__form player-form"
+					onSubmit={handleSubmit}
+				>
+					<div className="player-form__avatar-block">
+						<div className="player-form__preview">
+							{preview ? (
+								<img src={preview} alt="Player" />
+							) : (
+								<span>ФОТО</span>
+							)}
+						</div>
+						<label className="player-form__upload-label">
+							Загрузить фото
+							<input
+								type="file"
+								onChange={handleFileChange}
+								hidden
+								accept="image/*"
+							/>
+						</label>
+					</div>
 
-          <div className="players-form-row">
-            <div className="players-form-group">
-              <label>Окончание контракта</label>
-              <input
-                type="text"
-                placeholder="01.06.2026"
-                value={formData.contractExpiry}
-                onChange={(e) => setFormData({ ...formData, contractExpiry: e.target.value })}
-              />
-            </div>
-            <div className="players-form-group">
-              <label>Тип контракта</label>
-              <select
-                value={formData.contractType}
-                onChange={(e) => setFormData({ ...formData, contractType: e.target.value })}
-              >
-                <option value="">Не выбрана</option>
-                <option value="ONE_WAY">Односторонний</option>
-                <option value="TWO_WAY">Двусторонний</option>
-                <option value="ENTRY_LEVEL">Контракт новичка</option>
-                <option value="TRY_OUT">Просмотровый</option>
-              </select>
-            </div>
-            <div className="players-form-group">
-              <label>Команда</label>
-              <select
-                value={formData.currentTeamId || ''}
-                onChange={(e) => setFormData({ ...formData, currentTeamId: e.target.value })}
-              >
-                <option value="">Не выбрана</option>
-                {teams.map(team => (
-                  <option key={team.id} value={team.id}>
-                    {team.name} (ID: {team.id})
-                  </option>
-                ))}
-              </select>
-            </div>
-          </div>
+					<div className="player-form__fields">
+						<div className="player-form__field">
+							<label className="player-form__label">
+								Фамилия
+							</label>
+							<input
+								className="player-form__input"
+								value={formData.lastName}
+								onChange={(e) =>
+									setFormData({
+										...formData,
+										lastName: e.target.value,
+									})
+								}
+								required
+							/>
+						</div>
 
-          <div className="players-form-actions">
-            <button type="submit" className="btn-primary">
-              {editingId ? 'Сохранить изменения' : 'Добавить игрока'}
-            </button>
-            <button type="button" onClick={resetForm} className="btn-secondary">
-              Отмена
-            </button>
-          </div>
-        </form>
-      )}
+						<div className="player-form__field">
+							<label className="player-form__label">Имя</label>
+							<input
+								className="player-form__input"
+								value={formData.firstName}
+								onChange={(e) =>
+									setFormData({
+										...formData,
+										firstName: e.target.value,
+									})
+								}
+								required
+							/>
+						</div>
 
-      <div className="players-list">
-        {players.length === 0 ? (
-          <p className="players-empty">Нет добавленных игроков</p>
-        ) : (
-          <table className="players-table">
-            <thead>
-              <tr>
-                <th>ID</th>
-                <th>ФИО</th>
-                <th>Дата рождения</th>
-                <th>Позиция</th>
-                <th>Рост/Вес</th>
-                <th>Контракт до</th>
-                <th>Команда</th>
-                <th>Действия</th>
-              </tr>
-            </thead>
-            <tbody>
-              {players.map((player) => (
-                <tr key={player.id}>
-                  <td>{player.id}</td>
-                  <td>
-                  <Link to={`/players/${player.id}`}>
-                    {player.lastName} {player.firstName}
-                    {player.middleName && ` ${player.middleName}`}
-                  </Link>
-                  </td>
-                  <td>{isoToRuDate(player.birthDate)}</td>
-                  <td>{player.position || '—'}</td>
-                  <td>
-                    {player.height && `${player.height} см`}
-                    {player.weight && ` / ${player.weight} кг`}
-                  </td>
-                  <td>{player.contractExpiry ? isoToRuDate(player.contractExpiry) : '—'}</td>
-                  <td>{player.currentTeam?.name || '—'}</td>
-                  <td data-label="Действия">
-                    <div className="players-actions">
-                      <button onClick={() => handleEdit(player)} className="btn-edit">
-                        Редактировать
-                      </button>
-                      <button onClick={() => handleDelete(player.id)} className="btn-delete">
-                        Удалить
-                      </button>
-                    </div>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        )}
-      </div>
-    </div>
-  );
+						<div className="player-form__field">
+							<label className="player-form__label">
+								Отчество
+							</label>
+							<input
+								className="player-form__input"
+								value={formData.middleName}
+								onChange={(e) =>
+									setFormData({
+										...formData,
+										middleName: e.target.value,
+									})
+								}
+							/>
+						</div>
+
+						<div className="player-form__field">
+							<label className="player-form__label">
+								Дата рождения
+							</label>
+							<input
+								className="player-form__input"
+								placeholder="ДД.ММ.ГГГГ"
+								value={formData.birthDate}
+								onChange={(e) =>
+									setFormData({
+										...formData,
+										birthDate: e.target.value,
+									})
+								}
+								required
+							/>
+						</div>
+
+						<div className="player-form__field">
+							<label className="player-form__label">
+								Позиция
+							</label>
+							<select
+								className="player-form__select"
+								value={formData.position}
+								onChange={(e) =>
+									setFormData({
+										...formData,
+										position: e.target.value,
+									})
+								}
+							>
+								<option value="">Не указана</option>
+								<option value="Вратарь">Вратарь</option>
+								<option value="Защитник">Защитник</option>
+								<option value="Нападающий">Нападающий</option>
+							</select>
+						</div>
+
+						<div className="player-form__field-group">
+							<div className="player-form__field">
+								<label className="player-form__label">
+									Рост (см)
+								</label>
+								<input
+									type="number"
+									className="player-form__input"
+									value={formData.height}
+									onChange={(e) =>
+										setFormData({
+											...formData,
+											height: e.target.value,
+										})
+									}
+								/>
+							</div>
+							<div className="player-form__field">
+								<label className="player-form__label">
+									Вес (кг)
+								</label>
+								<input
+									type="number"
+									className="player-form__input"
+									value={formData.weight}
+									onChange={(e) =>
+										setFormData({
+											...formData,
+											weight: e.target.value,
+										})
+									}
+								/>
+							</div>
+						</div>
+
+						<div className="player-form__field">
+							<label className="player-form__label">
+								Команда
+							</label>
+							<select
+								className="player-form__select"
+								value={formData.currentTeamId}
+								onChange={(e) =>
+									setFormData({
+										...formData,
+										currentTeamId: e.target.value,
+									})
+								}
+							>
+								<option value="">Не выбрана</option>
+								{teams.map((t) => (
+									<option key={t.id} value={t.id}>
+										{t.name}
+									</option>
+								))}
+							</select>
+						</div>
+
+						<div className="player-form__field">
+							<label className="player-form__label">
+								Тип контракта
+							</label>
+							<select
+								className="player-form__select"
+								value={formData.contractType}
+								onChange={(e) =>
+									setFormData({
+										...formData,
+										contractType: e.target.value,
+									})
+								}
+							>
+								<option value="">Не указан</option>
+								{CONTRACT_TYPE.map((type) => (
+									<option key={type.value} value={type.value}>
+										{type.label}
+									</option>
+								))}
+							</select>
+						</div>
+
+						<div className="player-form__field">
+							<label className="player-form__label">
+								Окончание контракта
+							</label>
+							<input
+								className="player-form__input"
+								placeholder="ДД.ММ.ГГГГ"
+								value={formData.contractExpiry}
+								onChange={(e) =>
+									setFormData({
+										...formData,
+										contractExpiry: e.target.value,
+									})
+								}
+							/>
+						</div>
+					</div>
+
+					<button
+						className="player-form__submit-btn"
+						type="submit"
+						disabled={isSubmitting}
+					>
+						{isSubmitting
+							? "..."
+							: editingId
+								? "Обновить"
+								: "Создать"}
+					</button>
+				</form>
+			)}
+
+			<div className="players-page__table-container">
+				<table className="players-table">
+					<thead className="players-table__head">
+						<tr className="players-table__row">
+							<th className="players-table__th">Игрок</th>
+							<th className="players-table__th players-table__th--desktop">
+								Позиция
+							</th>
+							<th className="players-table__th">Действия</th>
+						</tr>
+					</thead>
+					<tbody className="players-table__body">
+						{players.map((player) => (
+							<tr key={player.id} className="players-table__row">
+								<td className="players-table__td">
+									<div className="player-entity">
+										<img
+											className="player-entity__photo"
+											src={
+												player.photoUrl ||
+												"/default-player.png"
+											}
+											alt=""
+										/>
+										<div className="player-entity__info">
+											<Link
+												to={`/players/${player.id}`}
+												className="player-entity__name"
+											>
+												{player.lastName}{" "}
+												{player.firstName}
+											</Link>
+											<span className="player-entity__team">
+												{player.currentTeam?.name ||
+													"Свободный агент"}
+											</span>
+										</div>
+									</div>
+								</td>
+								<td className="players-table__td players-table__td--desktop">
+									<span className="player-position-badge">
+										{player.position || "—"}
+									</span>
+								</td>
+								<td className="players-table__td">
+									<div className="players-table__actions">
+										<button
+											onClick={() => handleEdit(player)}
+											className="action-button action-button--edit"
+                      type="button"
+										>
+											✎
+										</button>
+										<button
+                    type="button"
+											onClick={() =>
+												deletePlayer(player.id).then(
+													loadData,
+												)
+											}
+											className="action-button action-button--delete"
+										>
+											✖
+										</button>
+									</div>
+								</td>
+							</tr>
+						))}
+					</tbody>
+				</table>
+			</div>
+		</div>
+	);
 }
