@@ -1,225 +1,252 @@
-.players {
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 1.5rem;
+.players-page {
+    padding: 20px 0;
 }
 
-.players h2 {
-  text-align: center;
-  margin-bottom: 1.5rem;
+.players-page__header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 30px;
+    border-left: 8px solid var(--color-dark);
+    padding-left: 20px;
 }
 
-.players-add-btn {
-  display: block;
-  margin: 0 auto 1.5rem;
-  padding: 0.5rem 1.5rem;
-  background-color: #000;
-  color: white;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-  font-size: 1rem;
+.players-page__title {
+    font-size: 42px;
+    font-weight: 900;
+    text-transform: uppercase;
+    margin: 0;
 }
 
-.players-add-btn:hover {
-  background-color: #333;
+.players-page__toggle-btn {
+    background: var(--color-dark);
+    color: #fff;
+    border: none;
+    padding: 15px 30px;
+    font-weight: 900;
+    text-transform: uppercase;
+    cursor: pointer;
+    box-shadow: 6px 6px 0px var(--color-gray);
+    transition: transform 0.1s;
 }
 
-.players-form {
-  background-color: #f9f9f9;
-  padding: 1.5rem;
-  border-radius: 8px;
-  margin-bottom: 2rem;
-  border: 1px solid #eee;
+.players-page__toggle-btn:active {
+    transform: translate(3px, 3px);
+    box-shadow: 3px 3px 0px var(--color-gray);
 }
 
-.players-form-row {
-  display: flex;
-  gap: 1rem;
-  margin-bottom: 1rem;
-  flex-wrap: wrap;
+.players-page__toggle-btn--cancel {
+    background: #ff4757;
 }
 
-.players-form-group {
-  flex: 1;
-  min-width: 200px;
+.player-form {
+    display: grid;
+    grid-template-columns: 200px 1fr;
+    gap: 30px;
+    background: #fff;
+    border: 4px solid var(--color-dark);
+    padding: 30px;
+    box-shadow: 12px 12px 0px var(--color-dark);
+    margin-bottom: 50px;
 }
 
-.players-form-group label {
-  display: block;
-  margin-bottom: 0.25rem;
-  font-weight: 600;
+.player-form__avatar-block {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
 }
 
-.players-form-group small {
-  color: var(--color-dark-alternate);
-  font-size: 0.875rem;
+.player-form__preview {
+    width: 100%;
+    aspect-ratio: 3/4;
+    border: 4px solid var(--color-dark);
+    background: #f1f2f6;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 900;
+    overflow: hidden;
 }
 
-.players-form-group input {
-  width: 100%;
-  padding: 0.5rem;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-  font-size: 1rem;
+.player-form__preview img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
 }
 
-.players-form-group select {
-  width: 100%;
-  padding: 0.5rem;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-  font-size: 1rem;
-  font-family: var(--font-family-base);
-  background-color: var(--color-light);
-  color: var(--color-dark);
+.player-form__upload-label {
+    background: #f1f2f6;
+    border: 2px solid var(--color-dark);
+    padding: 10px;
+    text-align: center;
+    font-size: 12px;
+    font-weight: 800;
+    text-transform: uppercase;
+    cursor: pointer;
 }
 
-.players-form-group select:focus {
-  outline: none;
-  border-color: var(--color-dark-alternate);
-  background-color: var(--color-light-alternate);
+.player-form__fields {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px;
 }
 
-.players-form-actions {
-  display: flex;
-  gap: 1rem;
-  margin-top: 1rem;
+.player-form__label {
+    display: block;
+    font-size: 12px;
+    font-weight: 900;
+    text-transform: uppercase;
+    margin-bottom: 8px;
+}
+
+.player-form__input,
+.player-form__select {
+    width: 100%;
+    padding: 12px;
+    border: 3px solid var(--color-dark);
+    font-weight: 700;
+    outline: none;
+}
+
+.player-form__submit-btn {
+    grid-column: 1 / -1;
+    background: var(--color-dark);
+    color: #fff;
+    padding: 20px;
+    font-weight: 900;
+    text-transform: uppercase;
+    border: none;
+    font-size: 18px;
+    cursor: pointer;
+}
+
+.players-page__table-container {
+    overflow-x: auto;
+    border: 4px solid var(--color-dark);
+    box-shadow: 12px 12px 0px var(--color-gray-light);
 }
 
 .players-table {
-  width: 100%;
-  border-collapse: collapse;
-  margin-top: 1rem;
-  font-size: 0.95rem;
+    width: 100%;
+    border-collapse: collapse;
+    background: #fff;
 }
 
-.players-table th,
-.players-table td {
-  padding: 0.75rem;
-  text-align: left;
-  border-bottom: 1px solid #eee;
-  vertical-align: top;
+.players-table__th {
+    background: var(--color-dark);
+    color: #fff;
+    padding: 20px;
+    text-align: left;
+    text-transform: uppercase;
+    font-weight: 900;
 }
 
-.players-table th {
-  background-color: #f5f5f5;
-  font-weight: 600;
-  white-space: nowrap;
+.players-table__td {
+    padding: 15px 20px;
+    border-bottom: 3px solid var(--color-dark);
 }
 
-.players-table tbody tr:hover {
-  background-color: #fafafa;
+.player-entity {
+    display: flex;
+    align-items: center;
+    gap: 15px;
 }
 
-.players-actions {
-  display: flex;
-  gap: 0.5rem;
-  flex-wrap: wrap;
+.player-entity__photo {
+    width: 50px;
+    height: 65px;
+    border: 2px solid var(--color-dark);
+    object-fit: cover;
 }
 
-.btn-edit {
-  background-color: #1976d2;
-  color: white;
-  border: none;
-  padding: 0.375rem 0.75rem;
-  border-radius: 4px;
-  cursor: pointer;
-  font-size: 0.875rem;
+.player-entity__name {
+    display: block;
+    font-weight: 900;
+    color: var(--color-dark);
+    text-decoration: none;
+    text-transform: uppercase;
+    font-size: 16px;
 }
 
-.btn-edit:hover {
-  background-color: #1565c0;
+.player-entity__team {
+    font-size: 12px;
+    font-weight: 700;
+    color: #555;
 }
 
-.btn-delete {
-  background-color: #d32f2f;
-  color: white;
-  border: none;
-  padding: 0.375rem 0.75rem;
-  border-radius: 4px;
-  cursor: pointer;
-  font-size: 0.875rem;
+.player-position-badge {
+    background: #f1f2f6;
+    padding: 5px 10px;
+    border: 2px solid var(--color-dark);
+    font-weight: 800;
+    font-size: 12px;
 }
 
-.btn-delete:hover {
-  background-color: #b71c1c;
+.players-table__actions {
+    display: flex;
+    gap: 10px;
 }
 
-.btn-primary {
-  background-color: #000;
-  color: white;
-  border: none;
-  padding: 0.5rem 1rem;
-  border-radius: 4px;
-  cursor: pointer;
-  font-size: 1rem;
+.action-button {
+    width: 40px;
+    height: 40px;
+    border: 3px solid var(--color-dark);
+    background: #fff;
+    cursor: pointer;
+    font-weight: 900;
+    transition: all 0.1s;
 }
 
-.btn-primary:hover {
-  background-color: #333;
-}
+.action-button--edit:hover { background: #fee133; }
+.action-button--delete:hover { background: #ff4757; color: #fff; }
 
-.btn-secondary {
-  background-color: #f0f0f0;
-  color: var(--color-dark);
-  border: 1px solid #ccc;
-  padding: 0.5rem 1rem;
-  border-radius: 4px;
-  cursor: pointer;
-  font-size: 1rem;
-}
 
-.btn-secondary:hover {
-  background-color: #e0e0e0;
-}
-
-.players-empty,
-.players-loading,
-.players-error {
-  text-align: center;
-  padding: 2rem;
-}
-
-.players-error {
-  color: #d32f2f;
+@media (max-width: 992px) {
+    .player-form {
+        grid-template-columns: 1fr;
+    }
+    .player-form__avatar-block {
+        width: 150px;
+        margin: 0 auto;
+    }
 }
 
 @media (max-width: 768px) {
-  .players-table,
-  .players-table thead,
-  .players-table tbody,
-  .players-table th,
-  .players-table td,
-  .players-table tr {
-    display: block;
-  }
+    .players-page__title {
+        font-size: 28px;
+    }
 
-  .players-table thead tr {
-    position: absolute;
-    top: -9999px;
-    left: -9999px;
-  }
+    .players-page__header {
+        border-left-width: 5px;
+    }
 
-  .players-table tr {
-    border-bottom: 2px solid var(--color-gray);
-    padding-bottom: 1rem;
-    margin-bottom: 1rem;
-  }
+    .player-form__fields {
+        grid-template-columns: 1fr;
+    }
 
-  .players-table td {
-    clear: both;
-    text-align: right;
-    padding-left: 50%;
-    position: relative;
-  }
+    .players-table__th--desktop,
+    .players-table__td--desktop {
+        display: none;
+    }
 
-  .players-table td::before {
-    content: attr(data-label);
-    position: absolute;
-    left: 0.75rem;
-    width: calc(50% - 1.5rem);
-    font-weight: 600;
-    text-align: left;
-  }
+    .player-entity__name {
+        font-size: 14px;
+    }
+}
+
+@media (max-width: 480px) {
+    .players-page__header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 15px;
+    }
+
+    .players-page__toggle-btn {
+        width: 100%;
+    }
+
+    .player-form {
+        padding: 15px;
+        box-shadow: 6px 6px 0px var(--color-dark);
+    }
 }

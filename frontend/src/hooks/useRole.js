@@ -8,6 +8,7 @@ export const useRole = () => {
         isCoach: user?.role?.code === "COACH",
         isManager: user?.role?.code === "MANAGER",
         isDoctor: user?.role?.code === "DOCTOR",
+        isAnalyst: user?.role?.code === "ANALYST",
         role: user?.role?.code
     }
 }
