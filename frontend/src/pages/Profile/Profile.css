@@ -1,55 +1,133 @@
 .profile {
-  max-width: 600px;
-  margin: 0 auto;
-  padding: 2rem var(--container-padding-x);
+    padding-top: 100px;
+    padding-bottom: var(--spacing-xl);
+}
+
+.profile__header {
+    margin-bottom: 30px;
+    border-left: 6px solid var(--color-dark);
+    padding-left: 20px;
 }
 
 .profile__title {
-  text-align: center;
-  margin-bottom: 2rem;
-  font-size: 1.75rem;
-  color: var(--color-dark);
+    font-size: 32px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: var(--color-dark);
 }
 
-.profile__card {
-  background-color: var(--color-light);
-  border: 1px solid var(--color-gray);
-  border-radius: 8px;
-  padding: 1.5rem;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+.user-card {
+    display: flex;
+    gap: 40px;
+    background: var(--color-light);
+    border: 1px solid var(--color-gray);
+    padding: 40px;
+    box-shadow: 12px 12px 0px var(--color-dark);
 }
 
-.profile__field {
-  display: flex;
-  justify-content: space-between;
-  padding: 0.75rem 0;
-  border-bottom: 1px solid var(--color-gray);
-  color: var(--color-dark);
+.user-card__aside {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+    min-width: 200px;
 }
 
-.profile__field:last-child {
-  border-bottom: none;
+.user-card__avatar-wrapper {
+    width: 180px;
+    height: 180px;
+    border: 4px solid var(--color-dark);
+    background-color: var(--color-gray);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
 }
 
-.profile__field strong {
-  margin-right: 1rem;
-  color: var(--color-dark);
+.user-card__avatar {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
 }
 
-.profile__field span {
-  color: var(--color-dark-alternate);
-  text-align: right;
-  flex-shrink: 0;
+.user-card__avatar-placeholder {
+    font-size: 72px;
+    font-weight: 900;
+    color: var(--color-dark);
+    opacity: 0.2;
 }
 
-.profile-loading,
-.profile-error {
-  text-align: center;
-  padding: 2rem;
-  font-size: 1.1rem;
-  color: var(--color-dark);
+.user-card__status-badge {
+    background-color: #27ae60;
+    color: white;
+    padding: 4px 16px;
+    font-size: 11px;
+    font-weight: 800;
+    text-transform: uppercase;
+    border-radius: 20px;
 }
 
-.profile-error {
-  color: #d32f2f;
+.user-card__main {
+    flex-grow: 1;
+}
+
+.user-card__group {
+    margin-bottom: 24px;
+}
+
+.user-card__grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+    border-top: 1px solid var(--color-gray);
+    padding-top: 24px;
+}
+
+.user-card__label {
+    display: block;
+    font-size: 12px;
+    font-weight: 700;
+    text-transform: uppercase;
+    color: #888;
+    margin-bottom: 6px;
+}
+
+.user-card__value {
+    font-size: 16px;
+    color: var(--color-dark);
+    font-weight: 500;
+}
+
+.user-card__value--accent {
+    font-size: 24px;
+    font-weight: 800;
+    text-transform: uppercase;
+}
+
+.user-card__role-tag {
+    background-color: var(--color-dark);
+    color: var(--color-light);
+    padding: 2px 10px;
+    font-size: 13px;
+    font-weight: 700;
+}
+
+@media (max-width: 768px) {
+    .user-card {
+        flex-direction: column;
+        padding: 25px;
+        box-shadow: 6px 6px 0px var(--color-dark);
+    }
+
+    .user-card__aside {
+        min-width: auto;
+    }
+
+    .user-card__grid {
+        grid-template-columns: 1fr;
+    }
+
+    .profile__title {
+        font-size: 24px;
+    }
 }
