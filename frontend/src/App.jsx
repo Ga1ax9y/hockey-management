@@ -24,6 +24,7 @@ import Schedule from './components/Schedule/Schedule';
 import AddPhysicalRecord from './pages/Physicals/AddPhysicalRecord/AddPhysicalRecord';
 import MatchStats from './pages/MatchStats/MatchStats';
 import TrainingStats from './pages/TrainingStats/TrainingStats';
+import UsersList from '../UsersList/UsersList';
 const Layout = () => (
   <>
     <Header />
@@ -56,9 +57,15 @@ const router = createBrowserRouter([
           </ProtectedRoute>
         ),
       },
-      { path: '/admin/users', element: (
+      { path: '/admin/users/create', element: (
           <ProtectedRoute>
             <Users />
+          </ProtectedRoute>
+        ),
+      },
+      { path: '/admin/users/list', element: (
+          <ProtectedRoute>
+            <UsersList />
           </ProtectedRoute>
         ),
       },

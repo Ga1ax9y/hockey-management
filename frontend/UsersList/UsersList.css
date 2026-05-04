@@ -1,0 +1,131 @@
+.users-page {
+    padding-top: 40px;
+}
+
+.users-page__header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    margin-bottom: 30px;
+    border-left: 5px solid var(--color-dark);
+    padding-left: 15px;
+}
+
+.users-page__title {
+    font-size: 32px;
+    font-weight: 900;
+    text-transform: uppercase;
+    margin: 0;
+}
+
+.users-page__count {
+    font-size: 14px;
+    color: #666;
+    font-weight: 600;
+}
+
+.users-page__add-btn {
+    background: var(--color-dark);
+    color: #fff;
+    border: none;
+    padding: 10px 20px;
+    font-weight: 800;
+    text-transform: uppercase;
+    cursor: pointer;
+    box-shadow: 4px 4px 0px var(--color-gray);
+    transition: transform 0.1s;
+}
+
+.users-page__add-btn:active {
+    transform: translate(2px, 2px);
+    box-shadow: 2px 2px 0px var(--color-gray);
+}
+
+.users-page__table-wrapper {
+    background: #fff;
+    border: 2px solid var(--color-dark);
+    box-shadow: 10px 10px 0px var(--color-gray-light);
+    overflow-x: auto;
+}
+
+.users-table {
+    width: 100%;
+    border-collapse: collapse;
+    text-align: left;
+}
+
+.users-table__th {
+    padding: 15px 20px;
+    background: #f8f9fa;
+    border-bottom: 2px solid var(--color-dark);
+    font-size: 12px;
+    text-transform: uppercase;
+    font-weight: 800;
+}
+
+.users-table__td {
+    padding: 15px 20px;
+    border-bottom: 1px solid var(--color-gray-light);
+    font-size: 14px;
+}
+
+.users-table__row:hover {
+    background: rgba(0,0,0,0.02);
+}
+
+.user-info {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.user-info__avatar {
+    width: 40px;
+    height: 40px;
+    border: 2px solid var(--color-dark);
+    flex-shrink: 0;
+    overflow: hidden;
+    background: #eee;
+}
+
+.user-info__img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.user-info__placeholder {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 900;
+    background: var(--color-gray-light);
+    color: var(--color-dark);
+}
+
+.user-info__name {
+    font-weight: 700;
+}
+
+.user-role {
+    display: inline-block;
+    padding: 4px 8px;
+    font-size: 11px;
+    font-weight: 800;
+    text-transform: uppercase;
+    border: 1px solid var(--color-dark);
+}
+
+.user-role--1 { background: #e1f5fe; }
+.user-role--2 { background: #fff3e0; }
+
+.users-page__error {
+    background: #fee;
+    color: #c00;
+    padding: 15px;
+    margin-bottom: 20px;
+    border: 1px solid #c00;
+    font-weight: 600;
+}
