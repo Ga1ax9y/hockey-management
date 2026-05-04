@@ -23,7 +23,7 @@ export const getUserById = (id, token) =>
   API.get(`/users/${id}`, {
     headers: { Authorization: `Bearer ${token}` },
   });
-export const createUser = (data) => API.post("/users", data);
+export const createUser = (formData) => API.post("/users", formData);
 
 export const getRoles = () => API.get("/roles");
 export const getRoleById = (id) => API.get(`/roles/${id}`);
@@ -52,7 +52,7 @@ export const getPlayers = (params = {}) => {
 export const getPlayerById = (id, params = {}) => {
   return API.get(`/players/${id}${buildQuery(params)}`)
 }
-export const createPlayer = (data) => API.post("/players", data);
+export const createPlayer = (formData) => API.post("/players", formData);
 export const updatePlayer = (id, data) => API.put(`/players/${id}`, data);
 export const deletePlayer = (id) => API.delete(`/players/${id}`);
 export const changePlayerTeam = (id, newTeamId) => API.patch(`/transfers/add/${id}`, {newTeamId});

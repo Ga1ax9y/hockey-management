@@ -1,3 +1,5 @@
+export const DEFAULT_AVATAR = "/images/default-avatar.png";
+
 export const MEDICAL_STATUS = [
 	{ value: "injured", label: "Травмирован" },
 	{ value: "recovery", label: "Реабилитация" },
@@ -20,12 +22,16 @@ export const getMatchStatusLabel = (statusValue) => {
   return status ? status.label : "Неизвестно";
 };
 
+export const CONTRACT_TYPE = [
+	{ value: "ONE_WAY", label: "Односторонний" },
+	{ value: "TWO_WAY", label: "Двусторонний" },
+	{ value: "ENTRY_LEVEL", label: "Контракт новичка" },
+	{ value: "TRY_OUT", label: "Просмотровый" },
+]
 
-export const CONTRACT_TYPE = {
-	ONE_WAY: "Односторонний",
-	TWO_WAY: "Двусторонний",
-	ENTRY_LEVEL: "Контракт новичка",
-	TRY_OUT: "Просмотровый",
+export const getContractTypeLabel = (statusValue) => {
+  const status = CONTRACT_TYPE.find(s => s.value === statusValue);
+  return status ? status.label : "Неизвестно";
 };
 
 export const TRANSFER_TYPE = {

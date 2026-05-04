@@ -16,7 +16,8 @@ import {
 	SEASON_TYPES,
 	TRAINING_TYPES,
 } from "../../../utils/dicts";
-import Loader from '../../../components/layout/Loader/Loader'
+import Loader from "../../../components/layout/Loader/Loader";
+import { Link } from "react-router-dom";
 
 export default function Events() {
 	const { user } = useAuthStore();
@@ -419,9 +420,18 @@ function EventCard({ event }) {
 						{formatDateTimeToRU(event.start)}
 					</span>
 				</div>
-				<h3 className="event-card__title">
-					{isMatch ? `vs ${opponentName}` : trainingType}
-				</h3>
+				<Link
+					to={
+						isMatch
+							? `/matches/${event.id}/stats`
+							: `/trainings/${event.id}/stats`
+					}
+					className="btn"
+				>
+					<h3 className="event-card__title">
+						{isMatch ? `vs ${opponentName}` : trainingType}
+					</h3>
+				</Link>
 				<div className="event-card__details">
 					<span className="event-card__location">📍 {location}</span>
 					{isMatch && event.status === "finished" && (
