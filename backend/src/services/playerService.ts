@@ -90,7 +90,9 @@ const buildIncludeClause = (query: any): PlayerInclude => {
 }
 
 const buildSoloIncludeClause = (query: any, pagination: any): PlayerInclude => {
-    const include: PlayerInclude = {}
+    const include: PlayerInclude = { currentTeam: { select: {
+        name: true
+    }}}
 
     if (query.includeTransfers === "true") {
         include.careerHistory = {
@@ -305,6 +307,7 @@ export const PlayerService = {
             weight: player.weight,
             contractType: player.contractType,
             contractExpiry: player.contractExpiry,
+            currentTeam: player.currentTeam,
             currentTeamId: player.currentTeamId,
             createdAt: player.createdAt,
             updatedAt: player.updatedAt,
