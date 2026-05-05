@@ -27,7 +27,6 @@ export default function AddMedicalRecord() {
 				diagnosis: data.diagnosis,
 				status: data.status,
 			});
-			console.log(data)
 			reset();
 			loadMedicalRecords();
 		} catch (err) {

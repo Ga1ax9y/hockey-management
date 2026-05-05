@@ -34,9 +34,14 @@ export const getContractTypeLabel = (statusValue) => {
   return status ? status.label : "Неизвестно";
 };
 
-export const TRANSFER_TYPE = {
-	internal: "Внутренний",
-	external: "Внешний",
+export const TRANSFER_TYPE = [
+	{ value: "external", label: "Внешний" },
+	{ value: "internal", label: "Внутренний" },
+]
+
+export const getTransferTypeLabel = (transferValue) => {
+  const status = TRANSFER_TYPE.find(s => s.value === transferValue);
+  return status ? status.label : "Неизвестно";
 };
 
 export const TRAINING_TYPES = [
@@ -98,3 +103,8 @@ export const METRIC_TYPES = [
 	{ value: "resting_heart_rate", label: "ЧСС в покое", unit: "уд/мин" },
 	{ value: "grip_strength", label: "Кистевая динамометрия", unit: "кг" },
 ];
+
+export const getMetricTypeLabel = (metricValue) => {
+	const status = METRIC_TYPES.find(s => s.value === metricValue);
+	return status ? status.label : "Неизвестно";
+};

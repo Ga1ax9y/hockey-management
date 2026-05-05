@@ -232,7 +232,6 @@ const Schedule = ({ teamId }) => {
 				title: event.title,
 				start: event.start,
 				end: event.endDate || event.end,
-				opponentName: event.opponentName,
 				status: event.status,
 				extendedProps: {
 					type: event.type,
@@ -241,6 +240,7 @@ const Schedule = ({ teamId }) => {
 					isHomeGame: event.extendedProps.isHomeGame,
 					score: event.extendedProps.score,
 					myScore: event.extendedProps.myScore,
+					opponentName: event.extendedProps.opponentName,
 					opponentScore: event.extendedProps.opponentScore,
 					...event.details,
 				},

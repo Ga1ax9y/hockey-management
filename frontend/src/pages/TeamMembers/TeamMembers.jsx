@@ -30,7 +30,7 @@ export default function TeamMembers() {
       const teamUsersRes = playersRes.data.users.map(ut => ut?.user)
       setPlayers(playersRes.data.players);
       setTeamUsers(teamUsersRes);
-      setAllUsers(allUsersRes.data.filter(
+      setAllUsers(allUsersRes.data.data.filter(
                     user =>!teamUsersRes.some(ut => ut.id === user.id)));
       setError('');
     } catch (err) {
