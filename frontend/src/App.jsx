@@ -24,7 +24,7 @@ import Schedule from './components/Schedule/Schedule';
 import AddPhysicalRecord from './pages/Physicals/AddPhysicalRecord/AddPhysicalRecord';
 import MatchStats from './pages/MatchStats/MatchStats';
 import TrainingStats from './pages/TrainingStats/TrainingStats';
-import UsersList from '../UsersList/UsersList';
+import UsersList from './pages/UsersList/UsersList';
 const Layout = () => (
   <>
     <Header />

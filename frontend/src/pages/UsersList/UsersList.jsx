@@ -1,9 +1,9 @@
 import { useEffect, useState } from "react";
-import { getAllUsers } from "../src/services/api";
-import Loader from "../src/components/layout/Loader/Loader";
+import { getAllUsers } from "../../services/api";
+import Loader from "../../components/layout/Loader/Loader";
 import "./UsersList.css";
-import ErrorPage from "../src/pages/Error/ErrorPage";
-import { isoToRuDate } from "../src/utils/date";
+import ErrorPage from "../Error/ErrorPage";
+import { isoToRuDate } from "../../utils/date";
 
 export default function UsersList() {
     const [users, setUsers] = useState([]);
