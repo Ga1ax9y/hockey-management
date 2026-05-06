@@ -2,6 +2,30 @@ import type { NextFunction, Response } from "express"
 import type { AuthRequest } from "../middlewares/authMiddleware"
 import { CareerService } from "../services/careerService"
 import { AppError, commonErrorDict } from "../types/AppError"
+import { paginatedResponse } from "../helpers/paginatedResponse";
+import { getPagination } from "../helpers/pagination";
+
+export const getTransfers = async (req: AuthRequest, res: Response, next: NextFunction) => {
+    try {
+
+        const { id } = req.params
+        const { page, limit, skip } = getPagination(req.query);
+        const { transfers, total } = await CareerService.findByPlayer({
+            playerId: id,
+            pagination: { skip, limit },
+            filters: req.query
+        })
+
+        res.json(paginatedResponse(transfers, total, page, limit));
+    } catch (error: any) {
+        next(new AppError(
+            commonErrorDict.serverError.name,
+            commonErrorDict.serverError.httpCode,
+            error.message,
+            "Ошибка при получении трансферов игрока"
+        ));
+    }
+};
 
 export const changePlayerTeam = async (req: AuthRequest, res: Response, next: NextFunction) => {
     try {

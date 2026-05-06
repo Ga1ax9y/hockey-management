@@ -1,7 +1,45 @@
+import type { PlayerCareerHistoryWhereInput } from "../generated/prisma/models"
 import { prisma } from "../lib/prisma"
 import { AppError, commonErrorDict } from "../types/AppError"
 
+const buildTransferWhereClause = (query: any, playerId: number) => {
+    const where: PlayerCareerHistoryWhereInput = {}
+
+    const { goals } = query
+
+    where.playerId = Number(playerId)
+
+
+    return where
+}
+
 export const CareerService = {
+
+    async findByPlayer({ playerId, pagination, filters }: any) {
+        const { skip, limit } = pagination
+        const where = buildTransferWhereClause(filters, playerId)
+
+        const [transfers, total] = await Promise.all([
+            prisma.playerCareerHistory.findMany({
+                where,
+                include: {
+                    player: { select: { firstName: true, lastName: true } },
+                    fromTeam: { select: { name: true } },
+                    toTeam: { select: { name: true } },
+                },
+                skip,
+                take: limit,
+                orderBy: {
+                     [filters.sortBy || "transferDate" ]: filters.order || "desc"
+                }
+            }),
+            prisma.playerCareerHistory.count({ where })
+        ])
+        return {
+            transfers,
+            total
+        }
+    },
     async changeTeam(playerId: number, newTeamId: number, organizationId: number) {
 
         const player = await prisma.player.findFirst({
