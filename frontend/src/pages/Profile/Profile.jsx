@@ -1,32 +1,73 @@
+import { useState, useEffect } from 'react';
+import { useParams } from 'react-router-dom';
 import './Profile.css';
 import { useAuthStore } from '../../hooks/useAuthStore';
+import { getUserById } from '../../services/api';
 import Loader from '../../components/layout/Loader/Loader';
+import { isoToRuDate } from '../../utils/date';
 
 export default function Profile() {
-    const { user, isLoading } = useAuthStore();
+    const { id } = useParams();
+    const { user: authUser, isLoading: authLoading } = useAuthStore();
 
-    if (isLoading) return <Loader />;
-    if (!user) return null;
+    const [profileUser, setProfileUser] = useState(null);
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState(null);
+
+    useEffect(() => {
+        const fetchUserData = async () => {
+            if (!id) {
+                setProfileUser(authUser);
+                return;
+            }
+
+            if (authUser && id === authUser.id) {
+                setProfileUser(authUser);
+                return;
+            }
+
+            try {
+                setLoading(true);
+                const response = await getUserById(id);
+                setProfileUser(response.data);
+            } catch (err) {
+                setError('Пользователь не найден');
+                console.error(err);
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchUserData();
+    }, [id, authUser]);
+
+    if (authLoading || loading) return <Loader />;
+    if (error) return <div className="profile container"><h1>{error}</h1></div>;
+    if (!profileUser) return null;
+
+    const isOwnProfile = !id || (authUser && id === authUser.id);
 
     return (
         <div className="profile container">
             <header className="profile__header">
-                <h1 className="profile__title">Личное дело пользователя</h1>
+                <h1 className="profile__title">
+                    {isOwnProfile ? 'Личное дело' : `Профиль пользователя`}
+                </h1>
             </header>
 
             <main className="profile__content">
                 <div className="profile__card user-card">
                     <div className="user-card__aside">
                         <div className="user-card__avatar-wrapper">
-                            {user.avatarUrl ? (
+                            {profileUser.avatarUrl ? (
                                 <img
-                                    src={user.avatarUrl}
-                                    alt={user.fullName}
+                                    src={profileUser.avatarUrl}
+                                    alt={profileUser.fullName}
                                     className="user-card__avatar"
                                 />
                             ) : (
                                 <div className="user-card__avatar-placeholder">
-                                    {user.fullName?.charAt(0) || '?'}
+                                    {profileUser.fullName?.charAt(0) || '?'}
                                 </div>
                             )}
                         </div>
@@ -37,32 +78,36 @@ export default function Profile() {
                         <div className="user-card__group">
                             <label className="user-card__label">Полное имя</label>
                             <div className="user-card__value user-card__value--accent">
-                                {user.fullName || '—'}
+                                {profileUser.fullName || '—'}
                             </div>
                         </div>
 
                         <div className="user-card__grid">
                             <div className="user-card__group">
                                 <label className="user-card__label">Email</label>
-                                <div className="user-card__value">{user.email}</div>
+                                <div className="user-card__value">{profileUser.email}</div>
                             </div>
 
                             <div className="user-card__group">
                                 <label className="user-card__label">Роль в системе</label>
                                 <div className="user-card__value">
-                                    <span className="user-card__role-tag">{user.role.name}</span>
+                                    <span className="user-card__role-tag">
+                                        {profileUser.role?.name || profileUser.role}
+                                    </span>
                                 </div>
                             </div>
 
                             <div className="user-card__group">
                                 <label className="user-card__label">Организация</label>
-                                <div className="user-card__value">{user.organization?.name || '—'}</div>
+                                <div className="user-card__value">
+                                    {profileUser.organization?.name || '—'}
+                                </div>
                             </div>
 
                             <div className="user-card__group">
                                 <label className="user-card__label">Дата регистрации</label>
                                 <div className="user-card__value">
-                                    {new Date(user.createdAt).toLocaleDateString('ru-RU')}
+                                    {isoToRuDate(profileUser.createdAt)}
                                 </div>
                             </div>
                         </div>
