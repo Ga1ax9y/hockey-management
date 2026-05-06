@@ -2,7 +2,30 @@ import type { NextFunction, Response } from "express";
 import type { AuthRequest } from "../middlewares/authMiddleware";
 import { AppError, commonErrorDict } from "../types/AppError";
 import { TrainingStatsService } from "../services/trainingStatsService";
+import { getPagination } from "../helpers/pagination";
+import { paginatedResponse } from "../helpers/paginatedResponse";
 
+export const getTrainingStats = async (req: AuthRequest, res: Response, next: NextFunction) => {
+    try {
+
+        const { id } = req.params
+        const { page, limit, skip } = getPagination(req.query);
+        const { trainingStats, total } = await TrainingStatsService.findByPlayer({
+            playerId: id,
+            pagination: {skip,limit},
+            filters: req.query
+        })
+
+        res.json(paginatedResponse(trainingStats, total, page, limit));
+    } catch (error: any) {
+        next(new AppError(
+            commonErrorDict.serverError.name,
+            commonErrorDict.serverError.httpCode,
+            error.message,
+            "Ошибка при получении статистики тренировки игрока"
+        ));
+    }
+};
 export const createTrainingStats = async (req: AuthRequest, res: Response, next: NextFunction) => {
     try {
         const { trainingId, playerId, coachRating, description } = req.body
