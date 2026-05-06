@@ -2,6 +2,34 @@ import type { NextFunction, Response } from "express";
 import type { AuthRequest } from "../middlewares/authMiddleware";
 import { AppError, commonErrorDict } from "../types/AppError";
 import { MatchStatsService } from "../services/matchStatsService";
+import { getPagination } from "../helpers/pagination";
+import { paginatedResponse } from "../helpers/paginatedResponse";
+
+
+export const getMatchStats = async (req: AuthRequest, res: Response, next: NextFunction) => {
+    try {
+
+        const { id } = req.params
+        const { page, limit, skip } = getPagination(req.query);
+        const { matchStats, total } = await MatchStatsService.findByPlayer({
+            playerId: id,
+            pagination: {skip,limit},
+            filters: req.query
+        })
+
+        res.json(paginatedResponse(matchStats, total, page, limit));
+    } catch (error: any) {
+        if (error instanceof AppError) {
+            return next(error);
+        }
+        next(new AppError(
+            commonErrorDict.serverError.name,
+            commonErrorDict.serverError.httpCode,
+            error.message,
+            "Ошибка при получении статистики матча игрока"
+        ));
+    }
+};
 
 export const createMatchStats = async (req: AuthRequest, res: Response, next: NextFunction) => {
     try {
@@ -30,6 +58,9 @@ export const createMatchStats = async (req: AuthRequest, res: Response, next: Ne
         res.status(201).json(newMatchStats)
 
     } catch (error: any) {
+        if (error instanceof AppError) {
+            return next(error);
+        }
         next(new AppError(
             commonErrorDict.serverError.name,
             commonErrorDict.serverError.httpCode,
@@ -57,6 +88,9 @@ export const updateMatchStats = async (req: AuthRequest, res: Response, next: Ne
         res.json(updatedMatchStats)
     }
     catch (error: any) {
+        if (error instanceof AppError) {
+            return next(error);
+        }
         next(new AppError(
             commonErrorDict.serverError.name,
             commonErrorDict.serverError.httpCode,
@@ -83,6 +117,9 @@ export const upsertMatchStats = async (req: AuthRequest, res: Response, next: Ne
         const result = await MatchStatsService.upsert(req.body, orgId);
         res.status(200).json(result);
     } catch (error: any) {
+        if (error instanceof AppError) {
+            return next(error);
+        }
         next(new AppError(
             commonErrorDict.serverError.name,
             commonErrorDict.serverError.httpCode,
@@ -110,6 +147,9 @@ export const deleteMatchStats = async (req: AuthRequest, res: Response, next: Ne
             message: `Статистика матча с id ${id} успешно удален`
         })
     } catch (error: any) {
+        if (error instanceof AppError) {
+            return next(error);
+        }
         next(new AppError(
             commonErrorDict.serverError.name,
             commonErrorDict.serverError.httpCode,
