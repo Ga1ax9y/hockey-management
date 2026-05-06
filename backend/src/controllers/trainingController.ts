@@ -6,7 +6,7 @@ import { TrainingService } from "../services/trainingService";
 import { paginatedResponse } from "../helpers/paginatedResponse";
 
 export const getAllTrainings = async (req: AuthRequest, res: Response, next: NextFunction) => {
-    try{
+    try {
         const orgId = req.user?.organization.id;
         if (!orgId) {
             return next(new AppError(
@@ -24,7 +24,10 @@ export const getAllTrainings = async (req: AuthRequest, res: Response, next: Nex
 
         res.json(paginatedResponse(trainings, total, pagination.page, pagination.limit))
     }
-    catch(error: any){
+    catch (error: any) {
+        if (error instanceof AppError) {
+            return next(error);
+        }
         next(new AppError(
             commonErrorDict.serverError.name,
             commonErrorDict.serverError.httpCode,
@@ -49,7 +52,7 @@ export const getTrainingById = async (req: AuthRequest, res: Response, next: Nex
             ));
         }
         const training = await TrainingService.findById(Number(id), includeStats)
-        if (!training){
+        if (!training) {
             return next(
                 new AppError(
                     commonErrorDict.resourceNotFound.name,
@@ -62,6 +65,9 @@ export const getTrainingById = async (req: AuthRequest, res: Response, next: Nex
         res.json(training)
     }
     catch (error: any) {
+        if (error instanceof AppError) {
+            return next(error);
+        }
         next(new AppError(
             commonErrorDict.serverError.name,
             commonErrorDict.serverError.httpCode,
@@ -73,8 +79,8 @@ export const getTrainingById = async (req: AuthRequest, res: Response, next: Nex
 
 export const createTraining = async (req: AuthRequest, res: Response, next: NextFunction) => {
     try {
-        const {startTime, endTime, location, trainingType, teamId, coachId } = req.body
-        if (!startTime || !endTime  || !location || !trainingType || !teamId || !coachId) {
+        const { startTime, endTime, location, trainingType, teamId, coachId } = req.body
+        if (!startTime || !endTime || !location || !trainingType || !teamId || !coachId) {
             return next(new AppError(
                 commonErrorDict.serverError.name,
                 commonErrorDict.serverError.httpCode,
@@ -97,6 +103,9 @@ export const createTraining = async (req: AuthRequest, res: Response, next: Next
         res.status(201).json(newTraining)
 
     } catch (error: any) {
+        if (error instanceof AppError) {
+            return next(error);
+        }
         next(new AppError(
             commonErrorDict.serverError.name,
             commonErrorDict.serverError.httpCode,
@@ -109,7 +118,7 @@ export const createTraining = async (req: AuthRequest, res: Response, next: Next
 export const updateTraining = async (req: AuthRequest, res: Response, next: NextFunction) => {
     try {
         const { id } = req.params
-        const {  startTime, endTime, location, trainingType, teamId, coachId } = req.body
+        const { startTime, endTime, location, trainingType, teamId, coachId } = req.body
         const orgId = req.user?.organization.id;
 
         if (!orgId) {
@@ -124,6 +133,9 @@ export const updateTraining = async (req: AuthRequest, res: Response, next: Next
         res.json(updatedTraining)
     }
     catch (error: any) {
+        if (error instanceof AppError) {
+            return next(error);
+        }
         next(new AppError(
             commonErrorDict.serverError.name,
             commonErrorDict.serverError.httpCode,
@@ -133,7 +145,7 @@ export const updateTraining = async (req: AuthRequest, res: Response, next: Next
     }
 }
 
-export const deleteTraining = async (req: AuthRequest, res: Response, next:  NextFunction) => {
+export const deleteTraining = async (req: AuthRequest, res: Response, next: NextFunction) => {
     try {
         const { id } = req.params
         const orgId = req.user?.organization.id;
@@ -151,6 +163,9 @@ export const deleteTraining = async (req: AuthRequest, res: Response, next:  Nex
             message: `Тренировка с id ${id} успешно удален`
         })
     } catch (error: any) {
+        if (error instanceof AppError) {
+            return next(error);
+        }
         next(new AppError(
             commonErrorDict.serverError.name,
             commonErrorDict.serverError.httpCode,

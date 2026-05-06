@@ -1,4 +1,4 @@
-import type { MedicalHistoryWhereInput } from "../generated/prisma/models"
+import type { MedicalHistoryInclude, MedicalHistoryWhereInput } from "../generated/prisma/models"
 import { prisma } from "../lib/prisma";
 import { AppError, commonErrorDict } from "../types/AppError";
 
@@ -24,6 +24,7 @@ export const MedicalService = {
         const [records, total] = await Promise.all([
             prisma.medicalHistory.findMany({
                 where,
+                include: { player: {  select: { firstName: true, lastName: true }}},
                 skip,
                 take: limit,
                 orderBy: {

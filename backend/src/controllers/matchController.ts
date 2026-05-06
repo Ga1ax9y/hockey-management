@@ -31,6 +31,9 @@ export const getAllMatches = async (req: AuthRequest, res: Response, next: NextF
         res.json(paginatedResponse(matches, total, pagination.page, pagination.limit))
     }
     catch (error: any) {
+        if (error instanceof AppError) {
+            return next(error);
+        }
         next(new AppError(
             commonErrorDict.serverError.name,
             commonErrorDict.serverError.httpCode,
@@ -69,6 +72,9 @@ export const getMatchById = async (req: AuthRequest, res: Response, next: NextFu
         res.json(match)
     }
     catch (error: any) {
+        if (error instanceof AppError) {
+            return next(error);
+        }
         next(new AppError(
             commonErrorDict.serverError.name,
             commonErrorDict.serverError.httpCode,
@@ -105,6 +111,9 @@ export const createMatch = async (req: AuthRequest, res: Response, next: NextFun
         res.status(201).json(newMatch)
 
     } catch (error: any) {
+        if (error instanceof AppError) {
+            return next(error);
+        }
         next(new AppError(
             commonErrorDict.serverError.name,
             commonErrorDict.serverError.httpCode,
@@ -132,6 +141,9 @@ export const updateMatch = async (req: AuthRequest, res: Response, next: NextFun
         res.json(updatedMatch)
     }
     catch (error: any) {
+        if (error instanceof AppError) {
+            return next(error);
+        }
         next(new AppError(
             commonErrorDict.serverError.name,
             commonErrorDict.serverError.httpCode,
@@ -160,6 +172,9 @@ export const completeMatch = async (req: AuthRequest, res: Response, next: NextF
         res.json(completedMatch);
     }
     catch (error: any) {
+        if (error instanceof AppError) {
+            return next(error);
+        }
         next(new AppError(
             commonErrorDict.serverError.name,
             commonErrorDict.serverError.httpCode,
@@ -187,6 +202,9 @@ export const deleteMatch = async (req: AuthRequest, res: Response, next: NextFun
             message: `Матч с id ${id} успешно удален`
         })
     } catch (error: any) {
+        if (error instanceof AppError) {
+            return next(error);
+        }
         next(new AppError(
             commonErrorDict.serverError.name,
             commonErrorDict.serverError.httpCode,
@@ -195,5 +213,3 @@ export const deleteMatch = async (req: AuthRequest, res: Response, next: NextFun
         ))
     }
 }
-
-

@@ -50,6 +50,12 @@ export const UserService = {
                         code: true
                     }
                 },
+                organization: {
+                    select: {
+                        id: true,
+                        name: true
+                    }
+                },
                 createdAt: true
 
             }
