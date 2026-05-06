@@ -1,7 +1,6 @@
 .events-page {
     max-width: var(--container-width);
     margin-inline: auto;
-    padding: 40px var(--container-padding-x);
     font-family: var(--font-family-base);
     color: var(--color-dark);
 }
@@ -200,6 +199,12 @@
     font-size: 20px;
     margin: 0 0 10px 0;
     font-family: var(--font-family-alternate);
+    color: var(--color-dark);
+    text-decoration: none;
+}
+
+.event-card__title:hover {
+    text-decoration: underline;
 }
 
 .event-card__details {

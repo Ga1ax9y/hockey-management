@@ -1,7 +1,3 @@
-.players-page {
-    padding: 20px 0;
-}
-
 .players-page__header {
     display: flex;
     justify-content: space-between;
@@ -166,6 +162,10 @@
     text-decoration: none;
     text-transform: uppercase;
     font-size: 16px;
+}
+
+.player-entity__name:hover {
+    text-decoration: underline;
 }
 
 .player-entity__team {

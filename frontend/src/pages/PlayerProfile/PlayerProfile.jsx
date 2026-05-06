@@ -15,9 +15,11 @@ import {
 	TRANSFER_TYPE,
 	getTransferTypeLabel,
 	getMetricTypeLabel,
+	getTrainingStatusLabel,
 } from "../../utils/dicts";
 import ErrorPage from "../Error/ErrorPage";
 import { isoToRuDate } from "../../utils/date";
+import Loader from "../../components/layout/Loader/Loader";
 
 export default function PlayerProfile() {
 	const { id } = useParams();
@@ -97,21 +99,12 @@ export default function PlayerProfile() {
 	};
 
 	if (loading)
-		return (
-			<div className="player-profile-loading">Загрузка профиля...</div>
-		);
+		return <Loader	/>
 	if (error) return <ErrorPage error={error} />;
 	if (!player) return null;
 
 	return (
-		<div className="player-profile">
-			<button
-				className="player-profile__back-btn"
-				onClick={() => navigate(-1)}
-			>
-				← НАЗАД К СПИСКУ
-			</button>
-
+		<div className="player-profile container">
 			<header className="player-profile__header">
 				<div className="player-profile__avatar-container">
 					<img
@@ -182,6 +175,10 @@ export default function PlayerProfile() {
 					{matchStats.length > 0 ? (
 						<div className="player-profile__card">
 							<p>
+								<strong>Дата:</strong>{" "}
+								{isoToRuDate(matchStats[0].match.matchDate)}
+							</p>
+							<p>
 								<strong>Соперник:</strong>{" "}
 								{matchStats[0].match.opponentName}
 							</p>
@@ -211,8 +208,14 @@ export default function PlayerProfile() {
 					{trainingStats.length > 0 ? (
 						<div className="player-profile__card">
 							<p>
+								<strong>Дата:</strong>{" "}
+								{isoToRuDate(trainingStats[0].training.startTime)}
+							</p>
+							<p>
 								<strong>Тип:</strong>{" "}
-								{trainingStats[0].training.trainingType}
+								{getTrainingStatusLabel(
+									trainingStats[0].training.trainingType,
+								)}
 							</p>
 							<p>
 								<strong>Оценка тренера:</strong>{" "}
@@ -248,7 +251,7 @@ export default function PlayerProfile() {
 									)}
 									:
 								</strong>{" "}
-								{physicals[0].metricValue || "—"}
+								{physicals[0].metricValue || "—"}{" "}
 								{physicals[0].unit || "—"}
 							</p>
 						</div>
@@ -361,7 +364,7 @@ export default function PlayerProfile() {
 							</h2>
 							<button
 								className="player-profile__more-btn"
-								onClick={() => navigate(`/manager/players`)}
+								onClick={() => navigate(`/players`)}
 							>
 								КО ВСЕМ ИГРОКАМ
 							</button>

@@ -1,10 +1,21 @@
-.medical-record__form {
-    margin-bottom: 40px;
-}
+.event-card__recover-btn {
+    margin-top: 15px;
+    width: 100%;
+    padding: 12px;
 
-.medical-record__actions {
+    color: var(--color-dark);
+    font-size: 14px;
+    font-weight: 900;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+
+    border: 3px solid var(--color-dark);
+    cursor: pointer;
+
+    box-shadow: 4px 4px 0px var(--color-dark);
+    transition: all 0.1s ease;
+
     display: flex;
-    flex-direction: column;
-    gap: 10px;
-    margin-top: 20px;
+    align-items: center;
+    justify-content: center;
 }

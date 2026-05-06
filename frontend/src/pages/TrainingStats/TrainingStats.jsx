@@ -5,11 +5,14 @@ import "./TrainingStats.css";
 import TrainingProtocol from "../../components/Protocols/TrainingProtocol/TrainingProtocol";
 import { getTrainingStatusLabel } from "../../utils/dicts";
 import { formatDateTimeToRU } from "../../utils/date";
+import Loader from "../../components/layout/Loader/Loader";
+import ErrorPage from "../Error/ErrorPage";
 
 export default function TrainingStats() {
     const { id } = useParams();
     const [training, setTraining] = useState(null);
     const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
 
     const [showStats, setShowStats] = useState(false);
     const [statsLoading, setStatsLoading] = useState(false);
@@ -21,6 +24,7 @@ export default function TrainingStats() {
                 setTraining(res.data?.data || res.data);
             } catch (err) {
                 console.error("Ошибка загрузки тренировки:", err);
+                setError(err.response?.data);
             } finally {
                 setLoading(false);
             }
@@ -48,10 +52,10 @@ export default function TrainingStats() {
     };
 
     if (loading)
-        return <div className="training-stats__loader">Загрузка плана тренировки...</div>;
+        return <Loader />;
 
     if (!training)
-        return <div className="training-stats__error">Тренировка не найдена</div>;
+        return <ErrorPage error={error} />;
 
     return (
         <div className="training-stats container">

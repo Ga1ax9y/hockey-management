@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useParams, useNavigate, Link } from 'react-router-dom';
+import { useParams, Link } from 'react-router-dom';
 import {
   addTeamUser,
   removeTeamUser,
@@ -12,7 +12,6 @@ import ErrorPage from '../Error/ErrorPage';
 
 export default function TeamMembers() {
   const { id: teamId } = useParams();
-  const navigate = useNavigate();
   const [teamUsers, setTeamUsers] = useState([]);
   const [allUsers, setAllUsers] = useState([]);
   const [players, setPlayers] = useState([]);
@@ -74,13 +73,6 @@ export default function TeamMembers() {
   return (
     <div className="team-members">
       <h2>Состав и персонал команды</h2>
-      <button
-        className="members-back-btn"
-        onClick={() => navigate(`/teams/${teamId}`)}
-      >
-        ← Назад к команде
-      </button>
-
       <div className="members-section staff-section">
         <h3>Персонал команды</h3>
         {teamUsers.length === 0 ? (

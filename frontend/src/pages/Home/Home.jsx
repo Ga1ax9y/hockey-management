@@ -53,7 +53,7 @@ export default function Home() {
                 <li><Link to="/admin/roles">Управление ролями</Link></li>
               )}
               {isManager && (
-                <li><Link to="/manager/hierarchy">Иерархия команд</Link></li>
+                <li><Link to="/teams">Иерархия команд</Link></li>
               )}
             </ul>
           </div>

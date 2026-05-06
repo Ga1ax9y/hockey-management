@@ -69,9 +69,9 @@ const Schedule = ({ teamId }) => {
     const type = extendedProps.type?.toLowerCase();
 
     if (type === 'match') {
-        navigate(`/matches/${id}/stats`);
+        navigate(`/matches/${id}`);
     } else {
-        navigate(`/trainings/${id}/stats`);
+        navigate(`/trainings/${id}`);
     }
 };
 

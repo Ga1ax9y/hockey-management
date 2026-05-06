@@ -1,9 +1,15 @@
 import { useCallback, useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import { addMedicalRecord, getMedicalRecords } from "../../../services/api";
+import {
+	addMedicalRecord,
+	getMedicalRecords,
+	markPlayerRecovered,
+} from "../../../services/api";
 import { useForm } from "react-hook-form";
 import { MEDICAL_STATUS, getMedicalLabel } from "../../../utils/dicts";
 import { useRole } from "../../../hooks/useRole";
+import "./AddMedicalRecord.css";
+
 export default function AddMedicalRecord() {
 	const { id } = useParams();
 	const [isSubmitting, setIsSubmitting] = useState(false);
@@ -49,6 +55,13 @@ export default function AddMedicalRecord() {
 		loadMedicalRecords();
 	}, [loadMedicalRecords]);
 
+	const handleRecover = async (medicalId) => {
+		await markPlayerRecovered(medicalId);
+
+		const res = await getMedicalRecords(id);
+		setMedicalRecords([...(res.data.data || [])]);
+	};
+
 	return (
 		<div className="events-page">
 			<header className="events-page__header">
@@ -56,76 +69,74 @@ export default function AddMedicalRecord() {
 			</header>
 
 			{(isAdmin || isDoctor) && (
-					<section className="medical-record__form form-block">
-						<form onSubmit={handleSubmit(onSubmit)}>
-							<div className="medical-record__field form-block__field">
-								<label className="medical-record__label form-block__label">
-									Дата повреждения
-								</label>
-								<input
-									type="date"
-									className="medical-record__input form-block__input"
-									{...register("injuryDate", {
-										required: true,
-									})}
-								/>
-							</div>
-							<div className="medical-record__field form-block__field">
-								<label className="medical-record__label form-block__label">
-									Прогнозируемая дата восстановления
-								</label>
-								<input
-									type="date"
-									className="medical-record__input form-block__input"
-									{...register("recoveryDate", {
-										required: true,
-									})}
-								/>
-							</div>
-							<div className="medical-record__field form-block__field">
-								<label className="medical-record__label form-block__label">
-									Статус
-								</label>
-								<select
-									className="medical-record__input form-block__input"
-									{...register("status", {
-										required: true,
-									})}
-								>
-									<option value="" disabled selected>
-										Выберите тип
-									</option>
-									{MEDICAL_STATUS.map((t) => (
-										<option key={t.value} value={t.value}>
-											{t.label}
-										</option>
-									))}
-								</select>
-							</div>
-
-							<div className="medical-record__field form-block__field">
-								<label className="medical-record__label form-block__label">
-									Диагноз
-								</label>
-								<textarea
-									className="medical-record__textarea form-block__textarea"
-									{...register("diagnosis", {
-										required: true,
-									})}
-								></textarea>
-							</div>
-							<button
-								type="submit"
-								className="medical-record__submit form-block__submit"
-								disabled={isSubmitting}
+				<section className="medical-record__form form-block">
+					<form onSubmit={handleSubmit(onSubmit)}>
+						<div className="medical-record__field form-block__field">
+							<label className="medical-record__label form-block__label">
+								Дата повреждения
+							</label>
+							<input
+								type="date"
+								className="medical-record__input form-block__input"
+								{...register("injuryDate", {
+									required: true,
+								})}
+							/>
+						</div>
+						<div className="medical-record__field form-block__field">
+							<label className="medical-record__label form-block__label">
+								Прогнозируемая дата восстановления
+							</label>
+							<input
+								type="date"
+								className="medical-record__input form-block__input"
+								{...register("recoveryDate", {
+									required: true,
+								})}
+							/>
+						</div>
+						<div className="medical-record__field form-block__field">
+							<label className="medical-record__label form-block__label">
+								Статус
+							</label>
+							<select
+								className="medical-record__input form-block__input"
+								{...register("status", {
+									required: true,
+								})}
 							>
-								{isSubmitting
-									? "Загрузка..."
-									: "Добавить запись"}
-							</button>
-						</form>
-					</section>
-				)}
+								<option value="" disabled selected>
+									Выберите тип
+								</option>
+								{MEDICAL_STATUS.map((t) => (
+									<option key={t.value} value={t.value}>
+										{t.label}
+									</option>
+								))}
+							</select>
+						</div>
+
+						<div className="medical-record__field form-block__field">
+							<label className="medical-record__label form-block__label">
+								Диагноз
+							</label>
+							<textarea
+								className="medical-record__textarea form-block__textarea"
+								{...register("diagnosis", {
+									required: true,
+								})}
+							></textarea>
+						</div>
+						<button
+							type="submit"
+							className="medical-record__submit form-block__submit"
+							disabled={isSubmitting}
+						>
+							{isSubmitting ? "Загрузка..." : "Добавить запись"}
+						</button>
+					</form>
+				</section>
+			)}
 			<section className="medical-record__list-section">
 				<h2 className="events-page__section-title">
 					История повреждений
@@ -175,6 +186,19 @@ export default function AddMedicalRecord() {
 											)}
 										</div>
 									)}
+									{record.status !== "recovered" &&
+										(isDoctor || isAdmin) && (
+											<button
+												className="event-card__recover-btn"
+												onClick={() =>
+													handleRecover(
+														record.id,
+													)
+												}
+											>
+												ИГРОК ВОССТАНОВИЛСЯ
+											</button>
+										)}
 								</div>
 							</div>
 						))

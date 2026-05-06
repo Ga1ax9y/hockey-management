@@ -4,11 +4,14 @@ import { getMatchById } from "../../services/api";
 import "./MatchStats.css";
 import { getMatchStatusLabel } from "../../utils/dicts";
 import MatchProtocol from "../../components/Protocols/MatchProtocol/MatchProtocol";
+import Loader from "../../components/layout/Loader/Loader";
+import ErrorPage from "../Error/ErrorPage";
 
 export default function MatchStats() {
 	const { id } = useParams();
 	const [match, setMatch] = useState(null);
 	const [loading, setLoading] = useState(true);
+	const [error, setError] = useState(null);
 
 	const [showStats, setShowStats] = useState(false);
 	const [statsLoading, setStatsLoading] = useState(false);
@@ -20,6 +23,7 @@ export default function MatchStats() {
 				setMatch(res.data?.data || res.data);
 			} catch (err) {
 				console.error("Ошибка загрузки матча:", err);
+				setError(err.response?.data);
 			} finally {
 				setLoading(false);
 			}
@@ -41,16 +45,15 @@ export default function MatchStats() {
 			setShowStats(true);
 		} catch (err) {
 			alert("Не удалось загрузить подробную статистику", err);
+			setError(err.response?.data);
 		} finally {
 			setStatsLoading(false);
 		}
 	};
 
 	if (loading)
-		return (
-			<div className="match-stats__loader">Подготовка протокола...</div>
-		);
-	if (!match) return <div className="match-stats__error">Матч не найден</div>;
+		return <Loader />;
+	if (!match) return <ErrorPage error={error}/>;
 
 	return (
 		<div className="match-stats container">

@@ -15,6 +15,7 @@ import {
 	MATCH_TYPES,
 	SEASON_TYPES,
 	TRAINING_TYPES,
+	getTrainingStatusLabel
 } from "../../../utils/dicts";
 import Loader from "../../../components/layout/Loader/Loader";
 import { Link } from "react-router-dom";
@@ -423,13 +424,13 @@ function EventCard({ event }) {
 				<Link
 					to={
 						isMatch
-							? `/matches/${event.id}/stats`
-							: `/trainings/${event.id}/stats`
+							? `/matches/${event.id}`
+							: `/trainings/${event.id}`
 					}
-					className="btn"
+					className="event-card__title"
 				>
-					<h3 className="event-card__title">
-						{isMatch ? `vs ${opponentName}` : trainingType}
+					<h3>
+						{isMatch ? `vs ${opponentName}` : getTrainingStatusLabel(trainingType)}
 					</h3>
 				</Link>
 				<div className="event-card__details">

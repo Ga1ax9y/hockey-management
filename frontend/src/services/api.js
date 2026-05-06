@@ -19,10 +19,9 @@ export const getMe = () => API.get("/auth/me");
 export const getUsers = (token) => API.get("/users", {
   headers: { Authorization: `Bearer ${token}` },
 });
-export const getUserById = (id, token) =>
-  API.get(`/users/${id}`, {
-    headers: { Authorization: `Bearer ${token}` },
-  });
+export const getUserById = (id, params = {}) => {
+  return API.get(`/users/${id}${buildQuery(params)}`)
+};
 export const createUser = (formData) => API.post("/users", formData);
 
 export const getRoles = () => API.get("/roles");
@@ -89,6 +88,18 @@ export const getPhysicalRecords = (id, params = {}) => {
 }
 export const addPhysicalRecord = (id, data) =>
   API.post(`/physicals/add/${id}`, data);
+
+export const getMatchStats = (id, params = {}) => {
+  return API.get(`/match-stats/${id}/${buildQuery(params)}`)
+}
+
+export const getTransfers = (id, params = {}) => {
+  return API.get(`/transfers/${id}/${buildQuery(params)}`)
+}
+
+export const getTrainingStats = (id, params = {}) => {
+  return API.get(`/training-stats/${id}/${buildQuery(params)}`)
+}
 
 export const syncMatchStats = (data) => API.put("/match-stats/sync", data);
 export const syncTrainingStats = (data) => API.put("/training-stats/sync", data);

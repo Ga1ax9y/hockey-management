@@ -24,14 +24,14 @@ export default function AdminPanel() {
 
         {(isAdmin || isManager) && (
           <>
-            <Link to="/manager/hierarchy" className="admin-grid__card admin-card">
+            <Link to="/teams" className="admin-grid__card admin-card">
               <h2 className="admin-card__title">Иерархия команд</h2>
               <p className="admin-card__description">
                 Создание и управление хоккейными командами, привязка персонала
               </p>
               <span className="admin-card__action">Перейти →</span>
             </Link>
-            <Link to="/manager/players" className="admin-grid__card admin-card">
+            <Link to="/players" className="admin-grid__card admin-card">
               <h2 className="admin-card__title">Игроки</h2>
               <p className="admin-card__description">
                 Управление игроками, создание, редактирование и удаление
@@ -45,7 +45,7 @@ export default function AdminPanel() {
               </p>
               <span className="admin-card__action">Перейти →</span>
             </Link>
-            <Link to="/admin/users/list" className="admin-grid__card admin-card">
+            <Link to="/admin/users" className="admin-grid__card admin-card">
               <h2 className="admin-card__title">Список пользователей</h2>
               <p className="admin-card__description">
                 Просмотр всех зарегистрированных участников вашей организации

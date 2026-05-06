@@ -1,7 +1,3 @@
-.users-page {
-    padding-top: 40px;
-}
-
 .users-page__header {
     display: flex;
     justify-content: space-between;
@@ -107,6 +103,12 @@
 
 .user-info__name {
     font-weight: 700;
+    color: var(--color-dark);
+    text-decoration: none;
+}
+
+.user-info__name:hover {
+    text-decoration: underline;
 }
 
 .user-role {

@@ -59,7 +59,7 @@ export default function TeamDetails() {
 			return;
 		try {
 			await deleteTeam(id);
-			navigate("/manager/hierarchy", { replace: true });
+			navigate("/teams", { replace: true });
 		} catch (err) {
 			setError(err.response?.data);
 		}
