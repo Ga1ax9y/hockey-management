@@ -1,7 +1,3 @@
-.profile {
-    padding-bottom: var(--spacing-xl);
-}
-
 .profile__header {
     margin-bottom: 30px;
     border-left: 6px solid var(--color-dark);

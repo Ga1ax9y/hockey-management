@@ -108,7 +108,7 @@ export default function PlayerProfile() {
 			<header className="player-profile__header">
 				<div className="player-profile__avatar-container">
 					<img
-						src={player.photoUrl || "/default-avatar.png"}
+						src={player.photoUrl || "/default-player.png"}
 						alt={player.lastName}
 						className="player-profile__image"
 					/>

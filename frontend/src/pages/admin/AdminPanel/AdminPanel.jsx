@@ -16,7 +16,7 @@ export default function AdminPanel() {
           <Link to="/admin/roles" className="admin-grid__card admin-card">
             <h2 className="admin-card__title">Роли пользователей</h2>
             <p className="admin-card__description">
-              Управление ролями, создание, редактирование и удаление
+              Полное описание ролей пользователей
             </p>
             <span className="admin-card__action">Перейти →</span>
           </Link>
@@ -41,7 +41,7 @@ export default function AdminPanel() {
             <Link to="/admin/users/create" className="admin-grid__card admin-card">
               <h2 className="admin-card__title">Создать пользователя</h2>
               <p className="admin-card__description">
-                Создание учетной записи пользователя с загрузкой аватара в Cloudinary
+                Создание учетной записи пользователя
               </p>
               <span className="admin-card__action">Перейти →</span>
             </Link>
