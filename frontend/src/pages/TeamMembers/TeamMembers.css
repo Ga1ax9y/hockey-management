@@ -1,207 +1,188 @@
-.team-members {
-  max-width: 800px;
-  margin: 0 auto;
-  padding: 2rem;
+.team-members__header {
+  margin-bottom: 40px;
+  border-bottom: 5px solid var(--color-dark);
 }
 
-.team-members h2 {
-  text-align: center;
-  margin-bottom: 1.5rem;
+.team-members__title {
+  text-transform: uppercase;
+  font-weight: 900;
+  font-size: 32px;
+  margin: 0 0 10px 0;
 }
 
-.members-back-btn {
-  display: block;
-  margin-bottom: 1.5rem;
-  padding: 0.25rem 0.5rem;
-  background-color: #f0f0f0;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-  cursor: pointer;
-  color: var(--color-dark);
-  text-decoration: none;
+.team-members__section {
+  margin-bottom: 50px;
 }
 
-.members-back-btn:hover {
-  background-color: #e0e0e0;
+.team-members__empty {
+  font-weight: 700;
+  text-transform: uppercase;
+  color: var(--color-dark-alternate);
+  background: var(--color-gray);
+  padding: 20px;
+  border: 2px dashed var(--color-dark);
 }
 
-.members-section {
-  margin-bottom: 2.5rem;
-  padding: 1.5rem;
-  border: 1px solid #eee;
-  border-radius: 8px;
-  background-color: #fafafa;
+.members-block__title {
+  background: var(--color-dark);
+  color: white;
+  display: inline-block;
+  padding: 5px 15px;
+  text-transform: uppercase;
+  font-size: 14px;
+  font-weight: 900;
+  margin-bottom: 20px;
 }
 
-.members-section h3 {
-  margin-top: 0;
-  margin-bottom: 1rem;
-  color: var(--color-dark);
-}
-
-.members-list {
+.members-block__list {
   list-style: none;
   padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
 }
 
-.member-item {
+.staff-card {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 0.75rem;
-  border-bottom: 1px solid #eee;
+  background: var(--color-light);
+  border: 3px solid var(--color-dark);
+  padding: 15px 20px;
+  box-shadow: 6px 6px 0px var(--color-dark);
 }
 
-.member-item:last-child {
-  border-bottom: none;
-}
-
-.member-info {
-  flex-grow: 1;
-}
-
-.member-info strong {
-  display: block;
-  font-size: 1.1rem;
-  margin-bottom: 0.25rem;
-}
-
-.member-role {
-  background-color: var(--color-light-alternate);
-  padding: 0.125rem 0.5rem;
-  border-radius: 4px;
-  font-size: 0.875rem;
-  color: var(--color-dark-alternate);
-  margin-right: 0.5rem;
-}
-
-.member-email {
-  color: var(--color-dark-alternate);
-  font-size: 0.9rem;
-}
-
-.btn-remove {
-  background-color: #d32f2f;
-  color: white;
-  border: none;
-  padding: 0.25rem 0.75rem;
-  border-radius: 4px;
-  cursor: pointer;
-  font-size: 0.9rem;
-}
-
-.btn-remove:hover {
-  background-color: #b71c1c;
-}
-
-.add-member-form {
+.staff-card__info {
   display: flex;
-  gap: 0.75rem;
+  gap: 20px;
   align-items: center;
-  flex-wrap: wrap;
 }
 
-.add-member-form select {
-  flex-grow: 1;
-  padding: 0.5rem;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-  min-width: 200px;
+.staff-card__name {
+  font-weight: 900;
+  text-transform: uppercase;
 }
 
-.btn-add {
-  background-color: #000;
+.staff-card__role {
+  background: var(--color-dark-alternate);
   color: white;
-  border: none;
-  padding: 0.5rem 1rem;
-  border-radius: 4px;
-  cursor: pointer;
-  font-size: 1rem;
-}
-
-.btn-add:hover {
-  background-color: #333;
-}
-
-.members-loading,
-.members-error {
-  text-align: center;
-  padding: 2rem;
-}
-
-.members-error {
-  color: #d32f2f;
-}
-
-.players-section h3 {
-  color: #1976d2;
-}
-
-.staff-section h3 {
-  color: #388e3c;
-}
-
-.add-staff-section h3 {
-  color: #e65100;
-}
-
-.players-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-  gap: 1.25rem;
-  margin-top: 1rem;
-}
-
-.player-card {
-  border: 1px solid var(--color-gray);
-  border-radius: 8px;
-  padding: 1.25rem;
-  background-color: var(--color-light);
-  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-}
-
-.player-name {
-  font-size: 1.125rem;
+  padding: 2px 8px;
+  font-size: 11px;
   font-weight: 700;
-  margin-bottom: 0.75rem;
+  text-transform: uppercase;
 }
 
-.player-name a{
-  text-decoration: none;
-  color: var(--color-dark);
+.staff-card__email {
+  font-family: monospace;
+  color: #666;
 }
 
-.player-name a:hover {
-  text-decoration: underline;
+.staff-card__remove-btn {
+  background: transparent;
+  border: 2px solid #ff4757;
+  color: #ff4757;
+  font-weight: 900;
+  padding: 5px 10px;
+  cursor: pointer;
+  transition: 0.1s;
 }
 
-.player-details > div {
-  margin-bottom: 0.5rem;
-  display: flex;
-  justify-content: space-between;
+.staff-card__remove-btn:hover {
+  background: #ff4757;
+  color: white;
 }
 
-.player-details strong {
-  color: var(--color-dark-alternate);
+.members-block__table-wrapper {
+    overflow-x: auto;
+    border: 3px solid var(--color-dark);
+    box-shadow: 8px 8px 0px var(--color-dark);
+    background: var(--color-light);
 }
 
-.empty-message {
-  text-align: center;
-  color: var(--color-dark-alternate);
-  font-style: italic;
-  padding: 1rem;
+.members-table {
+    width: 100%;
+    border-collapse: collapse;
+    text-align: left;
+    font-family: var(--font-family-base);
 }
 
-.members-section {
-  margin-bottom: 2.5rem;
-  padding: 1.5rem;
-  border-radius: 8px;
-  background-color: #fafafa;
+.members-table__head {
+    background: var(--color-dark);
+    color: var(--color-light);
 }
 
-.members-section h3 {
-  margin-top: 0;
-  margin-bottom: 1.25rem;
-  padding-bottom: 0.5rem;
-  border-bottom: 2px solid var(--color-gray);
+.members-table__th {
+    padding: 15px 20px;
+    text-transform: uppercase;
+    font-weight: 900;
+    font-size: 12px;
+    letter-spacing: 1px;
+}
+
+.members-table__td {
+    padding: 12px 20px;
+    border-bottom: 2px solid var(--color-dark);
+    font-weight: 700;
+    font-size: 14px;
+}
+
+.members-table__row:last-child .members-table__td {
+    border-bottom: none;
+}
+
+.members-table__row:not(:first-child):hover {
+    background: var(--color-light-alternate);
+}
+
+.members-table__link {
+    color: var(--color-dark);
+    text-decoration: none;
+    text-transform: uppercase;
+    border-bottom: 2px solid transparent;
+    transition: 0.1s;
+}
+
+.members-table__link:hover {
+    color: var(--color-dark-alternate);
+    border-bottom-color: var(--color-dark-alternate);
+}
+
+/* Бейджи для позиций */
+.members-table__badge {
+    display: inline-block;
+    padding: 2px 8px;
+    font-size: 11px;
+    font-weight: 900;
+    text-transform: uppercase;
+    border: 2px solid var(--color-dark);
+}
+
+.members-table__badge--goalie {
+    background: var(--color-dark-alternate); /* Акцентный для вратаря */
+    color: white;
+}
+
+.members-table__badge--field {
+    background: var(--color-light);
+    color: var(--color-dark);
+}
+
+@media (max-width: 768px) {
+    .members-table__th, .members-table__td {
+        padding: 10px;
+        font-size: 12px;
+    }
+}
+
+@media (max-width: 768px) {
+  .staff-card {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 15px;
+  }
+  .staff-card__info {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 5px;
+  }
 }
