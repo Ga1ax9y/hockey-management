@@ -15,7 +15,7 @@ import {
 	MATCH_TYPES,
 	SEASON_TYPES,
 	TRAINING_TYPES,
-	getTrainingStatusLabel
+	getTrainingStatusLabel,
 } from "../../../utils/dicts";
 import Loader from "../../../components/layout/Loader/Loader";
 import { Link } from "react-router-dom";
@@ -169,14 +169,25 @@ export default function Events() {
 	}, [events]);
 
 	return (
-		<div className="events-page">
+		<div className="events-page container">
 			<header className="events-page__header">
-				<div className="events-page__controls">
+				<div className="events-page__top-bar">
 					<h1 className="events-page__title">Расписание событий</h1>
+					<button
+						className={`events-page__add-btn ${showForm ? "events-page__add-btn--active" : ""}`}
+						onClick={() => {
+							setShowForm(!showForm);
+							reset();
+						}}
+					>
+						{showForm ? "ОТМЕНИТЬ" : "ДОБАВИТЬ СОБЫТИЕ"}
+					</button>
+				</div>
 
-					<div className="events-page__team-selector">
-						<label className="events-page__selector-label">
-							Команда:
+				<div className="events-page__filter-panel">
+					<div className="events-page__selector">
+						<label className="events-page__label">
+							Фильтр по команде:
 						</label>
 						<select
 							className="events-page__select"
@@ -191,191 +202,226 @@ export default function Events() {
 						</select>
 					</div>
 				</div>
-
-				<button
-					className="events-page__add-btn"
-					onClick={() => {
-						setShowForm(!showForm);
-						reset();
-					}}
-				>
-					{showForm ? "Отмена" : "Добавить событие"}
-				</button>
 			</header>
 
 			{showForm && (
-				<form
-					className="events-page__form event-form"
-					onSubmit={handleSubmit(onSubmit)}
-				>
-					<div className="event-form__field">
-						<label className="event-form__label">Тип события</label>
-						<select
-							className="event-form__input"
-							{...register("eventType")}
-						>
-							<option value="TRAINING">Тренировка</option>
-							<option value="MATCH">Матч</option>
-						</select>
-					</div>
+				<section className="events-page__form-section">
+					<form
+						className="events-page__form form-block"
+						onSubmit={handleSubmit(onSubmit)}
+					>
 
-					<div className="event-form__row">
-						<div className="event-form__field">
-							<label className="event-form__label">Начало</label>
-							<input
-								type="datetime-local"
-								className="event-form__input"
-								{...register("startTime", { required: true })}
-							/>
+						<div className="form-block__field">
+							<label className="form-block__label">
+								Тип события
+							</label>
+							<select
+								className="form-block__select"
+								{...register("eventType")}
+							>
+								<option value="TRAINING">Тренировка</option>
+								<option value="MATCH">Матч</option>
+							</select>
 						</div>
-						{eventType === "TRAINING" && (
-							<div className="event-form__field">
-								<label className="event-form__label">
-									Конец
+
+						<div className="form-block__row">
+							<div className="form-block__field">
+								<label className="form-block__label">
+									Начало
 								</label>
 								<input
 									type="datetime-local"
-									className="event-form__input"
-									{...register("endTime")}
-								/>
-							</div>
-						)}
-					</div>
-
-					<div className="event-form__field">
-						<label className="event-form__label">
-							Для какой команды?
-						</label>
-						<select
-							className="event-form__input"
-							{...register("teamId", { required: true })}
-						>
-							<option value="">Выберите команду...</option>
-							{teams.map((t) => (
-								<option key={t.id} value={t.id}>
-									{t.name}
-								</option>
-							))}
-						</select>
-					</div>
-
-					<div className="event-form__field">
-						<label className="event-form__label">Локация</label>
-						<input
-							className="event-form__input"
-							{...register("location", { required: true })}
-						/>
-					</div>
-
-					{eventType === "MATCH" ? (
-						<div className="event-form__row">
-							<select
-								className="event-form__input"
-								{...register("isHomeGame")}
-							>
-								<option value="true">Дома</option>
-								<option value="false">Выезд</option>
-							</select>
-							<input
-								className="event-form__input"
-								placeholder="Соперник"
-								{...register("opponentName", {
-									required: true,
-								})}
-							/>
-							<select
-								className="event-form__input"
-								placeholder="Тип (Лед, Зал)"
-								{...register("matchType", {
-									required: true,
-								})}
-							>
-								{MATCH_TYPES.map((t) => (
-									<option key={t.value} value={t.value}>
-										{t.label}
-									</option>
-								))}
-							</select>
-							<select
-								className="event-form__input"
-								{...register("season", { required: true })}
-								defaultValue="2025/2026"
-							>
-								<option value="" disabled>
-									Выберите сезон
-								</option>
-								{SEASON_TYPES.map((season) => (
-									<option key={season} value={season}>
-										{season}
-									</option>
-								))}
-							</select>
-						</div>
-					) : (
-						<>
-							<div className="event-form__field">
-								<select
-									className="event-form__input"
-									placeholder="Тип (Лед, Зал)"
-									{...register("trainingType", {
+									className="form-block__input"
+									{...register("startTime", {
 										required: true,
 									})}
-								>
-									{TRAINING_TYPES.map((t) => (
-										<option key={t.value} value={t.value}>
-											{t.label}
-										</option>
-									))}
-								</select>
+								/>
 							</div>
-							<div className="event-form__field">
-								<label className="event-form__label">
-									Тренер
+							{eventType === "TRAINING" && (
+								<div className="form-block__field">
+									<label className="form-block__label">
+										Конец
+									</label>
+									<input
+										type="datetime-local"
+										className="form-block__input"
+										{...register("endTime")}
+									/>
+								</div>
+							)}
+						</div>
+
+						<div className="form-block__row">
+							<div className="form-block__field">
+								<label className="form-block__label">
+									Команда
 								</label>
 								<select
-									className="event-form__input"
-									disabled={!createTeamId}
-									{...register("coachId", {
-										required: eventType === "TRAINING",
-									})}
+									className="form-block__select"
+									{...register("teamId", { required: true })}
 								>
-									<option value="">
-										{createTeamId
-											? "Выберите тренера"
-											: "Сначала выберите команду"}
-									</option>
-									{coaches.map((c) => (
-										<option key={c.id} value={c.id}>
-											{c.fullName} ({c.email})
+									<option value="">Выберите...</option>
+									{teams.map((t) => (
+										<option key={t.id} value={t.id}>
+											{t.name}
 										</option>
 									))}
 								</select>
 							</div>
-						</>
-					)}
+							<div className="form-block__field">
+								<label className="form-block__label">
+									Локация
+								</label>
+								<input
+									className="form-block__input"
+									{...register("location", {
+										required: true,
+									})}
+								/>
+							</div>
+						</div>
 
-					<button type="submit" className="event-form__submit">
-						Создать запись
-					</button>
-				</form>
+						{eventType === "MATCH" ? (
+							<>
+								<div className="form-block__row">
+									<div className="form-block__field">
+										<label className="form-block__label">
+											Место
+										</label>
+										<select
+											className="form-block__select"
+											{...register("isHomeGame")}
+										>
+											<option value="true">Дома</option>
+											<option value="false">Выезд</option>
+										</select>
+									</div>
+									<div className="form-block__field">
+										<label className="form-block__label">
+											Соперник
+										</label>
+										<input
+											className="form-block__input"
+											{...register("opponentName", {
+												required: true,
+											})}
+										/>
+									</div>
+								</div>
+								<div className="form-block__row">
+									<div className="form-block__field">
+										<label className="form-block__label">
+											Тип
+										</label>
+										<select
+											className="form-block__input"
+											placeholder="Тип (Лед, Зал)"
+											{...register("matchType", {
+												required: true,
+											})}
+										>
+											{MATCH_TYPES.map((t) => (
+												<option
+													key={t.value}
+													value={t.value}
+												>
+													{t.label}
+												</option>
+											))}
+										</select>
+									</div>
+									<div className="form-block__field">
+										<label className="form-block__label">
+											Сезон
+										</label>
+										<select
+											className="form-block__input"
+											{...register("season", {
+												required: true,
+											})}
+											defaultValue="2025/2026"
+										>
+											<option value="" disabled>
+												Выберите сезон
+											</option>
+											{SEASON_TYPES.map((season) => (
+												<option
+													key={season}
+													value={season}
+												>
+													{season}
+												</option>
+											))}
+										</select>
+									</div>
+								</div>
+							</>
+						) : (
+							<div className="form-block__row">
+								<div className="form-block__field">
+									<label className="form-block__label">
+										Тип тренировки
+									</label>
+									<select
+										className="form-block__select"
+										{...register("trainingType", {
+											required: true,
+										})}
+									>
+										{TRAINING_TYPES.map((t) => (
+											<option
+												key={t.value}
+												value={t.value}
+											>
+												{t.label}
+											</option>
+										))}
+									</select>
+								</div>
+								<div className="form-block__field">
+									<label className="form-block__label">
+										Тренер
+									</label>
+									<select
+										className="form-block__select"
+										disabled={!createTeamId}
+										{...register("coachId")}
+									>
+										<option value="">
+											{createTeamId
+												? "Выберите..."
+												: "Сначала выберите команду"}
+										</option>
+										{coaches.map((c) => (
+											<option key={c.id} value={c.id}>
+												{c.fullName}
+											</option>
+										))}
+									</select>
+								</div>
+							</div>
+						)}
+
+						<button type="submit" className="form-block__submit">
+							СОЗДАТЬ ЗАПИСЬ
+						</button>
+					</form>
+				</section>
 			)}
 
 			<main className="events-page__content">
 				{loading ? (
 					<Loader />
 				) : (
-					<>
-						<section className="events-page__section">
+					<div className="events-page__layout">
+						<section className="events-page__column">
 							<h2 className="events-page__section-title">
 								Предстоящие
 							</h2>
 							<div className="events-page__list">
 								{upcoming.length > 0 ? (
 									upcoming.map((e) => (
-										<EventCard
-											key={`${e.type}-${e.id}`}
-											event={e}
-										/>
+										<EventCard key={e.id} event={e} />
 									))
 								) : (
 									<p className="events-page__empty">
@@ -385,20 +431,17 @@ export default function Events() {
 							</div>
 						</section>
 
-						<section className="events-page__section events-page__section--past">
+						<section className="events-page__column events-page__column--past">
 							<h2 className="events-page__section-title">
 								История
 							</h2>
 							<div className="events-page__list">
 								{past.map((e) => (
-									<EventCard
-										key={`${e.type}-${e.id}`}
-										event={e}
-									/>
+									<EventCard key={e.id} event={e} />
 								))}
 							</div>
 						</section>
-					</>
+					</div>
 				)}
 			</main>
 		</div>
@@ -410,36 +453,44 @@ function EventCard({ event }) {
 	const isMatch = event.type === "MATCH";
 
 	return (
-		<div className={`event-card event-card--${event.type.toLowerCase()}`}>
+		<article
+			className={`event-card event-card--${event.type.toLowerCase()}`}
+		>
 			<div className="event-card__side-indicator"></div>
-			<div className="event-card__content">
-				<div className="event-card__meta">
-					<span className="event-card__type">
+			<div className="event-card__body">
+				<header className="event-card__header">
+					<span className="event-card__badge">
 						{isMatch ? "МАТЧ" : "ТРЕНИРОВКА"}
 					</span>
-					<span className="event-card__time">
+					<time className="event-card__time">
 						{formatDateTimeToRU(event.start)}
-					</span>
-				</div>
+					</time>
+				</header>
+
 				<Link
 					to={
 						isMatch
 							? `/matches/${event.id}`
 							: `/trainings/${event.id}`
 					}
-					className="event-card__title"
+					className="event-card__title-link"
 				>
-					<h3>
-						{isMatch ? `vs ${opponentName}` : getTrainingStatusLabel(trainingType)}
+					<h3 className="event-card__title">
+						{isMatch
+							? `vs ${opponentName}`
+							: getTrainingStatusLabel(trainingType)}
 					</h3>
 				</Link>
-				<div className="event-card__details">
-					<span className="event-card__location">📍 {location}</span>
+
+				<footer className="event-card__footer">
+					<span className="event-card__info">📍 {location}</span>
 					{isMatch && event.status === "finished" && (
-						<span className="event-card__score">📊 {score}</span>
+						<span className="event-card__score">
+							Финальный счет: {score}
+						</span>
 					)}
-				</div>
+				</footer>
 			</div>
-		</div>
+		</article>
 	);
 }
