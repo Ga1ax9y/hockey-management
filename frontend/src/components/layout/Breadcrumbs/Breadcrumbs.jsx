@@ -21,6 +21,8 @@ const Breadcrumbs = () => {
     "admin": "Панель администратора",
     "members": "Участники",
     "transfers": "Трансферы",
+    "login": "Вход",
+    "register": "Регистрация",
   };
 
   return (
