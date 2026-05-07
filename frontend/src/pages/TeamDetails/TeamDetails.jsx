@@ -3,9 +3,9 @@ import { useParams, useNavigate } from "react-router-dom";
 import { getTeamById, updateTeam, deleteTeam } from "../../services/api";
 import "./TeamDetails.css";
 import { useRole } from "../../hooks/useRole";
-import Schedule from "../../components/Schedule/Schedule";
+import Loader from "../../components/layout/Loader/Loader";
 import ErrorPage from "../Error/ErrorPage";
-
+import Schedule from "../../components/Schedule/Schedule";
 export default function TeamDetails() {
 	const { id } = useParams();
 	const navigate = useNavigate();
@@ -29,7 +29,7 @@ export default function TeamDetails() {
 			setEditForm(res.data);
 			setError("");
 		} catch (err) {
-			setError(err.response?.data);
+			setError(err.response?.data || "Ошибка загрузки данных");
 		} finally {
 			setLoading(false);
 		}
@@ -46,40 +46,47 @@ export default function TeamDetails() {
 			setTeam(editForm);
 			setIsEditing(false);
 		} catch (err) {
-			setError(err.response?.data);
+			setError(err.response?.data || "Ошибка при обновлении");
 		}
 	};
 
 	const handleDelete = async () => {
-		if (
-			!confirm(
-				"Вы уверены, что хотите удалить эту команду? Это действие нельзя отменить.",
-			)
-		)
-			return;
+		if (!confirm("Вы уверены? Это действие нельзя отменить.")) return;
 		try {
 			await deleteTeam(id);
 			navigate("/teams", { replace: true });
 		} catch (err) {
-			setError(err.response?.data);
+			setError(err.response?.data || "Ошибка при удалении");
 		}
 	};
 
-	if (loading) return <div className="team-detail-loading">Загрузка...</div>;
+	if (loading) return <Loader />;
 	if (error) return <ErrorPage error={error} />;
 	if (!team) return null;
 
 	return (
-		<>
-			<div className="team-detail">
-				<h2>Команда: {team.name}</h2>
+		<div className="team-details container">
+			<header className="team-details__header">
+				<h1 className="team-details__title">
+					{isEditing
+						? "Редактирование команды"
+						: `Команда: ${team.name}`}
+				</h1>
+			</header>
 
+			<div className="team-details__content">
 				{isEditing ? (
-					<form className="team-edit-form" onSubmit={handleUpdate}>
-						<div className="form-group">
-							<label>Название команды *</label>
+					<form
+						className="team-details__form form-block"
+						onSubmit={handleUpdate}
+					>
+						<div className="team-details__field form-block__field">
+							<label className="team-details__label form-block__label">
+								Название команды *
+							</label>
 							<input
 								type="text"
+								className="team-details__input form-block__input"
 								value={editForm.name}
 								onChange={(e) =>
 									setEditForm({
@@ -90,23 +97,50 @@ export default function TeamDetails() {
 								required
 							/>
 						</div>
-						<div className="form-group">
-							<label>Лига</label>
-							<input
-								type="text"
-								value={editForm.league || ""}
-								onChange={(e) =>
-									setEditForm({
-										...editForm,
-										league: e.target.value,
-									})
-								}
-							/>
+
+						<div className="form-block__row">
+							<div className="team-details__field form-block__field">
+								<label className="team-details__label form-block__label">
+									Лига
+								</label>
+								<input
+									type="text"
+									className="team-details__input form-block__input"
+									value={editForm.league || ""}
+									onChange={(e) =>
+										setEditForm({
+											...editForm,
+											league: e.target.value,
+										})
+									}
+								/>
+							</div>
+							<div className="team-details__field form-block__field">
+								<label className="team-details__label form-block__label">
+									Сезон *
+								</label>
+								<input
+									type="text"
+									className="team-details__input form-block__input"
+									value={editForm.season}
+									onChange={(e) =>
+										setEditForm({
+											...editForm,
+											season: e.target.value,
+										})
+									}
+									required
+								/>
+							</div>
 						</div>
-						<div className="form-group">
-							<label>Уровень *</label>
+
+						<div className="team-details__field form-block__field">
+							<label className="team-details__label form-block__label">
+								Уровень *
+							</label>
 							<input
 								type="number"
+								className="team-details__input form-block__input"
 								min="1"
 								max="10"
 								value={editForm.level}
@@ -119,90 +153,80 @@ export default function TeamDetails() {
 								required
 							/>
 						</div>
-						<div className="form-group">
-							<label>Сезон *</label>
-							<input
-								type="text"
-								value={editForm.season}
-								onChange={(e) =>
-									setEditForm({
-										...editForm,
-										season: e.target.value,
-									})
-								}
-								required
-							/>
-						</div>
-						<div className="form-actions">
-							<button type="submit" className="btn-primary">
-								Сохранить
+
+						<div className="team-details__form-actions">
+							<button
+								type="submit"
+								className="team-details__submit form-block__submit"
+							>
+								Сохранить изменения
 							</button>
 							<button
 								type="button"
+								className="team-details__cancel form-block__secondary-btn"
 								onClick={() => setIsEditing(false)}
-								className="btn-secondary"
 							>
 								Отмена
 							</button>
 						</div>
 					</form>
 				) : (
-					<div className="team-info">
-						<p>
-							<strong>ID:</strong> {team.id}
-						</p>
-						<p>
-							<strong>Название:</strong> {team.name}
-						</p>
-						<p>
-							<strong>Лига:</strong> {team.league || "—"}
-						</p>
-						<p>
-							<strong>Уровень:</strong> {team.level}
-						</p>
-						<p>
-							<strong>Сезон:</strong> {team.season}
-						</p>
-					</div>
-				)}
+					<div className="team-details__card team-card">
+						<div className="team-card__info">
+							<div className="team-card__group">
+								<span className="team-card__label">Лига</span>
+								<span className="team-card__value team-card__value--accent">
+									{team.league || "Вне лиги"}
+								</span>
+							</div>
+							<div className="team-card__group">
+								<span className="team-card__label">
+									Уровень системы
+								</span>
+								<span className="team-card__value">
+									{team.level}
+								</span>
+							</div>
+							<div className="team-card__group">
+								<span className="team-card__label">Сезон</span>
+								<span className="team-card__value">
+									{team.season}
+								</span>
+							</div>
+						</div>
 
-				{!isEditing && (
-					<div className="team-actions">
-						{(isAdmin || isManager) && (
-							<>
-								<button
-									onClick={() => setIsEditing(true)}
-									className="btn-primary"
-								>
-									Редактировать
-								</button>
-								<button
-									onClick={handleDelete}
-									className="btn-danger"
-								>
-									Удалить команду
-								</button>
-							</>
-						)}
-						<button
-							onClick={() => navigate(`/teams/${id}/members`)}
-							className="btn-primary"
-						>
-							Состав
-						</button>
-						<button
-							onClick={() => navigate(-1)}
-							className="btn-secondary"
-						>
-							Назад
-						</button>
+						<footer className="team-card__actions">
+							<button
+								className="team-card__btn team-card__btn--main"
+								onClick={() => navigate(`/teams/${id}/members`)}
+							>
+								ПОСМОТРЕТЬ СОСТАВ
+							</button>
+
+							{(isAdmin || isManager) && (
+								<div className="team-card__admin-zone">
+									<button
+										className="team-card__btn"
+										onClick={() => setIsEditing(true)}
+									>
+										РЕДАКТИРОВАТЬ
+									</button>
+									<button
+										className="team-card__btn team-card__btn--danger"
+										onClick={handleDelete}
+									>
+										УДАЛИТЬ
+									</button>
+								</div>
+							)}
+						</footer>
 					</div>
 				)}
+				<div className="team-schedule container">
+					<h2>Расписание</h2>
+					<Schedule teamId={team.id} />
+				</div>
 			</div>
-			<div className="team-schedule container">
-				<h2>Расписание</h2>
-				<Schedule teamId={team.id} />
-			</div>
-		</>
+		</div>
 	);
 }
