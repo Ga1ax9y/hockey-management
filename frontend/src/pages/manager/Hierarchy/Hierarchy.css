@@ -1,144 +1,138 @@
-.hierarchy {
-  max-width: 900px;
-  margin: 0 auto;
-  padding: 1.5rem;
-}
-
-.hierarchy h2 {
-  margin-bottom: 1.5rem;
-  text-align: center;
-}
-
-.hierarchy-add-btn {
-  display: block;
-  margin: 0 auto 1.5rem;
-  padding: 0.5rem 1.5rem;
-  background-color: #000;
-  color: white;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-  font-size: 1rem;
-}
-
-.hierarchy-add-btn:hover {
-  background-color: #333;
-}
-
-.hierarchy-create-form {
-  background-color: #f9f9f9;
-  padding: 1.5rem;
-  border-radius: 8px;
-  margin-bottom: 2rem;
-  border: 1px solid #eee;
-}
-
-.form-group {
-  margin-bottom: 1rem;
-}
-
-.form-group label {
-  display: block;
-  margin-bottom: 0.25rem;
-  font-weight: 600;
-}
-
-.form-group input {
-  width: 100%;
-  padding: 0.5rem;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-  font-size: 1rem;
-  box-sizing: border-box;
-}
-
-.form-group small {
-  display: block;
-  color: var(--color-dark-alternate);
-  font-size: 0.875rem;
-  margin-top: 0.25rem;
-}
-
-.hierarchy-submit-btn {
-  background-color: #000;
-  color: white;
-  border: none;
-  padding: 0.5rem 1.5rem;
-  border-radius: 4px;
-  cursor: pointer;
-  font-size: 1rem;
-}
-
-.hierarchy-submit-btn:hover {
-  background-color: #333;
-}
-
-.hierarchy-tree {
-  margin-top: 2rem;
-}
-
-.hierarchy-level {
-  margin-bottom: 2rem;
-}
-
-.hierarchy-level h3 {
-  color: var(--color-dark);
-  border-bottom: 2px solid var(--color-gray);
-  padding-bottom: 0.5rem;
-  margin-bottom: 1rem;
-}
-
-.hierarchy-level-teams {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-  gap: 1rem;
-}
-
-.hierarchy-team-card {
-  border: 1px solid #eee;
-  border-radius: 8px;
-  padding: 1rem;
-  background-color: white;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-}
-
-.team-name {
-  font-weight: 700;
-  font-size: 1.125rem;
-  margin-bottom: 0.5rem;
-}
-
-.team-meta {
+/* .hierarchy{
   display: flex;
-  gap: 0.75rem;
-  flex-wrap: wrap;
+  flex-direction: column;
+  gap: 40px;
+  justify-content: center;
+  align-items: center;
+} */
+.hierarchy__header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 30px;
+    border-bottom: 4px solid var(--color-dark);
+    padding-bottom: 15px;
 }
 
-.team-league,
-.team-season {
-  background-color: var(--color-light-alternate);
-  padding: 0.125rem 0.5rem;
-  border-radius: 4px;
-  font-size: 0.875rem;
-  color: var(--color-dark-alternate);
+.hierarchy__title {
+    text-transform: uppercase;
+    font-size: 32px;
+    margin: 0;
 }
 
-.hierarchy-empty,
-.hierarchy-loading,
-.hierarchy-error {
-  text-align: center;
-  padding: 2rem;
+.hierarchy__add-btn {
+    border: 3px solid var(--color-dark);
+    background-color: var(--color-light);
+    padding: 10px 20px;
+    font-weight: 900;
+    text-transform: uppercase;
+    cursor: pointer;
+    box-shadow: 4px 4px 0px var(--color-dark);
+    transition: 0.1s;
 }
 
-.hierarchy-error {
-  color: #d32f2f;
+.hierarchy__add-btn:hover {
+    transform: translate(-2px, -2px);
+    box-shadow: 6px 6px 0px var(--color-dark);
 }
 
-.hierarchy-team-card.clickable {
-  cursor: pointer;
-  transition: box-shadow 0.2s;
+.hierarchy__add-btn--active {
+    background: var(--color-dark);
+    color: var(--color-light);
 }
 
-.hierarchy-team-card.clickable:hover {
-  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+.hierarchy__create-wrapper {
+
+    margin-bottom: 40px;
+    max-width: 700px;
+}
+
+.hierarchy__tree {
+    display: flex;
+    flex-direction: column;
+    gap: 40px;
+}
+
+.hierarchy__level {
+    position: relative;
+}
+
+
+.hierarchy__level-badge {
+    display: inline-block;
+    background: var(--color-dark);
+    color: white;
+    padding: 4px 12px;
+    font-weight: 900;
+    text-transform: uppercase;
+    font-size: 14px;
+    margin-bottom: 15px;
+}
+
+.hierarchy__level-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 20px;
+}
+
+.hierarchy__team-card {
+    background: var(--color-light);
+    border: 3px solid var(--color-dark);
+    padding: 20px;
+    cursor: pointer;
+    box-shadow: 6px 6px 0px var(--color-dark);
+    transition: 0.1s;
+}
+
+.hierarchy__team-card:hover {
+    transform: translate(-3px, -3px);
+    box-shadow: 9px 9px 0px var(--color-dark-alternate);
+}
+
+.hierarchy__team-name {
+    font-size: 20px;
+    font-weight: 900;
+    text-transform: uppercase;
+    margin: 0 0 10px 0;
+}
+
+.hierarchy__team-meta {
+    display: flex;
+    gap: 15px;
+    font-size: 12px;
+    font-weight: 700;
+}
+
+.hierarchy__team-league {
+    color: var(--color-dark-alternate);
+}
+
+.hierarchy__help {
+    margin-top: 5px;
+    color: #666;
+    font-style: italic;
+}
+
+.hierarchy__status {
+    text-align: center;
+    padding: 100px;
+    font-weight: 900;
+    font-size: 24px;
+    text-transform: uppercase;
+}
+
+.hierarchy__status--error {
+    color: var(--color-error);
+}
+
+@media (max-width: 600px) {
+    .hierarchy__header {
+        flex-direction: column;
+        gap: 20px;
+        align-items: flex-start;
+    }
+
+    .hierarchy__level-grid {
+        grid-template-columns: 1fr;
+    }
 }
