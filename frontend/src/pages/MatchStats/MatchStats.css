@@ -27,6 +27,15 @@
     flex-direction: column;
 }
 
+.match-score__team-link{
+    color: var(--color-light);
+    text-decoration: none;
+}
+
+.match-score__team-link:hover {
+    text-decoration: underline;
+}
+
 .match-score__team--home { align-items: flex-start; }
 .match-score__team--away { align-items: flex-end; }
 

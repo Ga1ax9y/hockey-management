@@ -1,17 +1,20 @@
 import React, { useState, useEffect } from "react";
-import { useParams } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 import { getMatchById } from "../../services/api";
 import "./MatchStats.css";
 import { getMatchStatusLabel } from "../../utils/dicts";
 import MatchProtocol from "../../components/Protocols/MatchProtocol/MatchProtocol";
 import Loader from "../../components/layout/Loader/Loader";
 import ErrorPage from "../Error/ErrorPage";
+import { isoToRuDate } from "../../utils/date";
+import { useRole } from "../../hooks/useRole";
 
 export default function MatchStats() {
 	const { id } = useParams();
 	const [match, setMatch] = useState(null);
 	const [loading, setLoading] = useState(true);
 	const [error, setError] = useState(null);
+	const  {isAdmin, isAnalyst} = useRole();
 
 	const [showStats, setShowStats] = useState(false);
 	const [statsLoading, setStatsLoading] = useState(false);
@@ -51,15 +54,18 @@ export default function MatchStats() {
 		}
 	};
 
-	if (loading)
-		return <Loader />;
-	if (!match) return <ErrorPage error={error}/>;
+	if (loading) return <Loader />;
+	if (!match) return <ErrorPage error={error} />;
 
 	return (
 		<div className="match-stats container">
 			<header className="match-stats__header match-score">
 				<div className="match-score__team match-score__team--home">
-					<h2 className="match-score__name">{match.myTeam?.name}</h2>
+					<h2 className="match-score__name">
+					<Link to={`/teams/${match.myTeam?.id}`} className="match-score__team-link">
+					{match.myTeam?.name}
+					</Link>
+					</h2>
 					<span className="match-score__city">Дома</span>
 				</div>
 
@@ -82,7 +88,7 @@ export default function MatchStats() {
 				<div className="match-info__item">
 					<span className="match-info__label">Дата:</span>
 					<span className="match-info__value">
-						{new Date(match.matchDate).toLocaleDateString("ru-RU")}
+						{isoToRuDate(match.matchDate)}
 					</span>
 				</div>
 				<div className="match-info__item">
@@ -146,8 +152,18 @@ export default function MatchStats() {
 														"—"}
 												</td>
 												<td className="player-stats__name">
-													{record.player?.lastName}{" "}
-													{record.player?.firstName}
+													<Link
+														to={`/players/${record.player?.id}`}
+													>
+														{
+															record.player
+																?.lastName
+														}{" "}
+														{
+															record.player
+																?.firstName
+														}
+													</Link>
 												</td>
 												<td>{record.goals}</td>
 												<td>{record.assists}</td>
@@ -199,7 +215,7 @@ export default function MatchStats() {
 					</div>
 				)}
 			</section>
-			<MatchProtocol />
+			{(isAdmin || isAnalyst) && <MatchProtocol />}
 		</div>
 	);
 }
