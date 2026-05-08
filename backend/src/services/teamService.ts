@@ -142,7 +142,7 @@ export const TeamService = {
                 skip,
                 take: limit,
                 orderBy: {
-                    [query.sortBy || "createdAt"]: query.order || "desc"
+                    [query.sortBy || "createdAt"]: query.order || "asc"
                 }
             }),
             prisma.team.count({ where })
