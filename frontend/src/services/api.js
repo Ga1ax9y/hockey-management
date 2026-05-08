@@ -30,7 +30,9 @@ export const createRole = (data) => API.post("/roles", data);
 export const updateRole = (id, data) => API.put(`/roles/${id}`, data);
 export const deleteRole = (id) => API.delete(`/roles/${id}`);
 
-export const getTeams = () => API.get("/teams");
+export const getTeams = (params = {}) => {
+  return API.get(`/teams/${buildQuery(params)}`)
+};
 export const getTeamById = (id, params = {}) => {
   return API.get(`/teams/${id}${buildQuery(params)}`)
 }
