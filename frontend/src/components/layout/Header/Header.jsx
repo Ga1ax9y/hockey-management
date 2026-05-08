@@ -45,10 +45,10 @@ export default function Header() {
             <Link to="/login">Войти</Link>
           </li> }
            {isAdmin && <li>
-            <Link to="/admin">Управление</Link>
+            <Link to="/management">Управление</Link>
           </li>}
           {(isManager || isAdmin) && <li>
-            <Link to="/teams">Иерархия</Link>
+            <Link to="/management/teams">Иерархия</Link>
           </li>}
           {(isCoach || isAdmin) && <li>
             <Link to="/events">События</Link>
@@ -78,13 +78,13 @@ export default function Header() {
             <Link to="/login" onClick={toggleMenu}>Войти</Link>
           </li> }
            {isAdmin && <li>
-            <Link to="/admin" onClick={toggleMenu}>Управление</Link>
+            <Link to="/management" onClick={toggleMenu}>Управление</Link>
           </li>}
           {(isManager || isAdmin) && <li>
-            <Link to="/teams" onClick={toggleMenu}>Иерархия</Link>
+            <Link to="/management/teams" onClick={toggleMenu}>Иерархия</Link>
           </li>}
           {(isCoach || isAdmin) && <li>
-            <Link to="/events" onClick={toggleMenu}>Тренировки</Link>
+            <Link to="/events" onClick={toggleMenu}>События</Link>
           </li>}
           {isAuthenticated && (
             <>

@@ -364,7 +364,7 @@ export default function PlayerProfile() {
 							</h2>
 							<button
 								className="player-profile__more-btn"
-								onClick={() => navigate(`/players`)}
+								onClick={() => navigate(`/management/players`)}
 							>
 								КО ВСЕМ ИГРОКАМ
 							</button>

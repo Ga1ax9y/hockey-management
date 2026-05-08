@@ -40,7 +40,7 @@ const Layout = () => {
 	const shouldShowBreadcrumbs = !hideBreadcrumbsRoutes.includes(
 		location.pathname,
 	);
-	
+
 	return (
 		<>
 			<Header />
@@ -84,7 +84,7 @@ const router = createBrowserRouter([
 				),
 			},
 			{
-				path: "/admin",
+				path: "/management",
 				element: (
 					<ProtectedRoute>
 						<AdminPanel />
@@ -93,7 +93,7 @@ const router = createBrowserRouter([
 			},
 
 			{
-				path: "/admin/users/create",
+				path: "/management/users/create",
 				element: (
 					<ProtectedRoute>
 						<Users />
@@ -101,7 +101,7 @@ const router = createBrowserRouter([
 				),
 			},
 			{
-				path: "/admin/users",
+				path: "/management/users",
 				element: (
 					<ProtectedRoute>
 						<UsersList />
@@ -109,7 +109,7 @@ const router = createBrowserRouter([
 				),
 			},
 			{
-				path: "/admin/roles",
+				path: "/management/roles",
 				element: (
 					<ProtectedRoute>
 						<Roles />
@@ -117,7 +117,7 @@ const router = createBrowserRouter([
 				),
 			},
 			{
-				path: "/teams",
+				path: "/management/teams",
 				element: (
 					<ProtectedRoute>
 						<Hierarchy />
@@ -125,7 +125,7 @@ const router = createBrowserRouter([
 				),
 			},
 			{
-				path: "/players",
+				path: "/management/players",
 				element: (
 					<ProtectedRoute>
 						<Players />

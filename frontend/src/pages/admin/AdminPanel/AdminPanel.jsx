@@ -13,7 +13,7 @@ export default function AdminPanel() {
 
       <div className="admin-page__grid admin-grid">
         {isAdmin && (
-          <Link to="/admin/roles" className="admin-grid__card admin-card">
+          <Link to="/management/roles" className="admin-grid__card admin-card">
             <h2 className="admin-card__title">Роли пользователей</h2>
             <p className="admin-card__description">
               Полное описание ролей пользователей
@@ -24,28 +24,28 @@ export default function AdminPanel() {
 
         {(isAdmin || isManager) && (
           <>
-            <Link to="/teams" className="admin-grid__card admin-card">
+            <Link to="/management/teams" className="admin-grid__card admin-card">
               <h2 className="admin-card__title">Иерархия команд</h2>
               <p className="admin-card__description">
                 Создание и управление хоккейными командами, привязка персонала
               </p>
               <span className="admin-card__action">Перейти →</span>
             </Link>
-            <Link to="/players" className="admin-grid__card admin-card">
+            <Link to="/management/players" className="admin-grid__card admin-card">
               <h2 className="admin-card__title">Игроки</h2>
               <p className="admin-card__description">
                 Управление игроками, создание, редактирование и удаление
               </p>
               <span className="admin-card__action">Перейти →</span>
             </Link>
-            <Link to="/admin/users/create" className="admin-grid__card admin-card">
+            <Link to="/management/users/create" className="admin-grid__card admin-card">
               <h2 className="admin-card__title">Создать пользователя</h2>
               <p className="admin-card__description">
                 Создание учетной записи пользователя
               </p>
               <span className="admin-card__action">Перейти →</span>
             </Link>
-            <Link to="/admin/users" className="admin-grid__card admin-card">
+            <Link to="/management/users" className="admin-grid__card admin-card">
               <h2 className="admin-card__title">Список пользователей</h2>
               <p className="admin-card__description">
                 Просмотр всех зарегистрированных участников вашей организации

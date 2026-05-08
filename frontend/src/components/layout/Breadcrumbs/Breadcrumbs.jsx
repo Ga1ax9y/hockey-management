@@ -23,6 +23,7 @@ const Breadcrumbs = () => {
     "transfers": "Трансферы",
     "login": "Вход",
     "register": "Регистрация",
+    "management": "Управление",
   };
 
   return (
