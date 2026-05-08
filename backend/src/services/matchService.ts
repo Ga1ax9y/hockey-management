@@ -57,6 +57,7 @@ export const MatchService = {
                         include: {
                             player: {
                                 select: {
+                                    id: true,
                                     firstName: true,
                                     lastName: true,
                                     middleName: true,
