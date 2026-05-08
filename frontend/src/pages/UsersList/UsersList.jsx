@@ -5,18 +5,22 @@ import "./UsersList.css";
 import ErrorPage from "../Error/ErrorPage";
 import { isoToRuDate } from "../../utils/date";
 import { Link } from "react-router-dom";
+import Pagination from "../../components/layout/Pagination/Pagination";
 
 export default function UsersList() {
 	const [users, setUsers] = useState([]);
+	const [page, setPage] = useState(1);
+	const [meta, setMeta] = useState(null);
 	const [loading, setLoading] = useState(true);
 	const [error, setError] = useState("");
 
 	useEffect(() => {
-		const fetchUsers = async () => {
+		const fetchUsers = async (currentPage = 1) => {
 			try {
 				setLoading(true);
-				const res = await getAllUsers();
+				const res = await getAllUsers({ page: currentPage });
 				setUsers(res.data.data);
+				setMeta(res.data.meta);
 			} catch (err) {
 				setError(err.response?.data);
 			} finally {
@@ -24,8 +28,13 @@ export default function UsersList() {
 			}
 		};
 
-		fetchUsers();
-	}, []);
+		fetchUsers(page);
+	}, [page]);
+
+	const handlePageChange = (newPage) => {
+		setPage(newPage);
+		window.scrollTo({ top: 0, behavior: "smooth" });
+	};
 
 	if (loading) return <Loader />;
 	if (error) return <ErrorPage error={error} />;
@@ -85,7 +94,7 @@ export default function UsersList() {
 											to={`/profile/${user.id}`}
 											className="user-info__name"
 										>
-												{user.fullName}
+											{user.fullName}
 										</Link>
 									</div>
 								</td>
@@ -108,6 +117,11 @@ export default function UsersList() {
 					</tbody>
 				</table>
 			</div>
+			{!loading && meta && (
+				<div className="players-page__pagination">
+					<Pagination meta={meta} onPageChange={handlePageChange} />
+				</div>
+			)}
 		</div>
 	);
 }

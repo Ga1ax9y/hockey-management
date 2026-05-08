@@ -5,11 +5,14 @@ import { useForm } from "react-hook-form";
 import { METRIC_TYPES } from "../../../utils/dicts";
 import { useRole } from "../../../hooks/useRole";
 import "./AddPhysicalRecord.css";
+import Pagination from "../../../components/layout/Pagination/Pagination";
 
 export default function AddPhysicalRecord() {
 	const { id } = useParams();
 	const [isSubmitting, setIsSubmitting] = useState(false);
 	const [physicalRecords, setPhysicalRecords] = useState([]);
+	const [page, setPage] = useState(1);
+	const [meta, setMeta] = useState(null);
 	const { isAdmin, isCoach } = useRole();
 
 	const { register, handleSubmit, reset } = useForm({
@@ -21,6 +24,10 @@ export default function AddPhysicalRecord() {
 		},
 	});
 
+	const handlePageChange = (newPage) => {
+		setPage(newPage);
+		window.scrollTo({ top: 500, behavior: "smooth" });
+	};
 	const onSubmit = async (data) => {
 		setIsSubmitting(true);
 		try {
@@ -31,7 +38,7 @@ export default function AddPhysicalRecord() {
 				unit: data.unit,
 			});
 			reset();
-			loadPhysicalRecords();
+			loadPhysicalRecords(page);
 		} catch (err) {
 			alert("Ошибка: " + (err.response?.data?.error || err.message));
 		} finally {
@@ -39,18 +46,19 @@ export default function AddPhysicalRecord() {
 		}
 	};
 
-	const loadPhysicalRecords = useCallback(async () => {
+	const loadPhysicalRecords = useCallback(async (currentPage=1) => {
 		try {
-			const res = await getPhysicalRecords(id);
+			const res = await getPhysicalRecords(id, { page: currentPage, limit: 5 });
 			setPhysicalRecords(res.data.data);
+			setMeta(res.data.meta);
 		} catch (err) {
 			console.error(err);
 		}
 	}, [id]);
 
 	useEffect(() => {
-		loadPhysicalRecords();
-	}, [loadPhysicalRecords]);
+		loadPhysicalRecords(page);
+	}, [loadPhysicalRecords, page]);
 
 	return (
 		<div className="physical-page container">
@@ -190,6 +198,11 @@ export default function AddPhysicalRecord() {
 					)}
 				</div>
 			</section>
+			{meta && (
+				<div className="players-page__pagination">
+					<Pagination meta={meta} onPageChange={handlePageChange} />
+				</div>
+			)}
 		</div>
 	);
 }

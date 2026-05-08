@@ -154,6 +154,7 @@ export default function MatchStats() {
 												<td className="player-stats__name">
 													<Link
 														to={`/players/${record.player?.id}`}
+														className="player-stats__player-link"
 													>
 														{
 															record.player

@@ -4,25 +4,34 @@ import { getMatchStats } from "../../../services/api";
 import "./PlayerMatches.css";
 import Loader from "../../../components/layout/Loader/Loader";
 import { isoToRuDate } from "../../../utils/date";
+import Pagination from "../../../components/layout/Pagination/Pagination";
 export default function PlayerMatches() {
 	const { id } = useParams();
 	const [stats, setStats] = useState([]);
+	const [page, setPage] = useState(1);
+	const [meta, setMeta] = useState(null);
 	const [loading, setLoading] = useState(true);
 
+	const handlePageChange = (newPage) => {
+		setPage(newPage);
+		window.scrollTo({ top: 0, behavior: "smooth" });
+	};
+
 	useEffect(() => {
-		const fetchStats = async () => {
+		const fetchStats = async (currentPage = 1) => {
 			try {
 				setLoading(true);
-				const response = await getMatchStats(id);
+				const response = await getMatchStats(id, { page: currentPage, limit: 1 });
 				setStats(response.data.data || []);
+				setMeta(response.data.meta);
 			} catch (err) {
 				console.error("Ошибка при загрузке статистики:", err);
 			} finally {
 				setLoading(false);
 			}
 		};
-		fetchStats();
-	}, [id]);
+		fetchStats(page);
+	}, [id, page]);
 
 	if (loading) return <Loader />;
 
@@ -98,6 +107,11 @@ export default function PlayerMatches() {
 					</tbody>
 				</table>
 			</div>
+			{!loading && meta && (
+				<div className="players-page__pagination">
+					<Pagination meta={meta} onPageChange={handlePageChange} />
+				</div>
+			)}
 		</div>
 	);
 }

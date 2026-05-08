@@ -5,85 +5,123 @@ import "./PlayerTrainings.css";
 import Loader from "../../../components/layout/Loader/Loader";
 import { isoToRuDate } from "../../../utils/date";
 import { getTrainingStatusLabel } from "../../../utils/dicts";
+import Pagination from "../../../components/layout/Pagination/Pagination";
 
 export default function PlayerTrainings() {
-  const { id } = useParams();
-  const [trainings, setTrainings] = useState([]);
-  const [loading, setLoading] = useState(true);
+	const { id } = useParams();
+	const [trainings, setTrainings] = useState([]);
+	const [page, setPage] = useState(1);
+	const [meta, setMeta] = useState(null);
+	const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    const fetchTrainings = async () => {
-      try {
-        setLoading(true);
-        const response = await getTrainingStats(id);
-        setTrainings(response.data.data || []);
-      } catch (err) {
-        console.error("Ошибка при загрузке статистики тренировок:", err);
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchTrainings();
-  }, [id]);
+	useEffect(() => {
+		const fetchTrainings = async (currentPage = 1) => {
+			try {
+				setLoading(true);
+				const response = await getTrainingStats(id, {
+					page: currentPage,
+					limit: 10,
+				});
+				setTrainings(response.data.data || []);
+				setMeta(response.data.meta);
+			} catch (err) {
+				console.error(
+					"Ошибка при загрузке статистики тренировок:",
+					err,
+				);
+			} finally {
+				setLoading(false);
+			}
+		};
+		fetchTrainings(page);
+	}, [id, page]);
 
-  if (loading) return <Loader />;
+	const handlePageChange = (newPage) => {
+		setPage(newPage);
+		window.scrollTo({ top: 0, behavior: "smooth" });
+	};
 
-  return (
-    <div className="player-trainings container">
-      <header className="player-trainings__header">
-        <h1 className="player-trainings__title">ЖУРНАЛ ТРЕНИРОВОК</h1>
-      </header>
+	if (loading) return <Loader />;
 
-      <div className="player-trainings__table-container">
-        {trainings.length === 0 ? (
-          <div className="player-trainings__empty">
-            <div className="player-trainings__empty-box">
-              <p className="player-trainings__empty-text">ДАННЫЕ О ТРЕНИРОВКАХ ОТСУТСТВУЮТ</p>
-              <span className="player-trainings__empty-sub">Записей в системе пока нет</span>
-            </div>
-          </div>
-        ) : (
-          <table className="player-trainings__table">
-            <thead className="player-trainings__thead">
-              <tr>
-                <th>ДАТА</th>
-                <th>ТИП ТРЕНИРОВКИ</th>
-                <th>ТРЕНЕР</th>
-                <th>ОЦЕНКА</th>
-                <th>КОММЕНТАРИЙ</th>
-              </tr>
-            </thead>
-            <tbody className="player-trainings__tbody">
-              {trainings.map((item) => (
-                <tr key={item.id} className="player-trainings__row">
-                  <td className="player-trainings__cell--date">
-                    {isoToRuDate(item.training.startTime)}
-                  </td>
-                  <td className="player-trainings__cell--type">
-                    <span className="player-trainings__type-label">
-                      {getTrainingStatusLabel(item.training.trainingType)}
-                    </span>
-                  </td>
-                  <td className="player-trainings__cell--coach">
-                    {item.training.coach?.fullName || "—"}
-                  </td>
-                  <td className="player-trainings__cell--rating">
-                    <div className={`player-trainings__rating-circle ${
-                      item.coachRating >= 8 ? "player-trainings__rating-circle--high" :
-                      item.coachRating <= 4 ? "player-trainings__rating-circle--low" : ""
-                    }`}>
-                      {item.coachRating || "0"}
-                    </div>
-                  </td>
-                  <td className="player-trainings__cell--comment">
-                    {item.description || <span className="player-trainings__none">Записей нет</span>}
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        )}
-      </div>
-    </div>
-  );
+	return (
+		<div className="player-trainings container">
+			<header className="player-trainings__header">
+				<h1 className="player-trainings__title">ЖУРНАЛ ТРЕНИРОВОК</h1>
+			</header>
+
+			<div className="player-trainings__table-container">
+				{trainings.length === 0 ? (
+					<div className="player-trainings__empty">
+						<div className="player-trainings__empty-box">
+							<p className="player-trainings__empty-text">
+								ДАННЫЕ О ТРЕНИРОВКАХ ОТСУТСТВУЮТ
+							</p>
+							<span className="player-trainings__empty-sub">
+								Записей в системе пока нет
+							</span>
+						</div>
+					</div>
+				) : (
+					<table className="player-trainings__table">
+						<thead className="player-trainings__thead">
+							<tr>
+								<th>ДАТА</th>
+								<th>ТИП ТРЕНИРОВКИ</th>
+								<th>ТРЕНЕР</th>
+								<th>ОЦЕНКА</th>
+								<th>КОММЕНТАРИЙ</th>
+							</tr>
+						</thead>
+						<tbody className="player-trainings__tbody">
+							{trainings.map((item) => (
+								<tr
+									key={item.id}
+									className="player-trainings__row"
+								>
+									<td className="player-trainings__cell--date">
+										{isoToRuDate(item.training.startTime)}
+									</td>
+									<td className="player-trainings__cell--type">
+										<span className="player-trainings__type-label">
+											{getTrainingStatusLabel(
+												item.training.trainingType,
+											)}
+										</span>
+									</td>
+									<td className="player-trainings__cell--coach">
+										{item.training.coach?.fullName || "—"}
+									</td>
+									<td className="player-trainings__cell--rating">
+										<div
+											className={`player-trainings__rating-circle ${
+												item.coachRating >= 8
+													? "player-trainings__rating-circle--high"
+													: item.coachRating <= 4
+														? "player-trainings__rating-circle--low"
+														: ""
+											}`}
+										>
+											{item.coachRating || "0"}
+										</div>
+									</td>
+									<td className="player-trainings__cell--comment">
+										{item.description || (
+											<span className="player-trainings__none">
+												Записей нет
+											</span>
+										)}
+									</td>
+								</tr>
+							))}
+						</tbody>
+					</table>
+				)}
+			</div>
+			{!loading && meta && (
+				<div className="players-page__pagination">
+					<Pagination meta={meta} onPageChange={handlePageChange} />
+				</div>
+			)}
+		</div>
+	);
 }

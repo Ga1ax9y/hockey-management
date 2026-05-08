@@ -19,6 +19,7 @@ import {
 } from "../../../utils/dicts";
 import Loader from "../../../components/layout/Loader/Loader";
 import { Link } from "react-router-dom";
+import Pagination from "../../../components/layout/Pagination/Pagination";
 
 export default function Events() {
 	const { user } = useAuthStore();
@@ -26,6 +27,8 @@ export default function Events() {
 
 	const [events, setEvents] = useState([]);
 	const [teams, setTeams] = useState([]);
+	const [page, setPage] = useState(1);
+	const [meta, setMeta] = useState(null);
 	const [coaches, setCoaches] = useState([]);
 	const [loading, setLoading] = useState(true);
 	const [showForm, setShowForm] = useState(false);
@@ -70,22 +73,32 @@ export default function Events() {
 		initTeams();
 	}, [user, isCoach]);
 
-	const loadSchedule = useCallback(async () => {
-		if (!viewTeamId) return;
-		setLoading(true);
-		try {
-			const scheduleRes = await getSchedule(viewTeamId);
-			setEvents(scheduleRes.data?.data || []);
-		} catch (err) {
-			console.error("Ошибка загрузки расписания:", err);
-		} finally {
-			setLoading(false);
-		}
-	}, [viewTeamId]);
+	const loadSchedule = useCallback(
+		async (currentPage = 1) => {
+			if (!viewTeamId) return;
+			setLoading(true);
+			try {
+				const scheduleRes = await getSchedule(viewTeamId, {
+					page: currentPage,
+				});
+				setEvents(scheduleRes.data?.data || []);
+				setMeta(scheduleRes.data.meta);
+			} catch (err) {
+				console.error("Ошибка загрузки расписания:", err);
+			} finally {
+				setLoading(false);
+			}
+		},
+		[viewTeamId],
+	);
+	const handlePageChange = (newPage) => {
+		setPage(newPage);
+		window.scrollTo({ top: 0, behavior: "smooth" });
+	};
 
 	useEffect(() => {
-		loadSchedule();
-	}, [loadSchedule]);
+		loadSchedule(page);
+	}, [loadSchedule, page]);
 
 	const loadCoaches = useCallback(async (teamId) => {
 		if (!teamId) {
@@ -210,7 +223,6 @@ export default function Events() {
 						className="events-page__form form-block"
 						onSubmit={handleSubmit(onSubmit)}
 					>
-
 						<div className="form-block__field">
 							<label className="form-block__label">
 								Тип события
@@ -409,7 +421,7 @@ export default function Events() {
 				</section>
 			)}
 
-			<main className="events-page__content">
+			<div className="events-page__content">
 				{loading ? (
 					<Loader />
 				) : (
@@ -443,7 +455,12 @@ export default function Events() {
 						</section>
 					</div>
 				)}
-			</main>
+			</div>
+			{!loading && meta && (
+				<div className="players-page__pagination">
+					<Pagination meta={meta} onPageChange={handlePageChange} />
+				</div>
+			)}
 		</div>
 	);
 }

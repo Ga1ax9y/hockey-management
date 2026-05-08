@@ -238,6 +238,8 @@ const Schedule = ({ teamId }) => {
 					location: event.extendedProps.location,
 					coachId: event.extendedProps.coachId,
 					isHomeGame: event.extendedProps.isHomeGame,
+					matchType: event.extendedProps.matchType,
+					season: event.extendedProps.season,
 					score: event.extendedProps.score,
 					myScore: event.extendedProps.myScore,
 					opponentName: event.extendedProps.opponentName,

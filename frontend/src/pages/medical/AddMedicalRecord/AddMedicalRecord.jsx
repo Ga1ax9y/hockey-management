@@ -10,11 +10,14 @@ import { MEDICAL_STATUS, getMedicalLabel } from "../../../utils/dicts";
 import { useRole } from "../../../hooks/useRole";
 import "./AddMedicalRecord.css";
 import { isoToRuDate } from "../../../utils/date";
+import Pagination from "../../../components/layout/Pagination/Pagination";
 
 export default function AddMedicalRecord() {
 	const { id } = useParams();
 	const [isSubmitting, setIsSubmitting] = useState(false);
 	const [medicalRecords, setMedicalRecords] = useState([]);
+	const [page, setPage] = useState(1);
+	const [meta, setMeta] = useState(null);
 	const { isAdmin, isDoctor } = useRole();
 	const { register, handleSubmit, reset } = useForm({
 		defaultValues: {
@@ -24,6 +27,10 @@ export default function AddMedicalRecord() {
 			status: "",
 		},
 	});
+	const handlePageChange = (newPage) => {
+		setPage(newPage);
+		window.scrollTo({ top: 500, behavior: "smooth" });
+	};
 
 	const onSubmit = async (data) => {
 		setIsSubmitting(true);
@@ -35,7 +42,7 @@ export default function AddMedicalRecord() {
 				status: data.status,
 			});
 			reset();
-			loadMedicalRecords();
+			loadMedicalRecords(page);
 		} catch (err) {
 			alert("Ошибка: " + (err.response?.data?.error || err.message));
 		} finally {
@@ -43,18 +50,22 @@ export default function AddMedicalRecord() {
 		}
 	};
 
-	const loadMedicalRecords = useCallback(async () => {
-		try {
-			const res = await getMedicalRecords(id);
-			setMedicalRecords(res.data.data);
-		} catch (err) {
-			console.error(err);
-		}
-	}, [id]);
+	const loadMedicalRecords = useCallback(
+		async (currentPage = 1) => {
+			try {
+				const res = await getMedicalRecords(id, { page: currentPage, limit: 5 });
+				setMedicalRecords(res.data.data);
+				setMeta(res.data.meta);
+			} catch (err) {
+				console.error(err);
+			}
+		},
+		[id],
+	);
 
 	useEffect(() => {
-		loadMedicalRecords();
-	}, [loadMedicalRecords]);
+		loadMedicalRecords(page);
+	}, [loadMedicalRecords, page]);
 
 	const handleRecover = async (medicalId) => {
 		await markPlayerRecovered(medicalId);
@@ -160,10 +171,7 @@ export default function AddMedicalRecord() {
 											).toUpperCase()}
 										</span>{" "}
 										<time className="medical-card__date">
-											{isoToRuDate(
-												record.injuryDate,
-											)}{" "}
-											—{" "}
+											{isoToRuDate(record.injuryDate)} —{" "}
 											{record.status === "recovered"
 												? isoToRuDate(
 														record.recoveryDate,
@@ -207,6 +215,11 @@ export default function AddMedicalRecord() {
 					)}
 				</div>
 			</section>
+			{meta && (
+				<div className="players-page__pagination">
+					<Pagination meta={meta} onPageChange={handlePageChange} />
+				</div>
+			)}
 		</div>
 	);
 }

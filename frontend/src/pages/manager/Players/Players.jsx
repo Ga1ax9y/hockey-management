@@ -12,8 +12,11 @@ import { Link } from "react-router-dom";
 import Loader from "../../../components/layout/Loader/Loader";
 import ErrorPage from "../../Error/ErrorPage";
 import { CONTRACT_TYPE } from "../../../utils/dicts";
+import Pagination from "../../../components/layout/Pagination/Pagination";
 export default function Players() {
 	const [players, setPlayers] = useState([]);
+	const [page, setPage] = useState(1);
+	const [meta, setMeta] = useState(null);
 	const [teams, setTeams] = useState([]);
 	const [loading, setLoading] = useState(true);
 	const [isSubmitting, setIsSubmitting] = useState(false);
@@ -36,14 +39,15 @@ export default function Players() {
 		photo: null,
 	});
 
-	const loadData = useCallback(async () => {
+	const loadData = useCallback(async (currentPage = 1) => {
 		try {
 			setLoading(true);
 			const [playersRes, teamsRes] = await Promise.all([
-				getPlayers({ includeCurrentTeam: true }),
+				getPlayers({ includeCurrentTeam: true, page: currentPage }),
 				getTeams(),
 			]);
 			setPlayers(playersRes.data.data);
+			setMeta(playersRes.data.meta);
 			setTeams(teamsRes.data.data);
 		} catch (err) {
 			setError(err.response?.data);
@@ -53,8 +57,8 @@ export default function Players() {
 	}, []);
 
 	useEffect(() => {
-		loadData();
-	}, [loadData]);
+		loadData(page);
+	}, [loadData, page]);
 
 	const resetForm = () => {
 		setFormData({
@@ -82,6 +86,10 @@ export default function Players() {
 			setPreview(URL.createObjectURL(file));
 		}
 	};
+	const handlePageChange = (newPage) => {
+		setPage(newPage);
+		window.scrollTo({ top: 0, behavior: "smooth" });
+	};
 
 	const handleSubmit = async (e) => {
 		e.preventDefault();
@@ -106,7 +114,7 @@ export default function Players() {
 				await createPlayer(data);
 			}
 			resetForm();
-			loadData();
+			loadData(page);
 		} catch (err) {
 			setError(err.response?.data);
 		} finally {
@@ -135,7 +143,7 @@ export default function Players() {
 
 	if (loading) return <Loader />;
 
-	if (error) return <div>{error}</div>;
+	if (error) return <ErrorPage error={error} />;
 
 	return (
 		<div className="players-page container">
@@ -146,7 +154,7 @@ export default function Players() {
 					onClick={() =>
 						isCreating ? resetForm() : setIsCreating(true)
 					}
-          type="button"
+					type="button"
 				>
 					{isCreating ? "Отмена" : "+ Добавить"}
 				</button>
@@ -426,12 +434,12 @@ export default function Players() {
 										<button
 											onClick={() => handleEdit(player)}
 											className="action-button action-button--edit"
-                      type="button"
+											type="button"
 										>
 											✎
 										</button>
 										<button
-                    type="button"
+											type="button"
 											onClick={() =>
 												deletePlayer(player.id).then(
 													loadData,
@@ -448,6 +456,14 @@ export default function Players() {
 					</tbody>
 				</table>
 			</div>
+				{!loading && meta && (
+					<div className="players-page__pagination">
+						<Pagination
+							meta={meta}
+							onPageChange={handlePageChange}
+						/>
+					</div>
+				)}
 		</div>
 	);
 }
