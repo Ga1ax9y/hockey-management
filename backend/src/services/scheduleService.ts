@@ -53,7 +53,8 @@ export const buildTrainingWhereClause = (
 };
 
 export const ScheduleService = {
-    async findAll({query, user, organizationId, teamIdFromParams}: any) {
+    async findAll({query, user, organizationId, teamIdFromParams, pagination}: any) {
+        const {skip, limit} = pagination
         let targetTeamId: number;
 
         const isStaff = ["ADMIN", "MANAGER"].includes(user!.role.code);
@@ -89,22 +90,27 @@ export const ScheduleService = {
             effectiveQuery,
             organizationId,
         );
-        const [matches, trainings] = await Promise.all([
+        const [matches, trainings, totalMatches, totalTrainings] = await Promise.all([
             prisma.match.findMany({
                 where: matchWhere,
                 orderBy: { matchDate: "asc" },
+                take: limit+skip,
             }),
             prisma.training.findMany({
                 where: trainingWhere,
                 orderBy: { startTime: "asc" },
+                take: limit+skip,
             }),
+            prisma.match.count({ where: matchWhere }),
+            prisma.training.count({ where: trainingWhere }),
         ]);
-        const events = [
+        const allEvents = [
             ...matches.map((m) => ({
                 id: m.id,
                 title: `Матч: ${m.opponentName}`,
                 start: m.matchDate,
                 type: "MATCH",
+                sortDate: new Date(m.matchDate).getTime(),
                 status: m.status,
                 extendedProps: {
                     location: m.location,
@@ -112,6 +118,7 @@ export const ScheduleService = {
                     score: `${m.myScore}:${m.opponentScore}`,
                     myScore: m.myScore,
                     opponentName: m.opponentName,
+                    matchType: m.matchType,
                     opponentScore: m.opponentScore,
                 },
             })),
@@ -121,14 +128,21 @@ export const ScheduleService = {
                 start: t.startTime,
                 end: t.endTime,
                 type: "TRAINING",
+                sortDate: new Date(t.startTime).getTime(),
                 extendedProps: {
                     location: t.location,
                     trainingType: t.trainingType,
                     coachId: t.coachId,
                 },
             })),
-        ];
+        ]
+        const paginatedEvents = allEvents
+        .sort((a, b) => a.sortDate - b.sortDate)
+        .slice(skip, skip + limit);
 
-        return events;
+        return {
+            events: paginatedEvents,
+            total: totalMatches+totalTrainings
+        }
     }
 }
