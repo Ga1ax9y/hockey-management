@@ -9,6 +9,7 @@ import { useForm } from "react-hook-form";
 import { MEDICAL_STATUS, getMedicalLabel } from "../../../utils/dicts";
 import { useRole } from "../../../hooks/useRole";
 import "./AddMedicalRecord.css";
+import { isoToRuDate } from "../../../utils/date";
 
 export default function AddMedicalRecord() {
 	const { id } = useParams();
@@ -63,9 +64,12 @@ export default function AddMedicalRecord() {
 	};
 
 	return (
-		<div className="events-page">
-			<header className="events-page__header">
-				<h1 className="events-page__title">Медицинская история</h1>
+		<div className="medical-page container">
+			<header className="medical-page__header">
+				<h1 className="medical-page__title">
+					МЕДИЦИНСКАЯ{" "}
+					<span className="medical-page__title-accent">ИСТОРИЯ</span>
+				</h1>
 			</header>
 
 			{(isAdmin || isDoctor) && (
@@ -137,73 +141,69 @@ export default function AddMedicalRecord() {
 					</form>
 				</section>
 			)}
-			<section className="medical-record__list-section">
-				<h2 className="events-page__section-title">
-					История повреждений
+			<section className="medical-page__list-section">
+				<h2 className="medical-page__section-title">
+					ИСТОРИЯ ПОВРЕЖДЕНИЙ
 				</h2>
-
-				<div className="events-page__list">
+				<div className="medical-page__list">
 					{medicalRecords.length > 0 ? (
 						medicalRecords.map((record) => (
-							<div
-								key={record.id}
-								className="medical-record__card event-card"
-							>
-								<div className="event-card__side-indicator"></div>
-								<div className="event-card__content">
-									<div className="event-card__meta">
-										<span className="event-card__type">
-											{getMedicalLabel(record.status)}
-										</span>
-										<span className="event-card__time">
-											{new Date(
+							<article key={record.id} className="medical-card">
+								<div
+									className={`medical-card__indicator medical-card__indicator--${record.status}`}
+								></div>
+								<div className="medical-card__body">
+									<div className="medical-card__header">
+										<span className="medical-card__status-label">
+											{getMedicalLabel(
+												record.status,
+											).toUpperCase()}
+										</span>{" "}
+										<time className="medical-card__date">
+											{isoToRuDate(
 												record.injuryDate,
-											).toLocaleDateString("ru-RU")}
-											-
-											{new Date(
-												record.recoveryDate,
-											).toLocaleDateString("ru-RU")}
-										</span>
+											)}{" "}
+											—{" "}
+											{record.status === "recovered"
+												? isoToRuDate(
+														record.recoveryDate,
+													)
+												: "наст. время"}
+										</time>
 									</div>
 
-									<h3 className="event-card__title">
-										{record.diagnosis}{" "}
+									<h3 className="medical-card__diagnosis">
+										{record.diagnosis}
 									</h3>
 
 									{record.player && (
-										<div className="event-card__details">
-											<span>
+										<div className="medical-card__footer">
+											<span className="medical-card__player">
 												{record.player.lastName}{" "}
 												{record.player.firstName}
 											</span>
-											{record.player.currentTeam && (
-												<span className="event-card__score">
-													{
-														record.player
-															.currentTeam.name
-													}
-												</span>
-											)}
+											{record.status !== "recovered" &&
+												(isAdmin || isDoctor) && (
+													<button
+														className="medical-card__recover-btn"
+														onClick={() =>
+															handleRecover(
+																record.id,
+															)
+														}
+													>
+														ИГРОК ВОССТАНОВИЛСЯ
+													</button>
+												)}
 										</div>
 									)}
-									{record.status !== "recovered" &&
-										(isDoctor || isAdmin) && (
-											<button
-												className="event-card__recover-btn"
-												onClick={() =>
-													handleRecover(
-														record.id,
-													)
-												}
-											>
-												ИГРОК ВОССТАНОВИЛСЯ
-											</button>
-										)}
 								</div>
-							</div>
+							</article>
 						))
 					) : (
-						<p className="events-page__label">Записей пока нет</p>
+						<p className="medical-page__empty">
+							Медицинских записей не найдено
+						</p>
 					)}
 				</div>
 			</section>

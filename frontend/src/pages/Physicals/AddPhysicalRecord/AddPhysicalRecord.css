@@ -1,18 +1,110 @@
-.physical-record__form {
-    margin-bottom: 60px;
+.physical-page__header {
+    margin-bottom: 2.5rem;
 }
 
-.physical-record__card .event-card__side-indicator {
-    background-color: var(--color-dark-alternate);
+.physical-page__title {
+    font-size: 32px;
+    font-weight: 900;
+    text-transform: uppercase;
+    letter-spacing: -1px;
+    margin: 0;
+    padding-bottom: 0.5rem;
 }
 
-.event-card__unit {
-    font-size: 14px;
+.physical-page__subtitle {
+    font-size: 1.2rem;
+    text-transform: uppercase;
+    color: var(--color-dark);
+    margin: 2rem 0 1.5rem;
+}
+
+.metric-card {
+    display: flex;
+    margin-bottom: 1rem;
+    border: 1px solid var(--color-dark);
+    transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+.metric-card:hover {
+    border-color: var(--color-dark-hover);
+    transform: translateX(10px);
+}
+
+.metric-card__side {
+    width: 6px;
+    background-color: var(--color-light);
+}
+
+.metric-card__content {
+    padding: 1.5rem;
+    flex-grow: 1;
+}
+
+.metric-card__header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.5rem;
+}
+
+.metric-card__type {
+    font-size: 0.7rem;
+    font-weight: 800;
+    text-transform: uppercase;
     color: var(--color-dark-alternate);
-    text-transform: lowercase;
-    font-weight: 400;
+    letter-spacing: 1px;
 }
 
-.physical-record__list-section {
-    margin-top: 40px;
+.metric-card__date {
+    font-size: 0.8rem;
+    color: var(--color-dark-alternate);
+}
+
+.metric-card__value-container {
+    margin: 0.5rem 0 1rem;
+}
+
+.metric-card__value {
+    font-size: 2.2rem;
+    font-weight: 900;
+    color: var(--color-dark);
+    line-height: 1;
+}
+
+.metric-card__unit {
+    font-size: 1rem;
+    color: var(--color-dark-hover);
+    margin-left: 0.5rem;
+    text-transform: lowercase;
+}
+
+.metric-card__footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-top: 1rem;
+    border-top: 1px solid var(--color-dark);
+}
+
+.metric-card__player-name {
+    font-size: 0.85rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    color: var(--color-light-alternate);
+}
+
+.metric-card__team-tag {
+    background-color: var(--color-gray);
+    color: var(--color-dark);
+    padding: 2px 8px;
+    font-size: 0.7rem;
+    font-weight: 800;
+    text-transform: uppercase;
+}
+
+.physical-page__empty {
+    color: var(--color-dark-alternate);
+    font-style: italic;
+    text-align: center;
+    margin-top: 2rem;
 }
