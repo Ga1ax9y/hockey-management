@@ -28,6 +28,79 @@ export default function Users() {
 			setPreview(URL.createObjectURL(file));
 		}
 	};
+	const handlePrintCard = () => {
+		const roleName =
+			roles.find((r) => r.id == form.roleId)?.name || "Не указана";
+
+		const printWindow = window.open("", "_blank");
+		printWindow.document.write(`
+        <html>
+            <head>
+                <title>Учетная карточка - ${form.fullName}</title>
+                <style>
+                    body { font-family: 'Inter', sans-serif; padding: 40px; color: #000; }
+                    .card { border: 2px solid #000; padding: 30px; max-width: 600px; margin: 0 auto; position: relative; }
+                    .header { border-bottom: 2px solid #000; margin-bottom: 20px; padding-bottom: 10px; }
+                    .title { text-transform: uppercase; font-weight: 900; font-size: 20px; margin: 0; }
+                    .info-row { margin: 15px 0; font-size: 14px; }
+                    .label { font-weight: bold; text-transform: uppercase; font-size: 12px; color: #666; display: block; }
+                    .value { font-size: 18px; font-weight: 500; display: block; margin-top: 4px; }
+                    .credentials { background: #f0f0f0; padding: 15px; margin-top: 20px; border: 1px dashed #000; }
+                    .signatures { margin-top: 50px; display: grid; grid-template-columns: 1fr 1fr; gap: 40px; }
+                    .sig-block { border-top: 1px solid #000; padding-top: 10px; text-align: center; font-size: 12px; text-transform: uppercase; }
+                    .stamp { position: absolute; bottom: 100px; right: 50px; border: 3px solid rgba(0,0,0,0.1); width: 100px; height: 100px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 10px; transform: rotate(-15deg); }
+                </style>
+            </head>
+            <body>
+                <div class="card">
+                    <div class="header">
+                        <p class="title">Hockey Management System</p>
+                        <p style="margin:0; font-size: 12px;">Учетные данные доступа к платформе</p>
+                    </div>
+
+                    <div class="info-row">
+                        <span class="label">Владелец аккаунта</span>
+                        <span class="value">${form.fullName || "__________________________"}</span>
+                    </div>
+
+                    <div class="info-row">
+                        <span class="label">Роль в организации</span>
+                        <span class="value">${roleName}</span>
+                    </div>
+
+                    <div class="credentials">
+                        <div class="info-row">
+                            <span class="label">Логин (Email)</span>
+                            <span class="value">${form.email || "не указан"}</span>
+                        </div>
+                        <div class="info-row">
+                            <span class="label">Временный пароль</span>
+                            <span class="value" style="font-family: monospace; letter-spacing: 1px;">${form.password}</span>
+                        </div>
+                    </div>
+
+                    <p style="font-size: 10px; color: #555; margin-top: 20px;">
+                        * При первом входе рекомендуется сменить временный пароль в личном кабинете.
+                    </p>
+					<p style="font-size: 10px; color: #555; margin-top: 20px;">
+						** При подписи получатель дает согласие на обработку персональных данных и регистрируется в системе.
+                    </p>
+
+                    <div class="signatures">
+                        <div class="sig-block">Менеджер организации</div>
+                        <div class="sig-block">Получатель (подпись)</div>
+                    </div>
+
+                    <div class="stamp">М.П.</div>
+                </div>
+                <script>
+                    window.onload = function() { window.print(); window.close(); }
+                </script>
+            </body>
+        </html>
+    `);
+		printWindow.document.close();
+	};
 
 	const handleClearAvatar = () => {
 		setForm({ ...form, avatarUrl: "" });
@@ -232,6 +305,25 @@ export default function Users() {
 				</div>
 
 				<footer className="user-form__footer">
+					<button
+						className="user-form__print-btn"
+						type="button"
+						onClick={handlePrintCard}
+					>
+						<svg
+							width="16"
+							height="16"
+							viewBox="0 0 24 24"
+							fill="none"
+							stroke="currentColor"
+							strokeWidth="2"
+							style={{ marginRight: "8px" }}
+						>
+							<path d="M6 9V2h12v7M6 18H4a2 2 0 01-2-2v-5a2 2 0 012-2h16a2 2 0 012 2v5a2 2 0 01-2 2h-2" />
+							<path d="M6 14h12v8H6z" />
+						</svg>
+						Печать карточки
+					</button>
 					<button
 						className={`user-form__submit-btn ${isSubmitting ? "user-form__submit-btn--loading" : ""}`}
 						type="submit"
