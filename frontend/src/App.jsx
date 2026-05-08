@@ -1,4 +1,9 @@
-import { createBrowserRouter, Outlet, RouterProvider } from "react-router-dom";
+import {
+	createBrowserRouter,
+	Outlet,
+	RouterProvider,
+	useLocation,
+} from "react-router-dom";
 import "./App.css";
 import "../styles/global.css";
 import Header from "./components/layout/Header/Header";
@@ -29,15 +34,23 @@ import PlayerMatches from "./pages/PlayerInfo/Matches/PlayerMatches";
 import PlayerTrainings from "./pages/PlayerInfo/Trainings/PlayerTrainings";
 import PlayerTransfers from "./pages/PlayerInfo/Transfers/PlayerTransfers";
 import Breadcrumbs from "./components/layout/Breadcrumbs/Breadcrumbs";
-const Layout = () => (
-	<>
-		<Header />
-		<Breadcrumbs />
-		<main className="content">
-			<Outlet />
-		</main>
-	</>
-);
+const Layout = () => {
+	const location = useLocation();
+	const hideBreadcrumbsRoutes = ["/login", "/register"];
+	const shouldShowBreadcrumbs = !hideBreadcrumbsRoutes.includes(
+		location.pathname,
+	);
+	
+	return (
+		<>
+			<Header />
+			{shouldShowBreadcrumbs && <Breadcrumbs />}
+			<main className="content">
+				<Outlet />
+			</main>
+		</>
+	);
+};
 
 const router = createBrowserRouter([
 	{
