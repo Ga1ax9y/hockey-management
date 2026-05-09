@@ -160,7 +160,7 @@ export default function Users() {
 			}
 
 			await createUser(formData);
-			navigate("/admin");
+			navigate("/management/users");
 		} catch (err) {
 			setError(err.response?.data);
 			setIsSubmitting(false);

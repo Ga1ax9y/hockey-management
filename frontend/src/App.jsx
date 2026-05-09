@@ -35,6 +35,7 @@ import PlayerTrainings from "./pages/PlayerInfo/Trainings/PlayerTrainings";
 import PlayerTransfers from "./pages/PlayerInfo/Transfers/PlayerTransfers";
 import Breadcrumbs from "./components/layout/Breadcrumbs/Breadcrumbs";
 import Analytics from "./pages/Analytics/Analytics";
+import LogsPage from "./LogsPage/LogsPage";
 const Layout = () => {
 	const location = useLocation();
 	const hideBreadcrumbsRoutes = ["/login", "/register"];
@@ -137,6 +138,14 @@ const router = createBrowserRouter([
 				element: (
 					<ProtectedRoute>
 						<Players />
+					</ProtectedRoute>
+				),
+			},
+			{
+				path: "/management/logs",
+				element: (
+					<ProtectedRoute>
+						<LogsPage />
 					</ProtectedRoute>
 				),
 			},
