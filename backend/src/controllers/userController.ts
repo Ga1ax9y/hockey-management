@@ -6,6 +6,7 @@ import bcrypt from "bcrypt"
 import { getPagination } from "../helpers/pagination";
 import { paginatedResponse } from "../helpers/paginatedResponse";
 import { UserService } from "../services/userService";
+import { AuditService } from "../services/auditService";
 
 export const getAllUsers = async (req: AuthRequest, res: Response, next: NextFunction) => {
     try {
@@ -71,6 +72,7 @@ export const createUser = async (req: AuthRequest, res: Response, next: NextFunc
 
         try {
             avatarUrl = req.file ? req.file.path : null;
+
         } catch (uploadError: any) {
             return next(new AppError(
                 "CloudinaryError",
@@ -85,9 +87,22 @@ export const createUser = async (req: AuthRequest, res: Response, next: NextFunc
             avatarUrl: avatarUrl || req.body.avatarUrl
         }
 
-        const user = await UserService.create(userData, Number(organizationId))
+        const newUser = await UserService.create(userData, Number(organizationId))
 
-        res.status(201).json(user)
+        AuditService.logAction({
+            userId: req.user?.id || null,
+            action: "CREATE_USER",
+            entityType: "USER",
+            entityId: newUser.id,
+            oldValues: {},
+            newValues: {
+                email: newUser.email,
+                roleId: newUser.roleId,
+                fullName: newUser.fullName
+            }
+        })
+
+        res.status(201).json(newUser)
 
     } catch (error: any) {
         if (error instanceof AppError) {
@@ -101,3 +116,48 @@ export const createUser = async (req: AuthRequest, res: Response, next: NextFunc
         ))
     }
 }
+
+export const updateUser = async (req: AuthRequest, res: Response, next: NextFunction) => {
+    try {
+        const { id } = req.params;
+        const updateData = { ...req.body };
+
+        const oldUser = await prisma.user.findUnique({ where: { id: Number(id) } });
+        if (!oldUser) {
+            return next(new AppError(
+                commonErrorDict.badRequest.name,
+                commonErrorDict.badRequest.httpCode,
+                "Пользователь не найден",
+                "Ошибка обновления пользователя"));
+        }
+
+        const updatedUser = await UserService.update(Number(id), updateData);
+
+        AuditService.logAction({
+            userId: req.user?.id || null,
+            action: "UPDATE_USER",
+            entityType: "USER",
+            entityId: updatedUser.id,
+            oldValues: {
+                fullName: oldUser.fullName,
+                roleId: oldUser.roleId,
+                passwordChanged: false
+            },
+            newValues: {
+                fullName: updatedUser.fullName,
+                roleId: updatedUser.roleId,
+                passwordChanged: !!updateData.password
+            }
+        });
+
+        res.json(updatedUser);
+    } catch (error: any) {
+        if (error instanceof AppError) {
+            return next(error);
+        }
+        next(new AppError(
+            commonErrorDict.serverError.name,
+            commonErrorDict.serverError.httpCode,
+            error.message, "Ошибка при обновлении пользователя"));
+    }
+};

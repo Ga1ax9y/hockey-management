@@ -13,6 +13,7 @@ import matchStatsRoutes from "./matchStatsRoutes"
 import trainingStatsRoutes from "./trainingStatsRoutes"
 import careerRoutes from "./careerRoutes"
 import analyticsRoutes from "./analyticsRoutes"
+import auditRoutes from "./auditRoutes"
 
 const apiRouter = Router();
 
@@ -30,5 +31,6 @@ apiRouter.use("/match-stats", matchStatsRoutes)
 apiRouter.use("/training-stats", trainingStatsRoutes)
 apiRouter.use("/transfers", careerRoutes)
 apiRouter.use("/analytics", analyticsRoutes)
+apiRouter.use("/logs", auditRoutes)
 
 export default apiRouter;

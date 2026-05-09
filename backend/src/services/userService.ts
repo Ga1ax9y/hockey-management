@@ -112,5 +112,67 @@ export const UserService = {
         })
 
         return user
+    },
+    async update(userId: number, data: any) {
+        const { roleId, password, oldPassword, ...rest } = data;
+        const updatePayload: any = { ...rest };
+
+        if (password) {
+            const user = await prisma.user.findUnique({ where: { id: userId } });
+
+            if (!user)
+                throw new AppError(
+                    commonErrorDict.resourceNotFound.name,
+                    commonErrorDict.resourceNotFound.httpCode,
+                    "Пользователь не найден",
+                    "Ошибка безопасности"
+                );
+
+            if (oldPassword) {
+                const isMatch = await bcrypt.compare(oldPassword, user.passwordHash);
+
+                if (!isMatch) {
+                    throw new AppError(
+                        commonErrorDict.badRequest.name,
+                        commonErrorDict.badRequest.httpCode,
+                        "Текущий пароль введен неверно",
+                        "Ошибка безопасности"
+                    );
+                }
+                updatePayload.passwordHash = await bcrypt.hash(password, 10);
+            }
+        }
+
+        if (roleId !== undefined) {
+            updatePayload.roleId = Number(roleId);
+        }
+
+        const updatedUser = await prisma.user.update({
+            where: { id: userId },
+            data: updatePayload,
+            select: {
+                id: true,
+                email: true,
+                fullName: true,
+                roleId: true,
+                role: {
+                    select: {
+                        name: true
+                    }
+                },
+                organization: {
+                    select: {
+                        id: true,
+                        name: true
+                    }
+                },
+                avatarUrl: true,
+                createdAt: true,
+                updatedAt: true
+            },
+
+        });
+
+        return updatedUser;
     }
 }
