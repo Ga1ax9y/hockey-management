@@ -23,6 +23,9 @@ export const getUserById = (id, params = {}) => {
   return API.get(`/users/${id}${buildQuery(params)}`)
 };
 export const createUser = (formData) => API.post("/users", formData);
+export const updateUser = (id, data) => {
+    return API.patch(`/users/${id}`, data);
+};
 
 export const getRoles = () => API.get("/roles");
 export const getRoleById = (id) => API.get(`/roles/${id}`);
@@ -124,4 +127,8 @@ export const createIndexRecord = (data) => {
 
 export const updateTeamAnalytics = (data) => {
     return API.post('/analytics/readiness/refresh-team', data);
+};
+
+export const getAuditLogs = (params = {}) => {
+    return API.get(`/logs${buildQuery(params)}`);
 };

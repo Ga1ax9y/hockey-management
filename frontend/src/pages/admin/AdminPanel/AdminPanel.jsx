@@ -12,20 +12,16 @@ export default function AdminPanel() {
 			</header>
 
 			<div className="admin-page__grid admin-grid">
-				{isAdmin && (
-					<Link
-						to="/management/roles"
-						className="admin-grid__card admin-card"
-					>
-						<h2 className="admin-card__title">
-							Роли пользователей
-						</h2>
-						<p className="admin-card__description">
-							Полное описание ролей пользователей
-						</p>
-						<span className="admin-card__action">Перейти →</span>
-					</Link>
-				)}
+				<Link
+					to="/management/roles"
+					className="admin-grid__card admin-card"
+				>
+					<h2 className="admin-card__title">Роли пользователей</h2>
+					<p className="admin-card__description">
+						Полное описание ролей пользователей
+					</p>
+					<span className="admin-card__action">Перейти →</span>
+				</Link>
 
 				{(isAdmin || isManager) && (
 					<>
@@ -48,11 +44,10 @@ export default function AdminPanel() {
 							to="/management/analytics"
 							className="admin-grid__card admin-card"
 						>
-							<h2 className="admin-card__title">
-								Аналитика
-							</h2>
+							<h2 className="admin-card__title">Аналитика</h2>
 							<p className="admin-card__description">
-								Просмотр аналитических данных о командах и игроках
+								Просмотр аналитических данных о командах и
+								игроках
 							</p>
 							<span className="admin-card__action">
 								Перейти →
@@ -101,6 +96,20 @@ export default function AdminPanel() {
 							</span>
 						</Link>
 					</>
+				)}
+				{isAdmin && (
+					<Link
+						to="/management/logs"
+						className="admin-grid__card admin-card"
+					>
+						<h2 className="admin-card__title">
+							Логи
+						</h2>
+						<p className="admin-card__description">
+							Просмотр логов системы
+						</p>
+						<span className="admin-card__action">Перейти →</span>
+					</Link>
 				)}
 			</div>
 
