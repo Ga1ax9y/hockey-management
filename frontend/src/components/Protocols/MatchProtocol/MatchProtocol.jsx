@@ -191,7 +191,7 @@ export default function MatchProtocol() {
 										{p.player?.number}
 									</td>
 									<td className="protocol-table__td protocol-table__td--name">
-										<Link to={`/players/${p.player?.id}`} className="protocol-table__link">
+										<Link to={`/management/players/${p.player?.id}`} className="protocol-table__link">
 											{p.player?.lastName}{" "}
 											{p.player?.firstName}
 										</Link>

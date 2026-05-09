@@ -34,6 +34,7 @@ import PlayerMatches from "./pages/PlayerInfo/Matches/PlayerMatches";
 import PlayerTrainings from "./pages/PlayerInfo/Trainings/PlayerTrainings";
 import PlayerTransfers from "./pages/PlayerInfo/Transfers/PlayerTransfers";
 import Breadcrumbs from "./components/layout/Breadcrumbs/Breadcrumbs";
+import Analytics from "./pages/Analytics/Analytics";
 const Layout = () => {
 	const location = useLocation();
 	const hideBreadcrumbsRoutes = ["/login", "/register"];
@@ -91,7 +92,14 @@ const router = createBrowserRouter([
 					</ProtectedRoute>
 				),
 			},
-
+			{
+				path: "/management/analytics",
+				element: (
+					<ProtectedRoute>
+						<Analytics />
+					</ProtectedRoute>
+				),
+			},
 			{
 				path: "/management/users/create",
 				element: (
@@ -157,7 +165,7 @@ const router = createBrowserRouter([
 				),
 			},
 			{
-				path: "/players/:id",
+				path: "/management/players/:id",
 				element: (
 					<ProtectedRoute>
 						<PlayerProfile />
@@ -165,7 +173,7 @@ const router = createBrowserRouter([
 				),
 			},
 			{
-				path: "/players/:id/matches",
+				path: "/management/players/:id/matches",
 				element: (
 					<ProtectedRoute>
 						<PlayerMatches />
@@ -173,7 +181,7 @@ const router = createBrowserRouter([
 				),
 			},
 			{
-				path: "/players/:id/trainings",
+				path: "/management/players/:id/trainings",
 				element: (
 					<ProtectedRoute>
 						<PlayerTrainings />
@@ -181,7 +189,7 @@ const router = createBrowserRouter([
 				),
 			},
 			{
-				path: "/players/:id/transfers",
+				path: "/management/players/:id/transfers",
 				element: (
 					<ProtectedRoute>
 						<PlayerTransfers />
@@ -189,7 +197,7 @@ const router = createBrowserRouter([
 				),
 			},
 			{
-				path: "/players/:id/medicals",
+				path: "/management/players/:id/medicals",
 				element: (
 					<ProtectedRoute>
 						<AddMedicalRecord />
@@ -197,7 +205,7 @@ const router = createBrowserRouter([
 				),
 			},
 			{
-				path: "/players/:id/physicals",
+				path: "/management/players/:id/physicals",
 				element: (
 					<ProtectedRoute>
 						<AddPhysicalRecord />
@@ -205,7 +213,7 @@ const router = createBrowserRouter([
 				),
 			},
 			{
-				path: "/teams/:id",
+				path: "/management/teams/:id",
 				element: (
 					<ProtectedRoute>
 						<TeamDetails />
@@ -213,7 +221,7 @@ const router = createBrowserRouter([
 				),
 			},
 			{
-				path: "/teams/:id/members",
+				path: "/management/teams/:id/members",
 				element: (
 					<ProtectedRoute>
 						<TeamMembers />

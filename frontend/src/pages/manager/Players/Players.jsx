@@ -411,7 +411,7 @@ export default function Players() {
 										/>
 										<div className="player-entity__info">
 											<Link
-												to={`/players/${player.id}`}
+												to={`/management/players/${player.id}`}
 												className="player-entity__name"
 											>
 												{player.lastName}{" "}

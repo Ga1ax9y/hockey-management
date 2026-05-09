@@ -31,7 +31,7 @@ export default function Home() {
             <ul className="teams-list">
               {user.teams.map(ut => (
                 <li key={ut.id}>
-                  <Link to={`/teams/${ut.id}`} className="team-link">
+                  <Link to={`/management/teams/${ut.id}`} className="team-link">
                     {ut.name} <span className="team-league">({ut.league || '—'})</span>
                   </Link>
                 </li>
@@ -53,7 +53,7 @@ export default function Home() {
                 <li><Link to="/admin/roles">Управление ролями</Link></li>
               )}
               {isManager && (
-                <li><Link to="/teams">Иерархия команд</Link></li>
+                <li><Link to="/management/teams">Иерархия команд</Link></li>
               )}
             </ul>
           </div>

@@ -21,7 +21,7 @@ export default function PlayerMatches() {
 		const fetchStats = async (currentPage = 1) => {
 			try {
 				setLoading(true);
-				const response = await getMatchStats(id, { page: currentPage, limit: 1 });
+				const response = await getMatchStats(id, { page: currentPage, limit: 5 });
 				setStats(response.data.data || []);
 				setMeta(response.data.meta);
 			} catch (err) {

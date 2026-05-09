@@ -24,6 +24,7 @@ const Breadcrumbs = () => {
     "login": "Вход",
     "register": "Регистрация",
     "management": "Управление",
+    "analytics": "Аналитика"
   };
 
   return (

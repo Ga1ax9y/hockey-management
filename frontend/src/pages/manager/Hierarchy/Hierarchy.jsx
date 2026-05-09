@@ -211,7 +211,7 @@ export default function Hierarchy() {
 												className="hierarchy__team-card"
 												onClick={() =>
 													navigate(
-														`/teams/${team.id}`,
+														`/management/teams/${team.id}`,
 													)
 												}
 											>

@@ -62,7 +62,7 @@ export default function MatchStats() {
 			<header className="match-stats__header match-score">
 				<div className="match-score__team match-score__team--home">
 					<h2 className="match-score__name">
-					<Link to={`/teams/${match.myTeam?.id}`} className="match-score__team-link">
+					<Link to={`/management/teams/${match.myTeam?.id}`} className="match-score__team-link">
 					{match.myTeam?.name}
 					</Link>
 					</h2>
@@ -153,7 +153,7 @@ export default function MatchStats() {
 												</td>
 												<td className="player-stats__name">
 													<Link
-														to={`/players/${record.player?.id}`}
+														to={`/management/players/${record.player?.id}`}
 														className="player-stats__player-link"
 													>
 														{
