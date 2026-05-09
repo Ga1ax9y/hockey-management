@@ -210,7 +210,7 @@ export default function TeamMembers() {
 										>
 											<td className="members-table__td">
 												<Link
-													to={`/players/${player.id}`}
+													to={`/management/players/${player.id}`}
 													className="members-table__link"
 												>
 													{player.lastName}{" "}

@@ -167,7 +167,7 @@ export default function PlayerProfile() {
 						</h2>
 						<button
 							className="player-profile__more-btn"
-							onClick={() => navigate(`/players/${id}/matches`)}
+							onClick={() => navigate(`/management/players/${id}/matches`)}
 						>
 							ВСЕ МАТЧИ
 						</button>
@@ -200,7 +200,7 @@ export default function PlayerProfile() {
 						</h2>
 						<button
 							className="player-profile__more-btn"
-							onClick={() => navigate(`/players/${id}/trainings`)}
+							onClick={() => navigate(`/management/players/${id}/trainings`)}
 						>
 							ВСЕ ТРЕНИРОВКИ
 						</button>
@@ -233,7 +233,7 @@ export default function PlayerProfile() {
 						</h2>
 						<button
 							className="player-profile__more-btn"
-							onClick={() => navigate(`/players/${id}/physicals`)}
+							onClick={() => navigate(`/management/players/${id}/physicals`)}
 						>
 							ВСЕ ФИЗИЧЕСКИЕ ПОКАЗАТЕЛИ
 						</button>
@@ -268,7 +268,7 @@ export default function PlayerProfile() {
 							<button
 								className="player-profile__more-btn"
 								onClick={() =>
-									navigate(`/players/${id}/medicals`)
+									navigate(`/management/players/${id}/medicals`)
 								}
 							>
 								ИСТОРИЯ БОЛЕЗНЕЙ
@@ -326,7 +326,7 @@ export default function PlayerProfile() {
 						</h2>
 						<button
 							className="player-profile__more-btn"
-							onClick={() => navigate(`/players/${id}/transfers`)}
+							onClick={() => navigate(`/management/players/${id}/transfers`)}
 						>
 							ВСЕ ТРАНСФЕРЫ
 						</button>

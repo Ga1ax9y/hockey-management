@@ -105,3 +105,23 @@ export const getTrainingStats = (id, params = {}) => {
 
 export const syncMatchStats = (data) => API.put("/match-stats/sync", data);
 export const syncTrainingStats = (data) => API.put("/training-stats/sync", data);
+
+export const getPlayerHistory = (playerId, params = {}) => {
+    return API.get(`/analytics/readiness/history/${playerId}`, { params });
+};
+
+export const getTeamStatus = (teamId, params = {}) => {
+    return API.get(`/analytics/readiness/team/${teamId}`, { params });
+};
+
+export const previewIndex = (playerId) => {
+    return API.get(`/analytics/readiness/preview/${playerId}`);
+};
+
+export const createIndexRecord = (data) => {
+    return API.post('/analytics/readiness/save', data);
+};
+
+export const updateTeamAnalytics = (data) => {
+    return API.post('/analytics/readiness/refresh-team', data);
+};

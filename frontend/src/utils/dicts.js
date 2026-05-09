@@ -108,3 +108,14 @@ export const getMetricTypeLabel = (metricValue) => {
 	const status = METRIC_TYPES.find(s => s.value === metricValue);
 	return status ? status.label : "Неизвестно";
 };
+
+export const CONFIDENCE_LEVELS = [
+	{ value: "Low", label: "Низкая" },
+	{ value: "Medium", label: "Средняя" },
+	{ value: "High", label: "Высокая" },
+];
+
+export const getConfidenceLevelLabel = (confidenceValue) => {
+	const status = CONFIDENCE_LEVELS.find(s => s.value === confidenceValue);
+	return status ? status.label : "Неизвестно";
+};

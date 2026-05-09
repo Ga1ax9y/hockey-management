@@ -54,7 +54,7 @@ export default function TeamDetails() {
 		if (!confirm("Вы уверены? Это действие нельзя отменить.")) return;
 		try {
 			await deleteTeam(id);
-			navigate("/teams", { replace: true });
+			navigate("/management/teams", { replace: true });
 		} catch (err) {
 			setError(err.response?.data || "Ошибка при удалении");
 		}
