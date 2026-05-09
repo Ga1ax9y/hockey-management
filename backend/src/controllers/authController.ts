@@ -1,12 +1,8 @@
 import type { NextFunction, Request, Response } from "express";
-import { prisma } from "../lib/prisma";
-import bcrypt from "bcrypt"
-import jwt from "jsonwebtoken"
 import type { AuthRequest } from "../middlewares/authMiddleware";
 import { AppError, commonErrorDict } from "../types/AppError";
 import { AuthService } from "../services/authService";
 
-const JWT_SECRET = process.env.JWT_SECRET as string;
 
 export const register = async (req: Request, res: Response, next: NextFunction) => {
     try {
