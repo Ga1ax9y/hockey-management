@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from "react";
-import { getAuditLogs } from "../services/api";
+import { getAuditLogs } from "../../services/api";
 import "./LogsPage.css";
-import Loader from "../components/layout/Loader/Loader";
-import ErrorPage from "../pages/Error/ErrorPage";
-import Pagination from "../components/layout/Pagination/Pagination";
+import Loader from "../../components/layout/Loader/Loader";
+import ErrorPage from "../Error/ErrorPage";
+import Pagination from "../../components/layout/Pagination/Pagination";
 
 export default function LogsPage() {
 	const [logs, setLogs] = useState([]);
