@@ -1,113 +1,143 @@
-.home {
-  max-width: var(--container-width);
-  margin: 0 auto;
-  padding: 2rem var(--container-padding-x);
+.home__header {
+    border-bottom: 3px solid var(--color-dark);
+    padding-bottom: 20px;
+    margin-bottom: 30px;
 }
 
-.home__welcome {
-  text-align: center;
-  margin-bottom: 2.5rem;
-  padding-bottom: 1.5rem;
-  border-bottom: 2px solid var(--color-gray);
-}
-
-.home__welcome h1 {
-  font-size: 2.25rem;
-  margin-bottom: 1rem;
-  color: var(--color-dark);
+.home__title {
+    font-size: 32px;
+    font-weight: 900;
+    text-transform: uppercase;
+    margin: 0 0 10px 0;
+    letter-spacing: -0.5px;
 }
 
 .home__meta {
-  display: flex;
-  justify-content: center;
-  gap: 2rem;
-  flex-wrap: wrap;
-  color: var(--color-dark-alternate);
-  font-size: 1.1rem;
+    display: flex;
+    gap: 15px;
+    font-weight: 700;
+    font-size: 14px;
 }
 
-.home__stats {
-  display: flex;
-  flex-direction: column;
-  gap: 2rem;
-  max-width: 768px;
-  margin: 2.5rem auto 0;
-  padding: 0 var(--container-padding-x);
+.home__meta-item {
+    background: #fff;
+    padding: 6px 12px;
+    border: 2px solid var(--color-dark);
 }
 
-.stat-card {
-  background: none;
-  border: none;
-  padding: 0;
-  margin: 0;
+.home__meta-item--role {
+    background: var(--color-dark);
+    color: #fff;
 }
 
-.stat-card h3 {
-  font-size: 1.25rem;
-  font-weight: 700;
-  color: var(--color-dark);
-  margin-bottom: 1rem;
-  padding-bottom: 0.5rem;
-  border-bottom: 1px solid var(--color-gray);
+.home__grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    gap: 25px;
+    margin-bottom: 40px;
 }
 
-.teams-list,
-.quick-links {
-  list-style: none;
-  padding: 0;
-  margin: 0;
+.dashboard-card {
+    background: #fff;
+    border: 3px solid var(--color-dark);
+    box-shadow: 6px 6px 0px var(--color-dark);
+    padding: 24px;
+    display: flex;
+    flex-direction: column;
 }
 
-.teams-list li,
-.quick-links li {
-  margin-bottom: 0.625rem;
+.dashboard-card__title {
+    font-size: 18px;
+    font-weight: 900;
+    text-transform: uppercase;
+    margin: 0 0 20px 0;
+    border-bottom: 2px solid var(--color-dark);
+    padding-bottom: 8px;
 }
 
-.team-link,
-.quick-links a {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.5rem;
-  text-decoration: none;
-  color: var(--color-dark);
-  font-weight: 500;
-  padding: 0.25rem 0;
-  border-radius: 3px;
-  transition: color var(--transition-duration);
+.dashboard-card__empty {
+    font-weight: 700;
+    color: #666;
+    margin: 0;
 }
 
-.team-link:hover,
-.quick-links a:hover {
-  color: var(--color-dark-hover);
+.dashboard-card__list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
 }
 
-.team-league {
-  color: var(--color-dark-alternate);
-  font-weight: normal;
-  font-size: 0.95em;
+.dashboard-card__link {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px;
+    border: 2px solid var(--color-dark);
+    text-decoration: none;
+    color: var(--color-dark);
+    font-weight: 800;
+    transition: transform 0.1s ease, box-shadow 0.1s ease;
+    background: #fff;
 }
 
-.home__no-teams {
-  color: var(--color-dark-alternate);
-  font-style: italic;
-  margin: 0;
+.dashboard-card__link:hover {
+    transform: translate(-2px, -2px);
+    box-shadow: 4px 4px 0px var(--color-dark);
+}
+
+.dashboard-card__tag {
+    font-size: 11px;
+    background: #eee;
+    padding: 4px 8px;
+    border: 1px solid var(--color-dark);
+    text-transform: uppercase;
+}
+
+.dashboard-card__action-btn {
+    display: block;
+    text-align: center;
+    padding: 14px;
+    background: #fff;
+    border: 2px solid var(--color-dark);
+    color: var(--color-dark);
+    text-decoration: none;
+    font-weight: 900;
+    text-transform: uppercase;
+    font-size: 13px;
+    transition: all 0.1s ease;
+}
+
+.dashboard-card__action-btn:hover {
+    background: var(--color-dark);
+    color: #fff;
 }
 
 .home__footer {
-  text-align: center;
-  color: var(--color-dark-alternate);
-  font-size: 0.95rem;
-  padding-top: 1.5rem;
-  border-top: 1px solid var(--color-gray);
+    border-top: 2px dashed var(--color-dark);
+    padding-top: 15px;
+    text-align: right;
 }
 
-.home-loading,
-.home-error {
-  text-align: center;
-  padding: 2rem;
-  font-size: 1.1rem;
+.home__footer-text {
+    font-size: 12px;
+    font-weight: 700;
+    text-transform: uppercase;
+    color: #555;
 }
 
-.home-error {
-  color: #d32f2f;
+.dashboard-card__text {
+    font-weight: 700;
+    font-size: 14px;
+    margin: 0 0 20px 0;
+    line-height: 1.4;
+}
+
+.dashboard-card__admin-access {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    height: 100%;
 }
