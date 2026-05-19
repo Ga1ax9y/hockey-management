@@ -203,8 +203,8 @@ svg * {
     transition-property: fill, stroke;
 }
 
-svg *[fill] {fill: currentColor;}
-svg *[stroke] {stroke: currentColor;}
+/* svg *[fill] {fill: currentColor;}
+svg *[stroke] {stroke: currentColor;} */
 
 .visually-hidden {
     position: absolute !important;

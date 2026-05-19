@@ -102,11 +102,83 @@
 	font-family: "Courier New", Courier, monospace;
 }
 
+.chart-tooltip {
+    background: #ffffff;
+    border: 3px solid var(--color-dark, #222);
+    box-shadow: 4px 4px 0px var(--color-dark, #222);
+    padding: 12px;
+    font-family: inherit;
+}
+
+.chart-tooltip__opponent {
+    font-weight: 900;
+    text-transform: uppercase;
+    font-size: 14px;
+    margin: 0 0 2px 0;
+    color: var(--color-dark, #222);
+}
+
+.chart-tooltip__date {
+    font-size: 11px;
+    font-weight: 700;
+    color: #666;
+    margin: 0 0 8px 0;
+}
+
+.chart-tooltip__divider {
+    border-top: 2px solid var(--color-dark, #222);
+    margin-bottom: 8px;
+}
+
+.chart-tooltip__stat {
+    font-size: 12px;
+    font-weight: 700;
+    margin: 0 0 4px 0;
+    text-transform: uppercase;
+}
+
+.chart-tooltip__stat:last-child {
+    margin-bottom: 0;
+}
+
+.chart-tooltip__stat--main {
+    color: #ff4757;
+    font-weight: 900;
+    font-size: 13px;
+}
+
 .text-pos {
 	color: #00a300;
 }
 .text-neg {
 	color: #e50000;
+}
+
+.player-matches__chart-container {
+    margin-top: 40px;
+    background: #fff;
+    border: 3px solid var(--color-dark, #222);
+    box-shadow: 6px 6px 0px var(--color-dark, #222);
+    padding: 24px;
+}
+
+.dashboard-card__title {
+    font-size: 18px;
+    font-weight: 900;
+    text-transform: uppercase;
+    margin: 0 0 20px 0;
+    border-bottom: 2px solid var(--color-dark, #222);
+    padding-bottom: 8px;
+    letter-spacing: -0.5px;
+}
+
+.player-matches__chart-wrapper {
+    padding-top: 10px;
+}
+
+.recharts-text {
+    font-family: inherit;
+    text-transform: uppercase;
 }
 
 @media (max-width: 600px) {

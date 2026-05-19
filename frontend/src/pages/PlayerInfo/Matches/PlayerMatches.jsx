@@ -5,6 +5,16 @@ import "./PlayerMatches.css";
 import Loader from "../../../components/layout/Loader/Loader";
 import { isoToRuDate } from "../../../utils/date";
 import Pagination from "../../../components/layout/Pagination/Pagination";
+import {
+	LineChart,
+	Line,
+	XAxis,
+	YAxis,
+	CartesianGrid,
+	Tooltip,
+	Legend,
+	ResponsiveContainer,
+} from "recharts";
 export default function PlayerMatches() {
 	const { id } = useParams();
 	const [stats, setStats] = useState([]);
@@ -21,7 +31,10 @@ export default function PlayerMatches() {
 		const fetchStats = async (currentPage = 1) => {
 			try {
 				setLoading(true);
-				const response = await getMatchStats(id, { page: currentPage, limit: 5 });
+				const response = await getMatchStats(id, {
+					page: currentPage,
+					limit: 5,
+				});
 				setStats(response.data.data || []);
 				setMeta(response.data.meta);
 			} catch (err) {
@@ -32,6 +45,35 @@ export default function PlayerMatches() {
 		};
 		fetchStats(page);
 	}, [id, page]);
+
+	const chartData = [...stats].reverse().map((item) => ({
+		date: isoToRuDate(item.match.matchDate).split(" ")[0],
+		dateStr: isoToRuDate(item.match.matchDate),
+		opponent: item.match.opponentName,
+		Points: item.goals + item.assists,
+		Goals: item.goals,
+		Assists: item.assists,
+	}));
+	const CustomTooltip = ({ active, payload }) => {
+		if (active && payload && payload.length) {
+			const data = payload[0].payload;
+			return (
+				<div className="chart-tooltip">
+					<p className="chart-tooltip__opponent">{data.opponent}</p>
+					<p className="chart-tooltip__date">{data.dateStr}</p>
+					<div className="chart-tooltip__divider"></div>
+					<p className="chart-tooltip__stat chart-tooltip__stat--main">
+						Очки: {data.Points}
+					</p>
+					<p className="chart-tooltip__stat">Голы: {data.Goals}</p>
+					<p className="chart-tooltip__stat">
+						Передачи: {data.Assists}
+					</p>
+				</div>
+			);
+		}
+		return null;
+	};
 
 	if (loading) return <Loader />;
 
@@ -110,6 +152,70 @@ export default function PlayerMatches() {
 			{!loading && meta && (
 				<div className="players-page__pagination">
 					<Pagination meta={meta} onPageChange={handlePageChange} />
+				</div>
+			)}
+			{chartData.length > 0 && (
+				<div className="player-matches__chart-container dashboard-card">
+					<h3 className="dashboard-card__title">
+						Динамика набранных очков
+					</h3>
+					<div className="player-matches__chart-wrapper">
+						<ResponsiveContainer width="100%" height={300}>
+							<LineChart
+								data={chartData}
+								margin={{
+									top: 10,
+									right: 15,
+									left: -20,
+									bottom: 0,
+								}}
+							>
+								<CartesianGrid
+									strokeDasharray="3 3"
+									stroke="#222222"
+									opacity={0.15}
+								/>
+
+								<XAxis
+									dataKey="date"
+									tick={{
+										fill: "#222222",
+										fontWeight: 700,
+										fontSize: 11,
+									}}
+									stroke="#222222"
+								/>
+
+								<YAxis
+									dataKey="Points"
+									allowDecimals={false}
+									tick={{ fill: "#222222", fontWeight: 700 }}
+									stroke="#222222"
+								/>
+
+								<Tooltip content={<CustomTooltip />} />
+
+								<Line
+									type="linear"
+									dataKey="Points"
+									stroke="#222222"
+									strokeWidth={4}
+									dot={{
+										stroke: "#222222",
+										strokeWidth: 2,
+										r: 5,
+										fill: "#fff",
+									}}
+									activeDot={{
+										stroke: "#222222",
+										strokeWidth: 3,
+										r: 8,
+										fill: "#ff4757",
+									}}
+								/>
+							</LineChart>
+						</ResponsiveContainer>
+					</div>
 				</div>
 			)}
 		</div>
