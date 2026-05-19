@@ -198,7 +198,7 @@ export default function TeamDetails() {
 						<footer className="team-card__actions">
 							<button
 								className="team-card__btn team-card__btn--main"
-								onClick={() => navigate(`/teams/${id}/members`)}
+								onClick={() => navigate(`/management/teams/${id}/members`)}
 							>
 								ПОСМОТРЕТЬ СОСТАВ
 							</button>

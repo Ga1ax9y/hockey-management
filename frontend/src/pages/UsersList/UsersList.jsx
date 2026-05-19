@@ -51,7 +51,7 @@ export default function UsersList() {
 				<button
 					className="users-page__add-btn"
 					onClick={() =>
-						(window.location.href = "/admin/users/create")
+						(window.location.href = "/management/users/create")
 					}
 				>
 					+ Добавить
