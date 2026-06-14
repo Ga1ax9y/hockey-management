@@ -159,7 +159,7 @@ export default function MatchProtocol() {
 							{[
 								"Г",
 								"П",
-								"Ш",
+								"Б",
 								"Хит",
 								"+/-",
 								"Вбр",

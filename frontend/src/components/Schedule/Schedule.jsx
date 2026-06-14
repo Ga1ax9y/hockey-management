@@ -47,7 +47,7 @@ const Schedule = ({ teamId }) => {
 	});
 
 	useEffect(() => {
-		const handleClick = () => setContextMenu(null);
+		const handleClick = () => { setContextMenu(null);}
 		window.addEventListener("click", handleClick);
 		return () => window.removeEventListener("click", handleClick);
 	}, []);
@@ -88,6 +88,7 @@ const Schedule = ({ teamId }) => {
 
 	const openCreateModal = (type) => {
 		setModalType(type);
+		setModalMode("CREATE");
 		const dateStr = new Intl.DateTimeFormat("sv-SE").format(
 			contextMenu.date,
 		);
@@ -121,7 +122,6 @@ const Schedule = ({ teamId }) => {
 		setEditingId(event.id);
 
 		if (type === "TRAINING") {
-			console.log(event);
 			setTrainingFormData({
 				startTime: formatToInputDateTime(event.start),
 				endTime: formatToInputDateTime(event.end),
@@ -158,7 +158,6 @@ const Schedule = ({ teamId }) => {
 	const handleDelete = async (event) => {
 		if (!window.confirm("Удалить это событие?")) return;
 		try {
-			console.log(event.id);
 			if (event.extendedProps.type === "MATCH") {
 				await deleteMatch(event.id);
 			} else {
@@ -220,7 +219,8 @@ const Schedule = ({ teamId }) => {
 			alert(err.response?.data?.message || "Ошибка при сохранении");
 		}
 	};
-	const fetchEvents = async (info, successCallback, failureCallback) => {
+const fetchEvents = useCallback(
+    async (info, successCallback, failureCallback) => {
 		try {
 			const response = await getSchedule(teamId, {
 				startDate: info.startStr,
@@ -253,7 +253,10 @@ const Schedule = ({ teamId }) => {
 			console.error("Error loading schedule:", error);
 			failureCallback(error);
 		}
-	};
+	},
+	[teamId]
+);
+
 
 	const renderEventContent = (eventInfo) => {
 		const type = eventInfo.event.extendedProps.type;

@@ -13,6 +13,17 @@ import Loader from "../../../components/layout/Loader/Loader";
 import ErrorPage from "../../Error/ErrorPage";
 import { CONTRACT_TYPE } from "../../../utils/dicts";
 import Pagination from "../../../components/layout/Pagination/Pagination";
+
+const formatDateInput = (value) => {
+    const digits = value.replace(/\D/g, "").slice(0, 8);
+
+    if (digits.length <= 2) return digits;
+    if (digits.length <= 4)
+        return `${digits.slice(0, 2)}.${digits.slice(2)}`;
+
+    return `${digits.slice(0, 2)}.${digits.slice(2, 4)}.${digits.slice(4)}`;
+};
+
 export default function Players() {
 	const [players, setPlayers] = useState([]);
 	const [page, setPage] = useState(1);
@@ -244,7 +255,7 @@ export default function Players() {
 								onChange={(e) =>
 									setFormData({
 										...formData,
-										birthDate: e.target.value,
+										birthDate: formatDateInput(e.target.value),
 									})
 								}
 								required
@@ -364,7 +375,7 @@ export default function Players() {
 								onChange={(e) =>
 									setFormData({
 										...formData,
-										contractExpiry: e.target.value,
+										contractExpiry: formatDateInput(e.target.value),
 									})
 								}
 							/>
