@@ -137,7 +137,7 @@ export const ScheduleService = {
             })),
         ]
         const paginatedEvents = allEvents
-        .sort((a, b) => a.sortDate - b.sortDate)
+        .sort((a, b) => b.sortDate - a.sortDate)
         .slice(skip, skip + limit);
 
         return {
